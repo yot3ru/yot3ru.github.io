@@ -57,6 +57,18 @@ npm run build
 npm run preview
 ```
 
+## GitHub Pages
+
+The repository includes a GitHub Actions workflow at
+`.github/workflows/deploy-pages.yml`. Push the `main` branch, then set the
+repository's Pages source to **GitHub Actions** under Settings → Pages. The
+workflow builds `dist` and publishes that output; GitHub Pages must not publish
+the repository root because the source `index.html` still points to Vite's
+development entrypoint.
+
+Vite uses relative production URLs, so the same build works at both a project
+URL such as `https://name.github.io/lufi/` and a custom domain root.
+
 ## Project structure
 
 ```text
