@@ -68,6 +68,7 @@ development entrypoint.
 
 Vite uses relative production URLs, so the same build works at both a project
 URL such as `https://name.github.io/lufi/` and a custom domain root.
+The repository also includes `public/CNAME` for `lufi.lk`.
 
 ## Project structure
 
