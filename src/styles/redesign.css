@@ -530,3 +530,64 @@ h3{font-size:1.1875rem;font-weight:600;line-height:1.25;letter-spacing:-.012em;c
     border-left:0;
   }
 }
+
+/* Loading plate -----------------------------------------------------------
+   The mark is a small vessel: the cinnabar fill rises as real page assets
+   settle, then the plate dissolves without blocking the first interaction. */
+.loader{
+  position:fixed;
+  inset:0;
+  z-index:300;
+  display:grid;
+  place-items:center;
+  background:var(--ink);
+  color:var(--bone);
+  opacity:1;
+  visibility:visible;
+  transition:opacity .62s var(--glide),visibility 0s linear .62s;
+}
+.loader.is-done{opacity:0;visibility:hidden;pointer-events:none}
+.loader__stage{display:grid;justify-items:center;gap:1.15rem;width:min(10rem,42vw)}
+.loader__mark{position:relative;width:clamp(3.25rem,11vw,5.5rem);aspect-ratio:879/1654;overflow:hidden}
+.loader__mark svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.loader__mark-base use{fill:var(--bone);opacity:.18}
+.loader__mark-liquid{clip-path:inset(calc(100% - var(--loader-fill,0%)) 0 0 0)}
+.loader__mark-liquid use{fill:var(--cinnabar)}
+.loader__rule{width:100%;height:1px;background:var(--bone-18);overflow:hidden}
+.loader__rule span{display:block;width:100%;height:100%;background:var(--cinnabar);transform:scaleX(0);transform-origin:left;transition:transform .25s var(--glide)}
+.loader__label{display:flex;justify-content:space-between;align-items:center;width:100%;font:500 .625rem/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--bone-70)}
+.loader__label b{color:var(--bone);font-variant-numeric:tabular-nums;font-weight:500}
+@media (prefers-reduced-motion:reduce){
+  .loader,.loader__rule span{transition:none}
+}
+
+/* Mobile is a vertical sequence of complete chapters. Earlier desktop
+   constraints capped the frame itself, which clipped long copy on short
+   phones. Let the chapter own its height while the reel still snaps to its
+   start; no hidden inner scroll trap. */
+@media (max-width:760px){
+  :root{
+    --margin:clamp(1rem,5vw,1.35rem);
+    --page-block:clamp(1.25rem,4svh,2.25rem);
+    --page-block-end:calc(var(--page-block) + 3rem);
+    --copy-size:clamp(.875rem,3.7vw,1rem);
+  }
+  .reel{height:100svh;overflow-x:hidden;overflow-y:auto;scroll-snap-type:y mandatory;scroll-padding-top:0;-webkit-overflow-scrolling:touch}
+  .frame{height:auto;min-height:100svh;max-height:none;overflow:visible;scroll-snap-align:start}
+  .frame__in{height:auto;min-height:100svh;max-height:none;overflow:visible;padding:calc(var(--page-block) + 3rem) var(--margin) calc(var(--page-block-end) + 2rem) calc(var(--margin) + var(--rail-w));gap:clamp(1.25rem,5svh,2.25rem)}
+  .frame--hero .frame__in,.frame--end .frame__in{min-height:100svh}
+  .frame--hero .lockup__vis{width:min(68cqi,13rem)}
+  .frame--hero .tagline{font-size:clamp(2.25rem,11vw,3.5rem);line-height:.96}
+  .frame--hero .lede{max-width:34ch;font-size:var(--copy-size);line-height:1.5}
+  .frame--make .frame__in,.frame--fit .frame__in{gap:clamp(1.75rem,6svh,2.75rem)}
+  .frame--make .offer__row{padding-block:.8rem;row-gap:.35rem}
+  .frame--make .offer__body p,.frame--work .pass li p,.ticks li{font-size:var(--copy-size);line-height:1.45}
+  .frame--make .offer__out{font-size:.625rem;line-height:1.35}
+  .frame--work .pass{gap:clamp(1.25rem,5svh,2rem)}
+  .frame--work .pass li{padding-top:.8rem;gap:.65rem}
+  .frame--work .pull{margin-top:.25rem}
+  .frame--gal .frame__in{gap:clamp(1.25rem,4svh,2rem)}
+  .frame--gal .piece__vis{aspect-ratio:16/10}
+  .frame--fit .fit__cols{gap:clamp(1.5rem,5svh,2.25rem)}
+  .frame--end h2{font-size:clamp(2.75rem,12vw,4rem)}
+}

@@ -109,7 +109,8 @@ export async function mount(canvas, options = {}) {
   function loop(now) {
     if (!running) return;
     raf = requestAnimationFrame(loop);
-    if (now-last<1000/60-1) return;
+    const frameInterval = 1000 / (options.fps || 60);
+    if (now-last<frameInterval-1) return;
     const dt = Math.min((now-last)/1000,1/30); last = now;
     if (!motion.matches) {
       const follow = 1-Math.exp(-dt*13);

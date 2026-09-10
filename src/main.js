@@ -22,6 +22,48 @@ let reduced = motionPreference.matches;
 motionPreference.addEventListener('change', event => { reduced = event.matches; });
 const compact = matchMedia("(max-width:1100px), (max-height:760px), (max-aspect-ratio:13/10)");
 
+/* ---------- first paint --------------------------------------------------
+   The mark is the loading vessel: image/font readiness raises a warm fill,
+   then the whole plate clears once the browser has a usable first frame. */
+{
+  const loader = document.querySelector('[data-loader]');
+  if (loader) {
+    const images = [...document.images];
+    const pct = loader.querySelector('[data-loader-pct]');
+    const rule = loader.querySelector('[data-loader-rule]');
+    let finished = false;
+    const setProgress = (value) => {
+      const amount = Math.max(0, Math.min(1, value));
+      const text = `${Math.round(amount * 100)}%`;
+      loader.style.setProperty('--loader-fill', `${amount * 100}%`);
+      if (pct) pct.textContent = text;
+      if (rule) rule.style.transform = `scaleX(${amount})`;
+    };
+    const update = () => {
+      const imageProgress = images.length
+        ? images.filter((image) => image.complete).length / images.length
+        : 1;
+      const fontsReady = document.fonts?.status === 'loaded' ? 1 : 0;
+      setProgress(imageProgress * 0.82 + fontsReady * 0.18);
+    };
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      setProgress(1);
+      loader.classList.add('is-done');
+      window.setTimeout(() => loader.remove(), reduced ? 80 : 720);
+    };
+    images.forEach((image) => {
+      image.addEventListener('load', update, { once: true, passive: true });
+      image.addEventListener('error', update, { once: true, passive: true });
+    });
+    document.fonts?.ready?.then(update);
+    window.addEventListener('load', finish, { once: true });
+    window.setTimeout(finish, 4200);
+    update();
+  }
+}
+
 /* ---------- which frame is locked -----------------------------------------
    Drives the rail's aria-current and the counter. `scroll-state(snapped)`
    handles the frame's own styling in CSS; this is the part CSS cannot do,
@@ -264,12 +306,12 @@ const compact = matchMedia("(max-width:1100px), (max-height:760px), (max-aspect-
 {
   const mats = [...document.querySelectorAll("[data-mat]")];
   const nav = navigator;
-  const affordable =
-    !nav.connection?.saveData &&
-    !(nav.deviceMemory !== undefined && nav.deviceMemory < 4) &&
-    !(nav.hardwareConcurrency !== undefined && nav.hardwareConcurrency < 4);
+  const constrained =
+    nav.connection?.saveData ||
+    nav.deviceMemory === 1 ||
+    nav.hardwareConcurrency === 1;
 
-  if (mats.length && affordable) {
+  if (mats.length && !constrained) {
     import("./chrome.js").then(async ({ mount }) => {
       for (const [i, el] of mats.entries()) {
         const canvas = document.createElement("canvas");
@@ -280,17 +322,17 @@ const compact = matchMedia("(max-width:1100px), (max-height:760px), (max-aspect-
           seed: Number(el.dataset.seed || 12) + i * 7,
           dark: true,
           pointer: !coarse,
-          cap: 1.5,
+          cap: coarse ? 0.85 : 1.5,
+          fps: coarse ? 30 : 60,
         });
 
         if (!api) { canvas.remove(); continue; }   // the CSS still stays
         el.classList.add("is-live");
 
-        // phones and reduced motion get one frame, not an animation: the
-        // shader is fill-rate bound and a still carries the same idea
-        api.once();                       // correct on the first paint
+        // Phones use a lower-resolution, 30fps pass; reduced motion stays still.
+        api.once();
         let visible = false;
-        const sync = () => visible && !document.hidden && !reduced && !coarse ? api.start() : api.stop();
+        const sync = () => visible && !document.hidden && !reduced ? api.start() : api.stop();
         const io = new IntersectionObserver(
           (es) => { visible = es[0].isIntersecting; sync(); },
           { root: reel, threshold: 0 }
