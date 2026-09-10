@@ -1,0 +1,568 @@
+/* ==========================================================================
+   LUFI — the gate
+   Six frames run under one master container and lock into place.
+   ========================================================================== */
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bone);color:var(--ink);
+  font:400 1rem/1.5 var(--sans);
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;              /* the reel scrolls, not the document */
+}
+img,svg{display:block;max-width:100%}
+h1,h2,h3,p,ol,ul,figure,blockquote{margin:0}
+ol,ul{padding:0;list-style:none}
+a{color:inherit;text-decoration:none}
+b,i{font-style:normal;font-weight:inherit}
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip-path:inset(50%);white-space:nowrap;border:0}
+
+.skip{
+  position:fixed;top:-100px;left:var(--s4);z-index:200;
+  background:var(--ink);color:var(--bone);padding:var(--s3) var(--s5);
+  font:500 .8125rem/1 var(--sans);transition:top .18s var(--glide);
+}
+.skip:focus{top:var(--s4)}
+
+:where(a,button,[tabindex]):focus-visible{
+  outline:2px solid var(--cinnabar);outline-offset:3px;border-radius:2px;
+}
+
+/* ==========================================================================
+   THE MASTER CONTAINER
+   Every frame snaps inside this element, so composition never depends on the
+   document's own scroll height — which is what drifted between browsers.
+
+   `proximity`, never `mandatory`: mandatory snapping makes anything taller
+   than the viewport unreachable and strands keyboard focus on partly visible
+   targets. Frames that fit still land exactly; frames that grow stay readable.
+   ========================================================================== */
+.reel{
+  height:100svh;width:100%;
+  overflow-y:auto;overflow-x:hidden;
+  scroll-snap-type:y proximity;
+  overscroll-behavior-y:contain;
+  scrollbar-width:none;
+}
+.reel::-webkit-scrollbar{display:none}
+
+.frame{
+  position:relative;
+  scroll-snap-align:start;
+  scroll-snap-stop:always;      /* one frame per gesture: the gate holds */
+  height:100svh;
+  display:grid;
+  align-content:stretch;
+  /* Each frame is its own size container, so type can be bound to BOTH axes
+     of the frame rather than to the viewport. */
+  container-type:inline-size;container-name:frame;
+  isolation:isolate;
+}
+
+/* The frame's inner column is an inline container in its own right. Display
+   type sized against the frame would be sized against a box twice as wide as
+   the column that actually holds the words. */
+.frame__in{
+  width:min(100%, 96rem);
+  margin-inline:auto;
+  padding:clamp(2rem,6.5svh,4.5rem) var(--margin) clamp(1.75rem,5.5svh,3.5rem)
+          calc(var(--margin) + var(--rail-w));
+  container-type:inline-size;container-name:col;
+  position:relative;z-index:2;
+  display:grid;align-content:center;
+  gap:clamp(.5rem,2.2svh,2rem);
+  height:100%;
+}
+
+/* --- frames react when they lock -----------------------------------------
+   2026: a snapped frame is a real CSS state. Progressive enhancement — where
+   it is unsupported the frame simply stays in its resting style. */
+@supports (container-type:scroll-state){
+  .frame{container-type:inline-size scroll-state}
+  @container scroll-state(snapped: y){
+    .frame__in>*{--locked:1}
+    .stamp::after{transform:scaleX(1)}
+    .rail__perf{--x:1}
+  }
+}
+
+/* ==========================================================================
+   THE RAIL — perforation strip, and the section tabs
+   ========================================================================== */
+:root{--rail-w:clamp(3.25rem,5vw,4.75rem)}
+
+.rail{
+  position:fixed;inset:0 auto 0 0;z-index:60;
+  width:var(--rail-w);
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:space-between;
+  padding-block:var(--s5);
+  border-right:1px solid var(--ink-14);
+  background:var(--bone);
+  transition:background-color .7s var(--glide),border-color .7s var(--glide),color .7s var(--glide);
+}
+.rail[data-dark]{background:var(--ink);border-color:var(--bone-18);color:var(--bone)}
+.rail[data-dark] .rail__logo svg{--mark-fill:var(--bone)}
+.rail[data-dark] .rail__perf a::before{border-color:var(--bone-40)}
+.rail[data-dark] .rail__perf a:hover::before{border-color:var(--bone)}
+.rail[data-dark] .rail__perf a[aria-current="true"]::before{background:var(--cinnabar);border-color:var(--cinnabar)}
+.rail[data-dark] .rail__count{color:var(--bone-70)}
+.rail[data-dark] .rail__count b{color:var(--bone)}
+.rail__logo{display:block;width:clamp(1.25rem,2vw,1.6rem)}
+.rail__logo svg{width:100%;height:auto;--mark-fill:var(--ink)}
+
+.rail__perf{display:grid;gap:clamp(.5rem,1.6vh,1rem);justify-items:center}
+.rail__perf a{
+  display:grid;place-items:center;
+  width:22px;height:22px;position:relative;
+}
+/* the perforation itself */
+.rail__perf a::before{
+  content:"";width:9px;height:9px;border-radius:50%;
+  border:1.5px solid var(--ink-28);
+  background:transparent;
+  transition:background .22s var(--glide),border-color .22s var(--glide),
+             transform .22s var(--settle);
+}
+.rail__perf a:hover::before{border-color:var(--ink-70)}
+.rail__perf a[aria-current="true"]::before{
+  background:var(--cinnabar);border-color:var(--cinnabar);transform:scale(1.25);
+}
+/* the label rides out on hover and focus, never permanently occupying width */
+.rail__perf span{
+  position:absolute;left:calc(100% + .5rem);
+  font:500 .625rem/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;
+  white-space:nowrap;color:var(--ink-70);
+  background:var(--bone);padding:.35rem .5rem;
+  opacity:0;transform:translateX(-4px);pointer-events:none;
+  transition:opacity .18s var(--glide),transform .18s var(--glide);
+}
+.rail__perf a:hover span,.rail__perf a:focus-visible span{opacity:1;transform:none}
+
+.rail__count{
+  font:500 .625rem/1 var(--display);font-variant-numeric:tabular-nums;
+  letter-spacing:.08em;color:var(--ink-50);
+  display:grid;justify-items:center;gap:.15rem;
+}
+.rail__count b{color:var(--ink);font-weight:600}
+.rail__count i{opacity:.4}
+
+/* ==========================================================================
+   TYPE
+   Bound to both axes of the frame, and to the width of its own column.
+   ========================================================================== */
+.stamp{
+  font:500 clamp(.625rem,1.1cqi,.75rem)/1 var(--sans);
+  letter-spacing:.2em;text-transform:uppercase;color:var(--ink-70);
+  display:flex;align-items:center;gap:.6rem;
+}
+.stamp i{color:var(--cinnabar)}
+.stamp::after{
+  content:"";flex:1;height:1px;background:var(--ink-28);
+  transform:scaleX(var(--locked,0));transform-origin:left;
+  transition:transform .7s var(--settle);
+}
+.stamp--light{color:var(--bone-70)}
+.stamp--light::after{background:var(--bone-40)}
+
+h2{
+  font-family:var(--display);font-weight:600;
+  font-size:clamp(1.375rem, min(9.4cqi, 8.6svh), 5.5rem);
+  line-height:.95;letter-spacing:-.035em;
+}
+h3{
+  font-family:var(--display);font-weight:600;
+  font-size:clamp(.9375rem, min(2.5cqi, 2.5svh), 1.375rem);
+  line-height:1.1;letter-spacing:-.018em;
+}
+.lede{
+  font-size:clamp(.8125rem, min(2cqi, 2.3svh), 1.1875rem);
+  line-height:1.45;color:var(--ink-70);max-width:44ch;
+}
+.lede--light{color:var(--bone-70)}
+.head{display:grid;gap:clamp(.35rem,1.5svh,1.25rem)}
+.head--row{
+  display:grid;grid-template-columns:1fr auto;align-items:end;
+  gap:clamp(1rem,4cqi,3rem);
+}
+.note{font-size:clamp(.8125rem,1.5cqi,.9375rem);line-height:1.45;
+  color:var(--ink-70);max-width:34ch;text-align:right}
+.foot{font-size:clamp(.75rem, min(1.5cqi, 1.9svh), .9375rem);line-height:1.4;
+  color:var(--ink-70);max-width:52ch}
+
+/* ==========================================================================
+   01 · HERO
+   ========================================================================== */
+.frame--hero .frame__in{align-content:center}
+.hero{position:relative;z-index:2}
+
+.lockup{margin:0}
+.lockup__vis{display:block;width:min(100%, 62cqi, 46svh)}
+.lockup__svg{
+  width:100%;height:auto;
+  --mark-fill:var(--ink);--word-fill:var(--cinnabar-deep);
+}
+
+/* The tagline is authored in two lines. Sized to the exact maximum they still
+   wrapped, so each line is its own block that cannot break: the line count is
+   fixed by the markup, not by rounding. */
+.tagline{
+  font-family:var(--display);font-weight:500;
+  font-size:clamp(1.125rem, min(6.6cqi, 6.2svh), 3.75rem);
+  line-height:1.02;letter-spacing:-.03em;
+}
+.tagline span{display:block;white-space:nowrap}
+.tagline span:last-child{color:var(--cinnabar)}
+
+.acts{display:flex;flex-wrap:wrap;gap:var(--s3) var(--s4);align-items:center}
+.act{
+  display:inline-flex;align-items:center;gap:.6rem;
+  font:500 clamp(.8125rem,1.7cqi,.9375rem)/1 var(--sans);
+  padding:clamp(.6rem,1.5svh,.9rem) clamp(1rem,2.6cqi,1.35rem);border:1px solid transparent;
+  transition:background .28s var(--glide),color .28s var(--glide),
+             border-color .28s var(--glide),transform .34s var(--settle);
+}
+.act:active{transform:scale(.975);transition-duration:.09s;transition-timing-function:var(--press)}
+.act--go{background:var(--cinnabar);color:#fff}   /* the one gloss exception */
+.act--go svg{width:18px;height:18px;transition:transform .24s var(--settle)}
+.act--go:hover{background:var(--ink)}
+.act--go:hover svg{transform:translateX(4px)}
+.act--quiet{border-color:var(--ink-28);color:var(--ink)}
+.act--quiet:hover{border-color:var(--ink);background:var(--ink);color:var(--bone)}
+.act--light{border-color:var(--bone-40);color:var(--bone)}
+.act--light:hover{background:var(--bone);color:var(--ink);border-color:var(--bone)}
+.act.is-placeholder{cursor:default;opacity:.72}
+.act.is-placeholder:hover{background:transparent;color:inherit;border-color:inherit;transform:none}
+.act--go.is-placeholder:hover{background:var(--cinnabar);color:#fff}
+.placeholder-link{color:var(--bone-40);cursor:default}
+
+.cue{
+  position:absolute;left:calc(var(--margin) + var(--rail-w));bottom:var(--s5);
+  font:500 .625rem/1 var(--sans);letter-spacing:.24em;text-transform:uppercase;
+  color:var(--ink-50);z-index:2;
+}
+.cue span{display:inline-block;animation:nudge 2.6s var(--glide) infinite}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+
+/* ==========================================================================
+   02 · WHAT WE MAKE — the offer, priced posture without invented prices
+   ========================================================================== */
+.offer{display:grid;gap:0;border-top:1px solid var(--ink-14)}
+.offer__row{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:baseline;gap:clamp(.75rem,2.6cqi,2rem);
+  padding:clamp(.28rem,1.1svh,1.05rem) 0;
+  border-bottom:1px solid var(--ink-14);
+  transition:transform .42s var(--settle);
+}
+.offer__row:hover{transform:translateX(.75rem)}
+.offer__no{
+  font:600 clamp(.6875rem,1.3cqi,.8125rem)/1 var(--display);
+  font-variant-numeric:tabular-nums;color:var(--cinnabar);letter-spacing:.04em;
+}
+.offer__body{display:grid;gap:.3rem}
+.offer__body p{font-size:clamp(.75rem, min(1.5cqi, 1.9svh), .9375rem);line-height:1.4;color:var(--ink-70)}
+.offer__out{
+  font:500 clamp(.625rem,1.15cqi,.75rem)/1.3 var(--sans);
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ink-50);
+  text-align:right;white-space:nowrap;
+}
+.offer__out i{color:var(--ink-28)}
+
+/* ==========================================================================
+   03 · HOW WE WORK
+   ========================================================================== */
+.pass{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:clamp(1rem,3cqi,2.5rem);
+}
+.pass li{
+  display:grid;gap:.6rem;align-content:start;
+  padding-top:clamp(.4rem,1.5svh,1.1rem);
+  border-top:2px solid var(--ink);
+}
+.pass__no{
+  font:600 clamp(.6875rem,1.3cqi,.8125rem)/1 var(--display);
+  font-variant-numeric:tabular-nums;color:var(--cinnabar);
+}
+.pass li p{font-size:clamp(.75rem, min(1.45cqi, 1.9svh), .9375rem);line-height:1.4;color:var(--ink-70)}
+
+.pull{
+  border-left:2px solid var(--cinnabar);
+  padding-left:clamp(.85rem,2.4cqi,1.5rem);
+  max-width:56ch;
+}
+.pull p{
+  font:400 italic clamp(.875rem, min(2.3cqi, 2.8svh), 1.5rem)/1.3 var(--quote);
+  color:var(--ink-90);letter-spacing:-.01em;
+}
+
+/* ==========================================================================
+   04 · WORK — a horizontal band inside the frame, scrolled on its own axis
+   so it never fights the vertical gate.
+   ========================================================================== */
+.frame--gal .frame__in{align-content:center}
+.reel-x{
+  display:grid;grid-auto-flow:column;
+  grid-auto-columns:clamp(9rem, min(26cqi, 26svh), 19rem);
+  gap:clamp(.75rem,2cqi,1.5rem);
+  overflow-x:auto;overscroll-behavior-x:contain;
+  scroll-snap-type:x proximity;
+  padding-bottom:var(--s3);
+  scrollbar-width:thin;scrollbar-color:var(--ink-28) transparent;
+}
+.piece{scroll-snap-align:start;display:grid;gap:.7rem}
+.piece__vis{overflow:hidden;background:var(--stock);aspect-ratio:4/5}
+.piece__vis img{width:100%;height:100%;object-fit:cover;
+  transition:transform .62s var(--settle)}
+.piece:hover .piece__vis img{transform:scale(1.03)}
+.piece__meta{display:grid;gap:.3rem}
+.piece__ann{font-size:clamp(.75rem,1.35cqi,.8125rem);line-height:1.45;color:var(--ink-70)}
+.piece__tag{
+  font:500 .625rem/1 var(--sans);letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-50);
+}
+.piece__tag i{color:var(--ink-28)}
+
+/* ==========================================================================
+   05 · FIT
+   ========================================================================== */
+.fit__cols{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:clamp(1.25rem,4cqi,3.5rem);
+}
+.fit__lbl{
+  font:500 clamp(.625rem,1.15cqi,.75rem)/1 var(--sans);
+  letter-spacing:.16em;text-transform:uppercase;
+  padding-bottom:.6rem;margin-bottom:.85rem;border-bottom:1px solid var(--ink-14);
+}
+.fit__lbl--yes{color:var(--cinnabar)}
+.fit__lbl--no{color:var(--ink-50)}
+.ticks{display:grid;gap:clamp(.3rem,1.1svh,.6rem)}
+.ticks li{
+  display:grid;grid-template-columns:auto minmax(0,1fr);gap:.6rem;
+  font-size:clamp(.75rem, min(1.5cqi, 1.9svh), .9375rem);line-height:1.4;
+}
+.ticks li::before{
+  content:"";width:10px;height:10px;margin-top:.42em;
+  border-left:1.5px solid var(--cinnabar);border-bottom:1.5px solid var(--cinnabar);
+  transform:rotate(-45deg) translateY(-1px);
+}
+.ticks--no li::before{
+  border:0;border-top:1.5px solid var(--ink-28);transform:none;
+  width:12px;height:0;margin-top:.72em;
+}
+
+/* ==========================================================================
+   06 · BRIEF US — the ink field. One committed region, not an accent.
+   ========================================================================== */
+.frame--end{background:var(--ink);color:var(--bone)}
+.frame--end .frame__in{align-content:center}
+.end h2{color:var(--bone)}
+.acts--end{margin-top:var(--s2)}
+.act--big{
+  padding:1.05rem 1.6rem;
+  font-size:clamp(.875rem,1.9cqi,1.0625rem);
+}
+.act--big b{opacity:.72;font-weight:400}
+.act--quiet.act--light b{opacity:.72;margin-left:.35rem}
+
+.end__foot{
+  display:flex;flex-wrap:wrap;gap:.5rem var(--s5);
+  margin-top:clamp(.75rem,3.5svh,3rem);
+  padding-top:clamp(.6rem,1.8svh,1rem);border-top:1px solid var(--bone-18);
+  font:400 .75rem/1.4 var(--sans);color:var(--bone-40);
+}
+.end__foot i{opacity:.5}
+.end__foot a:hover{color:var(--bone)}
+
+/* ==========================================================================
+   THE MATERIAL
+   A canvas is a REPLACED element: inset:0 alone will not stretch it, so the
+   size is stated explicitly. The still is the fallback and is never removed —
+   a failed context leaves a designed panel, never a blank one.
+   ========================================================================== */
+.mat{
+  --material-mask:linear-gradient(90deg,
+    transparent 0%,transparent 24%,
+    rgb(0 0 0 / .03) 35%,rgb(0 0 0 / .10) 46%,
+    rgb(0 0 0 / .24) 58%,rgb(0 0 0 / .46) 71%,
+    rgb(0 0 0 / .72) 84%,#000 100%);
+  position:absolute;inset:0;z-index:0;overflow:hidden;
+}
+.frame--end .mat{
+  --material-mask:linear-gradient(90deg,
+    transparent 0%,transparent 20%,
+    rgb(0 0 0 / .025) 32%,rgb(0 0 0 / .09) 44%,
+    rgb(0 0 0 / .22) 57%,rgb(0 0 0 / .44) 70%,
+    rgb(0 0 0 / .70) 84%,#000 100%);
+}
+.mat canvas,.mat__still{
+  -webkit-mask-image:var(--material-mask);
+  mask-image:var(--material-mask);
+  -webkit-mask-repeat:no-repeat;
+  mask-repeat:no-repeat;
+  -webkit-mask-size:100% 100%;
+  mask-size:100% 100%;
+}
+.mat canvas{position:absolute;inset:0;width:100%!important;height:100%!important;
+  image-rendering:auto;
+  opacity:0;transition:opacity 1.35s var(--glide)}
+.mat.is-live canvas{opacity:.88}
+.mat.is-live .mat__still{opacity:0}
+.mat__still{
+  position:absolute;inset:0;transition:opacity 1.35s var(--glide);
+  background:
+    radial-gradient(120% 90% at 78% 18%, rgb(205 71 76 / .30) 0%, transparent 58%),
+    radial-gradient(90% 70% at 92% 82%, rgb(24 23 21 / .16) 0%, transparent 60%),
+    var(--bone);
+}
+.frame--end .mat__still{
+  background:
+    radial-gradient(110% 80% at 84% 22%, rgb(205 71 76 / .42) 0%, transparent 62%),
+    var(--ink);
+}
+
+/* ==========================================================================
+   NO SCROLL-REVEAL — deliberately.
+
+   The direction contract refuses "scroll-reveal everywhere" as the agency
+   default, and hiding content until an observer or a timeline says otherwise
+   is the single most common way this page can ship blank. Both mechanisms were
+   built and measured here: view() timelines reported a frozen negative
+   currentTime, and an IntersectionObserver rooted on the scroller does not
+   fire in a pane that is not compositing. Neither is a risk worth a fade.
+
+   Entrances belong to the gate instead. A frame that locks is a real CSS
+   state, and that is what gets expressed.
+   ========================================================================== */
+
+/* the locked frame draws its own rule across, so arriving is felt rather than
+   narrated. Purely additive: an engine without scroll-state simply never
+   draws it, and nothing is ever hidden waiting for it. */
+@supports (container-type:scroll-state){
+  .stamp::after{transform:scaleX(0);transform-origin:left;
+    transition:transform .8s var(--settle)}
+  @container scroll-state(snapped: y){
+    .stamp::after{transform:scaleX(1)}
+  }
+}
+
+/* ==========================================================================
+   THE LOUPE — augmentation only.
+   The native cursor is never hidden: OS cursor size and contrast are
+   accessibility settings, and Windows ignores them entirely once a page
+   overrides the cursor. This rides alongside and only on a fine pointer.
+   ========================================================================== */
+.cursor-reactive{display:none}
+@media (pointer:fine) and (prefers-reduced-motion:no-preference){
+  html.has-reactive-cursor,html.has-reactive-cursor *{cursor:none!important}
+  .cursor-reactive{
+    display:block;position:fixed;top:0;left:0;z-index:150;
+    width:28px;height:28px;border:1px solid var(--cinnabar);border-radius:50%;
+    pointer-events:none;opacity:0;
+    transition:opacity .18s var(--glide),background-color .2s var(--glide),border-color .2s var(--glide);
+    will-change:transform;
+  }
+  .cursor-reactive::after{
+    content:"";position:absolute;inset:50% auto auto 50%;width:3px;height:3px;
+    border-radius:50%;background:var(--cinnabar);transform:translate(-50%,-50%);
+    transition:background-color .2s var(--glide);
+  }
+  .cursor-reactive.is-on{opacity:1}
+  .cursor-reactive.is-hot{background:var(--cinnabar);border-color:var(--cinnabar)}
+  .cursor-reactive.is-hot::after{background:var(--bone)}
+  .cursor-reactive.is-down{background:var(--bone);border-color:var(--bone)}
+  .cursor-reactive.is-down::after{background:var(--ink)}
+}
+
+/* ==========================================================================
+   COMPACT — stated LAST on purpose.
+   A plain selector written after a media block beats it, which previously
+   shipped desktop type sizes to phones. Everything that must win at small
+   sizes lives here, at the end of the file.
+
+   A tab still fits its viewport here. The earlier version let frames grow on
+   a narrow or short window, which is exactly how the hero's buttons ended up
+   under the taskbar: growth does not remove the overflow, it just moves it
+   off screen where snap cannot correct it. These rules keep every height
+   term, so the frame's own height governs when the window is short.
+   ========================================================================== */
+@media (max-width:1100px), (max-height:760px), (max-aspect-ratio:13/10){
+  .frame{height:100svh}
+  .frame__in{
+    height:100%;
+    align-content:center;
+    gap:clamp(.35rem,1.6svh,1.5rem);
+    padding:clamp(2.25rem,6svh,3.75rem) var(--margin)
+            calc(clamp(2.75rem,6svh,3.75rem) + env(safe-area-inset-bottom));
+  }
+  .head--row{grid-template-columns:1fr;align-items:start;gap:.5rem}
+  .note{text-align:left;max-width:46ch}
+  .pass{grid-template-columns:1fr;gap:clamp(.4rem,1.6svh,1.1rem)}
+  .pass li{border-top-width:1.5px}
+  .fit__cols{grid-template-columns:1fr;gap:clamp(.75rem,2.5svh,1.75rem)}
+  .offer__row{
+    grid-template-columns:auto minmax(0,1fr);
+    row-gap:.2rem;align-items:start;
+  }
+  .offer__out{grid-column:2;text-align:left;white-space:normal}
+
+  .tagline{font-size:clamp(1.125rem, min(7.6cqi, 5.4svh), 2.5rem)}
+  h2{font-size:clamp(1.375rem, min(9cqi, 7.4svh), 2.75rem)}
+  .lockup__vis{width:min(100%, 68cqi, 30svh)}
+  .pull{padding-left:.75rem}
+
+  /* the rail becomes a bottom bar: a fixed side strip costs a phone the width
+     it least has, and the perforations still read as the section tabs */
+  :root{--rail-w:0px}
+  .rail{
+    inset:auto 0 0 0;width:100%;height:auto;flex-direction:row;
+    padding:.55rem var(--margin) calc(.55rem + env(safe-area-inset-bottom));
+    border-right:0;border-top:1px solid var(--ink-14);
+    background:var(--bone);
+  }
+  .rail__perf{grid-auto-flow:column;gap:.55rem}
+  .rail__perf span{display:none}
+  .rail__logo{width:1.1rem}
+  .cue{display:none}
+}
+
+/* Below these sizes a dense frame genuinely cannot hold its content at a
+   readable size. It scrolls inside itself rather than clipping: the frame is
+   still exactly one viewport and the gate still holds, but nothing is
+   unreachable. Alignment moves to start, because centring a scroll container
+   puts its first line above the top edge where it cannot be scrolled back. */
+@media (max-height:580px), (max-width:380px){
+  .frame__in{
+    align-content:start;
+    overflow-y:auto;overscroll-behavior-y:contain;
+    scrollbar-width:thin;scrollbar-color:var(--ink-28) transparent;
+  }
+}
+
+/* The one place a frame is allowed to grow. Below roughly a landscape phone
+   there is no type size that both fits and stays readable, and readable wins;
+   snap relaxes with it so nothing is ever trapped. */
+@media (max-height:470px){
+  .frame{height:auto;min-height:100svh;scroll-snap-stop:normal}
+  .frame__in{height:auto;min-height:100svh}
+  .reel{scroll-snap-type:y proximity}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+  }
+}
+
+/* while a deliberate jump is in flight the gate stops holding, or a jump from
+   frame 01 to frame 06 would be caught by every frame in between */
+/* snap is suspended outright while a scripted glide runs, so the snap
+   engine cannot fight the curve the script is drawing */
+.reel.is-gliding{scroll-snap-type:none}

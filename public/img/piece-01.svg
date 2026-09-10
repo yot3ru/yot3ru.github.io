@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000">
+<rect width="800" height="1000" fill="#D9CFC0"/>
+<g transform="rotate(-2.4 250 340)" opacity="0.35">
+      <rect x="60" y="90" width="380" height="500" fill="#EBE7E0"/>
+      <rect x="60" y="90" width="380" height="500" fill="none" stroke="#181715" stroke-width="1.5"/>
+      <rect x="88" y="130" width="324" height="86" fill="#181715"/>
+      <rect x="84" y="126" width="324" height="86" fill="#CD474C" style="mix-blend-mode:multiply"/>
+      <rect x="88" y="240" width="200" height="26" fill="#181715" opacity=".85"/>
+      <rect x="88" y="280" width="256" height="26" fill="#181715" opacity=".55"/>
+      <circle cx="360" cy="420" r="52" fill="#CD474C"/>
+      <circle cx="356" cy="416" r="52" fill="none" stroke="#181715" stroke-width="1.5"/>
+      <rect x="88" y="510" width="150" height="14" fill="#181715" opacity=".4"/>
+    </g><g transform="rotate(1.6 400 400)" opacity="0.55">
+      <rect x="210" y="150" width="380" height="500" fill="#EBE7E0"/>
+      <rect x="210" y="150" width="380" height="500" fill="none" stroke="#181715" stroke-width="1.5"/>
+      <rect x="238" y="190" width="324" height="86" fill="#181715"/>
+      <rect x="234" y="186" width="324" height="86" fill="#CD474C" style="mix-blend-mode:multiply"/>
+      <rect x="238" y="300" width="200" height="26" fill="#181715" opacity=".85"/>
+      <rect x="238" y="340" width="256" height="26" fill="#181715" opacity=".55"/>
+      <circle cx="510" cy="480" r="52" fill="#CD474C"/>
+      <circle cx="506" cy="476" r="52" fill="none" stroke="#181715" stroke-width="1.5"/>
+      <rect x="238" y="570" width="150" height="14" fill="#181715" opacity=".4"/>
+    </g><g transform="rotate(-1.1 550 470)" opacity="1">
+      <rect x="360" y="220" width="380" height="500" fill="#EBE7E0"/>
+      <rect x="360" y="220" width="380" height="500" fill="none" stroke="#181715" stroke-width="1.5"/>
+      <rect x="388" y="260" width="324" height="86" fill="#181715"/>
+      <rect x="384" y="256" width="324" height="86" fill="#CD474C" style="mix-blend-mode:multiply"/>
+      <rect x="388" y="370" width="200" height="26" fill="#181715" opacity=".85"/>
+      <rect x="388" y="410" width="256" height="26" fill="#181715" opacity=".55"/>
+      <circle cx="660" cy="550" r="52" fill="#CD474C"/>
+      <circle cx="656" cy="546" r="52" fill="none" stroke="#181715" stroke-width="1.5"/>
+      <rect x="388" y="640" width="150" height="14" fill="#181715" opacity=".4"/>
+    </g>
+</svg>

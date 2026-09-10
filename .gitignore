@@ -1,0 +1,10 @@
+node_modules/
+dist/
+
+# Local design tooling and generated skill state
+.agents/
+.impeccable/
+skills-lock.json
+
+# Private brand source files
+brand/

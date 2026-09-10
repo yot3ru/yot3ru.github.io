@@ -1,330 +1,309 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lufi — Creative production studio, Colombo</title>
-<meta name="description" content="Lufi builds brand identities with personality, then produces the monthly content that keeps them alive. A creative production studio in Colombo, Sri Lanka.">
-
-<meta property="og:title" content="Lufi — Creative production studio">
-<meta property="og:description" content="Identity, then the content that keeps it alive.">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LUFI — Creative production studio, Colombo</title>
+<meta name="description" content="LUFI is a creative production studio in Colombo. Graphic design, video editing, photography, videography and UI/UX for culture-first brands.">
+<meta name="theme-color" content="#181715">
+<link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/FunnelDisplay-0.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/DMSans-0.woff2" as="font" type="font/woff2" crossorigin>
+<meta property="og:title" content="LUFI — Creative production studio">
+<meta property="og:description" content="We find the gap, then produce the work that closes it.">
 <meta property="og:type" content="website">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
-<script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
 
-<a class="skip" href="#main">Skip to content</a>
+<!--
+  THESIS: The site performs the cut. Six frames run under one fixed gate and
+  lock, so the studio's move — two things, one hard cut — is the interface
+  itself. Refuses the agency default: dark ground, blob behind a hero, work
+  carousel, scroll-reveal everywhere.
+  OWN-WORLD: Bone stock, ink, cinnabar committed as whole fields not accents.
+  Perforation rail, registration crosses, frame counters in tabular figures,
+  stamped labels. Funnel Display huge; DM Sans labels; Zodiak once.
+  STORY: A promoter on a phone learns what LUFI makes, sees the craft, and
+  opens WhatsApp.
+  FIRST VIEWPORT: Lockup large at left over a live material field; tagline
+  under it; WhatsApp action visible immediately; perforation rail at the far
+  left; frame counter 01/06 at the foot.
+  FORM: Frames under a gate; candidate 7 of the grounded list; seed c843b0a8.
+  FINISH: unreviewed and undocumented is unfinished; this build ends with the
+  finish review, the verdict, and DESIGN.md
+-->
 
-<!-- stepped scroll progress -->
-<div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+<svg class="sprite" aria-hidden="true" focusable="false"><defs><symbol id="m" viewBox="0 0 879 1654"><path fill="var(--mark-fill,#181715)" fill-rule="evenodd" clip-rule="evenodd" d="M553 131C553 85.4875 568.592 43.6166 594.726 10.4378C596.694 7.93946 595.227 4.19244 592.066 3.84172C569.795 1.37067 544.486 5.07409e-05 515.543 6.10352e-05L344.984 0C154.455 -1.52588e-05 0.000131095 154.451 0.000114438 344.977L0 1654H229.392C229.392 1654 234.131 1653.13 236.758 1652.15C238.519 1651.5 240.428 1650.79 242.629 1650.24C264.123 1644.86 297.512 1634.38 312.752 1628.22C353.772 1611.65 378.533 1590.06 396.965 1554.78C400.82 1547.4 405.167 1537.68 406.624 1533.19L409.274 1525.01L402.886 1512.47C395.879 1498.72 385.266 1485.06 371.516 1472.09L362.598 1463.68L373.397 1453.16C393.057 1434 403.742 1416.77 412.929 1389.4C417.457 1375.9 421.724 1353.87 425.323 1326.36V1263.46C324.483 1255.95 245 1171.76 245 1069C245 966.242 324.483 882.048 425.323 874.544V761.728C421.798 735.081 417.637 713.741 413.226 700.598C404.142 673.527 393.577 656.485 374.136 637.542L363.458 627.136L372.276 618.82C385.872 605.999 396.366 592.489 403.295 578.889L409.612 566.491L406.992 558.407C405.551 553.961 401.252 544.35 397.44 537.052C379.215 502.168 354.731 480.814 314.169 464.427C299.1 458.339 266.084 447.973 244.83 442.657C236.127 440.48 229.005 438.239 229 437.678C228.996 437.117 237.955 434.436 248.911 431.719C357.436 404.809 394.788 372.837 417.836 287.12C424.638 261.818 434.425 211.688 439.382 177.06C439.495 176.971 439.529 176.99 439.619 177.06C444.575 211.688 454.362 261.818 461.165 287.12C484.212 372.837 521.565 404.81 630.089 431.719C641.045 434.436 650.005 437.117 650 437.678C649.996 438.239 642.873 440.48 634.17 442.657C612.916 447.973 579.9 458.339 564.832 464.427C524.27 480.814 499.785 502.168 481.56 537.052C477.748 544.35 473.449 553.961 472.008 558.407L469.388 566.491L475.705 578.889C482.634 592.489 493.128 605.999 506.724 618.82L515.543 627.136L504.864 637.542C485.423 656.485 474.858 673.527 465.774 700.598C461.363 713.741 457.203 735.08 453.677 761.728V874.472C554.991 881.492 635 965.903 635 1069C635 1172.1 554.991 1256.51 453.677 1263.53V1326.36C457.276 1353.87 461.543 1375.9 466.071 1389.4C475.258 1416.77 485.943 1434 505.603 1453.16L516.402 1463.68L507.484 1472.09C493.735 1485.06 483.122 1498.72 476.115 1512.47L469.726 1525.01L472.376 1533.19C473.833 1537.68 478.18 1547.4 482.035 1554.78C500.467 1590.06 525.228 1611.65 566.249 1628.22C581.488 1634.38 614.877 1644.86 636.371 1650.24C638.606 1650.79 640.615 1651.52 642.458 1652.18C645.136 1653.14 647.463 1653.98 649.608 1654L879 1654L879 415.863C879 399.679 878.538 383.926 877.615 368.606C875.988 341.624 872.929 315.982 868.437 291.678C867.897 288.753 864.45 287.454 862.039 289.196C829.97 312.354 790.579 326 748 326C640.304 326 553 238.696 553 131Z"/></symbol><symbol id="l" viewBox="0 0 3710 1654"><path fill="var(--mark-fill,#181715)" fill-rule="evenodd" clip-rule="evenodd" d="M553 131C553 85.4875 568.592 43.6166 594.726 10.4378C596.694 7.93946 595.227 4.19244 592.066 3.84172C569.795 1.37067 544.486 5.07409e-05 515.543 6.10352e-05L344.984 0C154.455 -1.52588e-05 0.000131095 154.451 0.000114438 344.977L0 1654H229.392C229.392 1654 234.131 1653.13 236.758 1652.15C238.519 1651.5 240.428 1650.79 242.629 1650.24C264.123 1644.86 297.512 1634.38 312.752 1628.22C353.772 1611.65 378.533 1590.06 396.965 1554.78C400.82 1547.4 405.167 1537.68 406.624 1533.19L409.274 1525.01L402.886 1512.47C395.879 1498.72 385.266 1485.06 371.516 1472.09L362.598 1463.68L373.397 1453.16C393.057 1434 403.742 1416.77 412.929 1389.4C417.457 1375.9 421.724 1353.87 425.323 1326.36V1263.46C324.483 1255.95 245 1171.76 245 1069C245 966.242 324.483 882.048 425.323 874.544V761.728C421.798 735.081 417.637 713.741 413.226 700.598C404.142 673.527 393.577 656.485 374.136 637.542L363.458 627.136L372.276 618.82C385.872 605.999 396.366 592.489 403.295 578.889L409.612 566.491L406.992 558.407C405.551 553.961 401.252 544.35 397.44 537.052C379.215 502.168 354.731 480.814 314.169 464.427C299.1 458.339 266.084 447.973 244.83 442.657C236.127 440.48 229.005 438.239 229 437.678C228.996 437.117 237.955 434.436 248.911 431.719C357.436 404.809 394.788 372.837 417.836 287.12C424.638 261.818 434.425 211.688 439.382 177.06C439.495 176.971 439.529 176.99 439.619 177.06C444.575 211.688 454.362 261.818 461.165 287.12C484.212 372.837 521.565 404.81 630.089 431.719C641.045 434.436 650.005 437.117 650 437.678C649.996 438.239 642.873 440.48 634.17 442.657C612.916 447.973 579.9 458.339 564.832 464.427C524.27 480.814 499.785 502.168 481.56 537.052C477.748 544.35 473.449 553.961 472.008 558.407L469.388 566.491L475.705 578.889C482.634 592.489 493.128 605.999 506.724 618.82L515.543 627.136L504.864 637.542C485.423 656.485 474.858 673.527 465.774 700.598C461.363 713.741 457.203 735.08 453.677 761.728V874.472C554.991 881.492 635 965.903 635 1069C635 1172.1 554.991 1256.51 453.677 1263.53V1326.36C457.276 1353.87 461.543 1375.9 466.071 1389.4C475.258 1416.77 485.943 1434 505.603 1453.16L516.402 1463.68L507.484 1472.09C493.735 1485.06 483.122 1498.72 476.115 1512.47L469.726 1525.01L472.376 1533.19C473.833 1537.68 478.18 1547.4 482.035 1554.78C500.467 1590.06 525.228 1611.65 566.249 1628.22C581.488 1634.38 614.877 1644.86 636.371 1650.24C638.606 1650.79 640.615 1651.52 642.458 1652.18C645.136 1653.14 647.463 1653.98 649.608 1654L879 1654L879 415.863C879 399.679 878.538 383.926 877.615 368.606C875.988 341.624 872.929 315.982 868.437 291.678C867.897 288.753 864.45 287.454 862.039 289.196C829.97 312.354 790.579 326 748 326C640.304 326 553 238.696 553 131Z"/><g transform="translate(1119 0)"><path fill="var(--word-fill,#A7383C)" fill-rule="evenodd" clip-rule="evenodd" d="M1958.62 368.606V642.697H2135.87V1011.3H1958.62V1654H1533.22V0.000577463H2147.69V368.606H1958.62Z"/><path fill="var(--word-fill,#A7383C)" fill-rule="evenodd" clip-rule="evenodd" d="M734.908 1566.57C774.802 1606.46 824.528 1635.6 884.085 1654H1160.31C1350.87 1654 1505.36 1499.55 1505.36 1309.02V0.000577463H1275.92C1271.84 0.0332619 1268.17 2.39272 1262.68 3.76454C1241.19 9.14038 1207.79 19.6233 1192.55 25.7792C1151.52 42.3502 1126.75 63.9445 1108.32 99.2207C1104.46 106.601 1100.12 116.32 1098.66 120.815L1096.01 128.991L1102.4 141.528C1109.41 155.281 1120.02 168.943 1133.77 181.908L1142.69 190.317L1131.89 200.84C1112.23 219.996 1101.54 237.23 1092.35 264.605C1087.82 278.096 1083.56 300.126 1079.96 327.641V1271.22C1079.96 1296.42 1075.23 1309.02 1065.78 1309.02C1056.32 1309.02 1051.6 1296.42 1051.6 1271.22V327.641C1048 300.126 1043.73 278.096 1039.2 264.605C1030.01 237.23 1019.32 219.996 999.661 200.84L988.859 190.317L997.779 181.908C1011.53 168.943 1022.15 155.281 1029.15 141.528L1035.54 128.991L1032.89 120.815C1031.44 116.32 1027.09 106.601 1023.23 99.2207C1004.8 63.9445 980.032 42.3502 939.004 25.7792C923.762 19.6233 890.366 9.14038 868.868 3.76454C863.382 2.39272 859.251 0.0332619 855.628 0.000577463H626.194V1238.14C626.194 1254.32 626.656 1270.07 627.58 1285.39C634.839 1405.77 670.614 1499.5 734.908 1566.57Z"/><path fill="var(--word-fill,#A7383C)" fill-rule="evenodd" clip-rule="evenodd" d="M2591 0.000577463V368.606H2534.28C2330.66 368.606 2165.6 203.576 2165.6 0.000577463H2591Z"/><path fill="var(--word-fill,#A7383C)" fill-rule="evenodd" clip-rule="evenodd" d="M2165.6 384.508V1654H2591V384.508H2165.6Z"/><path fill="var(--word-fill,#A7383C)" fill-rule="evenodd" clip-rule="evenodd" d="M425.402 1285.39V0H0V1654H614.47L821.631 1654C720.081 1615.23 614.469 1513.7 600.068 1285.39L425.402 1285.39Z"/></g></symbol></defs></svg>
 
-<header class="nav" id="nav">
-  <div class="nav__inner">
-    <a class="mark" href="#top" aria-label="Lufi, home">
-      <span class="mark__word">luf<span class="mark__i">ı<b></b></span></span>
-    </a>
+<a class="skip" href="#f1">Skip to content</a>
 
-    <nav class="nav__links" id="navLinks" aria-label="Main">
-      <a href="#services">Services</a>
-      <a href="#process">Process</a>
-      <a href="#work">Work</a>
-      <a href="#terms">Terms</a>
-      <a class="nav__cta" href="#contact">Start a project</a>
-    </nav>
+<!-- The rail. Where ::scroll-marker is supported this is decorative only and
+     the real markers are generated by the reel; elsewhere these anchors are
+     the navigation. Never both: app.css hides one or the other. -->
+<nav class="rail" aria-label="Sections">
+  <a class="rail__logo" href="#f1" aria-label="LUFI, top">
+    <svg viewBox="0 0 879 1654" aria-hidden="true"><use href="#m"/></svg>
+  </a>
+  <ol class="rail__perf">
+    <li><a href="#f1" data-nav="1" aria-label="Start"><span>Start</span></a></li>
+    <li><a href="#f2" data-nav="2" aria-label="What we make"><span>What we make</span></a></li>
+    <li><a href="#f3" data-nav="3" aria-label="How we work"><span>How we work</span></a></li>
+    <li><a href="#f4" data-nav="4" aria-label="Work"><span>Work</span></a></li>
+    <li><a href="#f5" data-nav="5" aria-label="Fit"><span>Fit</span></a></li>
+    <li><a href="#f6" data-nav="6" aria-label="Brief us"><span>Brief us</span></a></li>
+  </ol>
+  <p class="rail__count"><b data-count>01</b><i>/</i>06</p>
+</nav>
 
-    <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks">
-      <span class="nav__toggleLabel">Menu</span>
-      <span class="nav__bars" aria-hidden="true"><i></i><i></i></span>
-    </button>
-  </div>
-</header>
+<!-- THE GATE. One master container: every frame snaps inside this element, so
+     the composition never depends on the document's own scroll height. -->
+<main class="reel" id="reel" tabindex="0" aria-label="LUFI, six sections">
 
-<main id="main">
+  <!-- ═══ 01 · START ═══════════════════════════════════════════════════ -->
+  <section class="frame frame--hero" id="f1" data-frame="1" aria-labelledby="h1">
+    <div class="mat" data-mat aria-hidden="true"><div class="mat__still"></div></div>
 
-<!-- ═══════════ HERO ═══════════ -->
-<section class="hero" id="top" data-havi="curious">
-  <div class="hero__field" aria-hidden="true"></div>
+    <div class="frame__in hero">
+      <h1 class="lockup" id="h1">
+        <span class="lockup__vis" aria-hidden="true">
+          <svg class="lockup__svg" viewBox="0 0 3710 1654" role="presentation"><use href="#l"/></svg>
+        </span>
+        <span class="sr">LUFI</span>
+      </h1>
 
-  <div class="shell hero__inner">
-    <p class="kicker reveal">Creative production studio — Colombo</p>
+      <p class="tagline"><span>Every brand is stuck</span><span>between two things.</span></p>
 
-    <h1 class="hero__title">
-      <span class="reveal" style="--d:1">we make brands</span>
-      <span class="reveal" style="--d:2">that refuse to</span>
-      <span class="reveal hero__accent" style="--d:3">look boring</span>
-    </h1>
+      <p class="lede">We find the gap, then produce the work that closes it.
+        Design, film, photography and interfaces for culture-first brands.</p>
 
-    <p class="lede reveal" style="--d:4">
-      Identity first, then the content that keeps it alive. Built in Colombo
-      for brands that care how they look.
-    </p>
-
-    <div class="hero__actions reveal" style="--d:5">
-      <a class="btn" href="#contact">Start a project</a>
-      <a class="btn btn--ghost" href="#process">See how we work</a>
+      <div class="acts">
+        <a class="act act--go" href="#f6" data-wa>
+          <span>Brief us on WhatsApp</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        </a>
+        <a class="act act--quiet" href="#f4">See the work</a>
+      </div>
     </div>
 
-    <dl class="hero__facts reveal" style="--d:6">
-      <div><dt>Based in</dt><dd>Colombo, Sri&nbsp;Lanka</dd></div>
-      <div><dt>Working since</dt><dd>2026</dd></div>
-      <div><dt>Retainer slots</dt><dd>4 per quarter</dd></div>
-    </dl>
-  </div>
+    <p class="cue" aria-hidden="true"><span>Scroll</span></p>
+  </section>
 
-  <div class="dither" aria-hidden="true"></div>
-</section>
+  <!-- ═══ 02 · WHAT WE MAKE ════════════════════════════════════════════ -->
+  <section class="frame frame--make" id="f2" data-frame="2" aria-labelledby="h2">
+    <div class="frame__in">
+      <header class="head">
+        <p class="stamp">02 <i>·</i> What we make</p>
+        <h2 id="h2">Five disciplines,<br>one point of view.</h2>
+      </header>
 
-<!-- ═══════════ SERVICES ═══════════ -->
-<section class="band" id="services" data-havi="idle">
-  <div class="shell">
-    <header class="band__head">
-      <p class="kicker reveal">What we make</p>
-      <h2 class="reveal" style="--d:1">Four things, done properly</h2>
-      <p class="band__sub reveal" style="--d:2">
-        Most studios list twenty services. We do four, and we do them for brands
-        that plan to still be here in five years.
-      </p>
-    </header>
+      <ol class="offer">
+        <li class="offer__row">
+          <b class="offer__no">01</b>
+          <div class="offer__body">
+            <h3>Graphic design</h3>
+            <p>Identity, campaign artwork, packaging, social systems you can run yourself.</p>
+          </div>
+          <p class="offer__out">Logo suite <i>·</i> art direction <i>·</i> templates</p>
+        </li>
+        <li class="offer__row">
+          <b class="offer__no">02</b>
+          <div class="offer__body">
+            <h3>Video editing</h3>
+            <p>Cut, grade, sound and titles, from phone footage to multi-camera shoots.</p>
+          </div>
+          <p class="offer__out">Long form <i>·</i> reels <i>·</i> title sequences</p>
+        </li>
+        <li class="offer__row">
+          <b class="offer__no">03</b>
+          <div class="offer__body">
+            <h3>Photography</h3>
+            <p>Product, portrait, food and space, shot to work at thumbnail size and in print.</p>
+          </div>
+          <p class="offer__out">Lookbooks <i>·</i> menus <i>·</i> campaigns</p>
+        </li>
+        <li class="offer__row">
+          <b class="offer__no">04</b>
+          <div class="offer__body">
+            <h3>Videography</h3>
+            <p>Direction and camera for launches, sessions, nights and brand films.</p>
+          </div>
+          <p class="offer__out">Brand film <i>·</i> event <i>·</i> documentary</p>
+        </li>
+        <li class="offer__row">
+          <b class="offer__no">05</b>
+          <div class="offer__body">
+            <h3>UI/UX</h3>
+            <p>Sites and product interfaces designed to be built, not just admired.</p>
+          </div>
+          <p class="offer__out">Web <i>·</i> app <i>·</i> design systems</p>
+        </li>
+      </ol>
 
-    <div class="cards">
-      <article class="card reveal" style="--d:1">
-        <span class="card__tag">Identity</span>
-        <h3>Brand identity</h3>
-        <p>Logo system, colour, type, and a guideline your team can actually
-        follow. You leave with files, rules, and templates — not a single JPEG.</p>
-        <ul class="list">
-          <li>Logo and lockups</li>
-          <li>Colour and type system</li>
-          <li>Written guideline</li>
-          <li>Template library</li>
-        </ul>
-      </article>
-
-      <article class="card card--lead reveal" style="--d:2">
-        <span class="card__tag">Most booked</span>
-        <h3>Monthly content</h3>
-        <p>A set number of posts and videos every month, designed and edited in
-        your identity. Three-month minimum, because one month proves nothing.</p>
-        <ul class="list">
-          <li>Monthly content calendar</li>
-          <li>Designed posts and carousels</li>
-          <li>Edited short-form video</li>
-          <li>One shoot day included</li>
-        </ul>
-      </article>
-
-      <article class="card reveal" style="--d:3">
-        <span class="card__tag">Production</span>
-        <h3>Photo &amp; video</h3>
-        <p>Shoot days that produce weeks of content. Products, people, spaces.
-        We plan the shot list before anyone picks up a camera.</p>
-        <ul class="list">
-          <li>Product and lifestyle stills</li>
-          <li>Short-form video</li>
-          <li>Launch campaigns</li>
-        </ul>
-      </article>
-
-      <article class="card reveal" style="--d:4">
-        <span class="card__tag">Interfaces</span>
-        <h3>Websites &amp; apps</h3>
-        <p>Screens designed to match the brand and built to hand to developers
-        without a translation layer.</p>
-        <ul class="list">
-          <li>Marketing sites</li>
-          <li>App and product screens</li>
-          <li>Developer-ready handoff</li>
-        </ul>
-      </article>
+      <p class="foot">Most projects use two or three together. That is the point:
+        one studio holding the whole look instead of four vendors arguing.</p>
     </div>
-  </div>
-</section>
+  </section>
 
-<div class="dither dither--flip" aria-hidden="true"></div>
+  <!-- ═══ 03 · HOW WE WORK ═════════════════════════════════════════════ -->
+  <section class="frame frame--work" id="f3" data-frame="3" aria-labelledby="h3">
+    <div class="frame__in">
+      <header class="head">
+        <p class="stamp">03 <i>·</i> How we work</p>
+        <h2 id="h3">Three moves.<br>No mystery.</h2>
+      </header>
 
-<!-- ═══════════ PROCESS ═══════════ -->
-<section class="band band--raised" id="process" data-havi="working">
-  <div class="shell">
-    <header class="band__head">
-      <p class="kicker reveal">How it goes</p>
-      <h2 class="reveal" style="--d:1">Four steps, in this order</h2>
-      <p class="band__sub reveal" style="--d:2">
-        You approve the direction before anything is produced. No surprise
-        invoices, no work made in the dark.
-      </p>
-    </header>
+      <ol class="pass">
+        <li>
+          <b class="pass__no">01</b>
+          <h3>The brief</h3>
+          <p>One call. You tell us what the thing is for and who has to act on it.
+            We come back with what we would make and what it costs — in writing,
+            before anything starts.</p>
+        </li>
+        <li>
+          <b class="pass__no">02</b>
+          <h3>The cut</h3>
+          <p>We make it, and we show you early while it is still cheap to change.
+            You get the reasoning, not just the file. Two rounds are built into
+            every project.</p>
+        </li>
+        <li>
+          <b class="pass__no">03</b>
+          <h3>The handover</h3>
+          <p>Master files, export-ready sizes and the source. You own the work
+            outright. Nothing is held back to keep you coming back.</p>
+        </li>
+      </ol>
 
-    <ol class="steps">
-      <li class="step reveal" style="--d:1">
-        <span class="step__n">01</span>
-        <div class="step__body">
-          <h3>Brief</h3>
-          <p>One call, thirty minutes. We learn the business, the audience, and
-          the budget. You get a written scope and a price within two days.</p>
-          <span class="step__meta">2 days</span>
-        </div>
-      </li>
-      <li class="step reveal" style="--d:2">
-        <span class="step__n">02</span>
-        <div class="step__body">
-          <h3>Direction</h3>
-          <p>Moodboard and a written direction. You approve it before anything
-          gets made — this is the gate that keeps projects on time.</p>
-          <span class="step__meta">1 week</span>
-        </div>
-      </li>
-      <li class="step reveal" style="--d:3">
-        <span class="step__n">03</span>
-        <div class="step__body">
-          <h3>Production</h3>
-          <p>We make the work. Two revision rounds are included and scheduled,
-          so feedback has a place to go instead of arriving forever.</p>
-          <span class="step__meta">2–4 weeks</span>
-        </div>
-      </li>
-      <li class="step reveal" style="--d:4">
-        <span class="step__n">04</span>
-        <div class="step__body">
-          <h3>Handover</h3>
-          <p>Files, templates, and a walkthrough call so your team can run it
-          without us. Retainer clients continue straight into month one.</p>
-          <span class="step__meta">1 day</span>
-        </div>
-      </li>
-    </ol>
-  </div>
-</section>
-
-<!-- ═══════════ WORK ═══════════ -->
-<section class="band" id="work" data-havi="happy">
-  <div class="shell">
-    <header class="band__head">
-      <p class="kicker reveal">Selected work</p>
-      <h2 class="reveal" style="--d:1">Recent projects</h2>
-      <p class="band__sub reveal" style="--d:2">
-        A studio is only as good as the last thing it shipped. Here is the last
-        thing we shipped.
-      </p>
-    </header>
-
-    <!-- REPLACE: swap .work__art for real images — <img src="..." alt="..."> -->
-    <div class="work">
-      <a class="work__item reveal" style="--d:1" href="#contact">
-        <div class="work__art work__art--a" aria-hidden="true"></div>
-        <div class="work__meta">
-          <h3>Café identity and eight weeks of content</h3>
-          <p>Full identity, twelve templates, one shoot day.</p>
-          <span class="work__link">View project</span>
-        </div>
-      </a>
-
-      <a class="work__item reveal" style="--d:2" href="#contact">
-        <div class="work__art work__art--b" aria-hidden="true"></div>
-        <div class="work__meta">
-          <h3>Fashion label launch campaign</h3>
-          <p>Lookbook, campaign film, and rollout assets.</p>
-          <span class="work__link">View project</span>
-        </div>
-      </a>
-
-      <a class="work__item reveal" style="--d:3" href="#contact">
-        <div class="work__art work__art--c" aria-hidden="true"></div>
-        <div class="work__meta">
-          <h3>Fitness studio rebrand and site</h3>
-          <p>Identity, booking site, and a monthly content system.</p>
-          <span class="work__link">View project</span>
-        </div>
-      </a>
+      <blockquote class="pull">
+        <p>The gap is where the brand actually lives. Everything before it is
+          the pitch; everything after it is the proof.</p>
+      </blockquote>
     </div>
-  </div>
-</section>
+  </section>
 
-<div class="dither" aria-hidden="true"></div>
+  <!-- ═══ 04 · WORK ════════════════════════════════════════════════════
+       No client roster exists. These are self-initiated studio pieces, and
+       every card says so on its face — a portfolio that implies clients it
+       does not have is the one thing that would cost the studio trust. -->
+  <section class="frame frame--gal" id="f4" data-frame="4" aria-labelledby="h4">
+    <div class="frame__in">
+      <header class="head head--row">
+        <div>
+          <p class="stamp">04 <i>·</i> Work</p>
+          <h2 id="h4">Studio pieces.</h2>
+        </div>
+        <p class="note">Self-initiated. We are a new studio and we would rather
+          show what we can make than borrow someone else's logo.<span class="track-hint">Scroll to browse projects.</span></p>
+      </header>
 
-<!-- ═══════════ TERMS ═══════════ -->
-<section class="band band--raised" id="terms" data-havi="idle">
-  <div class="shell terms">
-    <div class="terms__head">
-      <p class="kicker reveal">Straight terms</p>
-      <h2 class="reveal" style="--d:1">What you agree to, in plain words</h2>
-      <p class="band__sub reveal" style="--d:2">
-        Every project runs on the same terms. You get them in writing before you
-        pay anything.
-      </p>
+      <ul class="reel-x" data-track tabindex="0" aria-label="Studio projects, scroll horizontally">
+        <li class="piece">
+          <div class="piece__vis"><img src="/img/studio-night-bills.webp" alt="Layered torn poster fragments in Bone, Ink and Cinnabar." width="1122" height="1402" loading="lazy" decoding="async"></div>
+          <div class="piece__meta">
+            <h3>Night bill sequence</h3>
+            <p class="piece__ann">Overprint, one plate misregistered on purpose — the gap is the artwork.</p>
+            <p class="piece__tag">Graphic design <i>·</i> studio piece</p>
+          </div>
+        </li>
+        <li class="piece">
+          <div class="piece__vis"><img src="/img/studio-title-sequence.webp" alt="Experimental title-sequence frames in Ink, Bone and Cinnabar." width="1122" height="1402" loading="lazy" decoding="async"></div>
+          <div class="piece__meta">
+            <h3>Title sequence study</h3>
+            <p class="piece__ann">Every title lands on a cut, never a fade. Sound leads picture by one frame.</p>
+            <p class="piece__tag">Video editing <i>·</i> studio piece</p>
+          </div>
+        </li>
+        <li class="piece">
+          <div class="piece__vis"><img src="/img/studio-portrait.webp" alt="Editorial studio portrait with Bone key light and Cinnabar rim light." width="1122" height="1402" loading="lazy" decoding="async"></div>
+          <div class="piece__meta">
+            <h3>Portrait series</h3>
+            <p class="piece__ann">One light, one reflector. Shot to hold at 120px because that is where it lives.</p>
+            <p class="piece__tag">Photography <i>·</i> studio piece</p>
+          </div>
+        </li>
+        <li class="piece">
+          <div class="piece__vis"><img src="/img/studio-booking-flow.webp" alt="Four-screen booking flow arranged on a strict editorial grid." width="1122" height="1402" loading="lazy" decoding="async"></div>
+          <div class="piece__meta">
+            <h3>Booking flow study</h3>
+            <p class="piece__ann">Four screens, one decision each. Designed against real thumb reach, not a desktop mock.</p>
+            <p class="piece__tag">UI/UX <i>·</i> studio piece</p>
+          </div>
+        </li>
+        <li class="piece">
+          <div class="piece__vis"><img src="/img/studio-launch-film.webp" alt="Cinematic installation of translucent fabric and brushed metal under Cinnabar light." width="1122" height="1402" loading="lazy" decoding="async"></div>
+          <div class="piece__meta">
+            <h3>Launch film stills</h3>
+            <p class="piece__ann">Cut on movement so the room never resets. Graded warm to match the space.</p>
+            <p class="piece__tag">Videography <i>·</i> studio piece</p>
+          </div>
+        </li>
+      </ul>
     </div>
+  </section>
 
-    <ul class="terms__list">
-      <li class="reveal" style="--d:1">
-        <h3>50% to start, 50% on delivery</h3>
-        <p>No hourly billing, no metered surprises. The price we quote is the
-        price you pay.</p>
-      </li>
-      <li class="reveal" style="--d:2">
-        <h3>Two revision rounds, included</h3>
-        <p>Scheduled into the timeline. Extra rounds are quoted before they
-        start, never billed after.</p>
-      </li>
-      <li class="reveal" style="--d:3">
-        <h3>Dates agreed in writing</h3>
-        <p>If we miss a date, you hear it from us first, with a new date and the
-        reason.</p>
-      </li>
-      <li class="reveal" style="--d:4">
-        <h3>You own the work</h3>
-        <p>Full ownership and source files transfer to you on final payment.
-        Nothing is held hostage.</p>
-      </li>
-    </ul>
-  </div>
-</section>
+  <!-- ═══ 05 · FIT ═════════════════════════════════════════════════════ -->
+  <section class="frame frame--fit" id="f5" data-frame="5" aria-labelledby="h5">
+    <div class="frame__in fit">
+      <header class="head">
+        <p class="stamp">05 <i>·</i> Fit</p>
+        <h2 id="h5">Worth knowing<br>before you write.</h2>
+      </header>
 
-<!-- ═══════════ CONTACT ═══════════ -->
-<section class="band contact" id="contact" data-havi="happy">
-  <div class="shell contact__inner">
-    <p class="kicker reveal">Start here</p>
-    <h2 class="contact__title reveal" style="--d:1">Tell us what you're building</h2>
-    <p class="lede reveal" style="--d:2">
-      Send a message with what you do and what you need. You get a reply within
-      one working day, and a written scope within two.
-    </p>
-
-    <div class="contact__actions reveal" style="--d:3">
-      <!-- REPLACE: your WhatsApp number and email -->
-      <a class="btn btn--big" href="https://wa.me/94000000000">Message on WhatsApp</a>
-      <a class="btn btn--ghost btn--big" href="mailto:hello@lufi.lk">hello@lufi.lk</a>
+      <div class="fit__cols">
+        <div class="fit__col">
+          <p class="fit__lbl fit__lbl--yes">We are good for</p>
+          <ul class="ticks">
+            <li>Brands with a point of view and no in-house design</li>
+            <li>Launches — a bar, a drop, a night, a record</li>
+            <li>Work that has to hold on a phone first</li>
+            <li>People who want the reasoning, not just the file</li>
+          </ul>
+        </div>
+        <div class="fit__col">
+          <p class="fit__lbl fit__lbl--no">We are not</p>
+          <ul class="ticks ticks--no">
+            <li>The cheapest quote you will get</li>
+            <li>A print shop — we design it, we do not run the press</li>
+            <li>Available for spec work or contests</li>
+            <li>Interested in making it look like someone else</li>
+          </ul>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <p class="contact__note reveal" style="--d:4">
-      We take four retainer clients a quarter. If we're full, we'll say so.
-    </p>
-  </div>
-</section>
+  <!-- ═══ 06 · BRIEF US ════════════════════════════════════════════════ -->
+  <section class="frame frame--end" id="f6" data-frame="6" aria-labelledby="h6">
+    <div class="mat" data-mat data-seed="61" aria-hidden="true"><div class="mat__still"></div></div>
+
+    <div class="frame__in end">
+      <h2 id="h6">Tell us what<br>it is for.</h2>
+      <p class="lede lede--light">One message. What you are making, who it is for,
+        and when you need it. We answer with what we would do and what it costs.</p>
+
+      <div class="acts acts--end">
+        <span class="act act--go act--big is-placeholder" aria-disabled="true">
+          <span>WhatsApp</span>
+          <b>[TK]</b>
+        </span>
+        <span class="act act--quiet act--light is-placeholder" aria-disabled="true">
+          <span>Email</span>
+          <b>[TK]</b>
+        </span>
+      </div>
+
+      <footer class="end__foot">
+        <p>LUFI <i>·</i> Colombo, Sri Lanka</p>
+        <p><span class="placeholder-link" aria-disabled="true">Instagram [TK]</span></p>
+        <p>© <span data-year>2026</span></p>
+      </footer>
+    </div>
+  </section>
 
 </main>
 
-<footer class="foot">
-  <div class="shell foot__inner">
-    <a class="mark mark--foot" href="#top" aria-label="Lufi, back to top">
-      <span class="mark__word">luf<span class="mark__i">ı<b></b></span></span>
-    </a>
-    <p class="foot__line">Creative production studio — Colombo, Sri&nbsp;Lanka</p>
-    <p class="foot__line foot__line--dim">© 2026 Lufi</p>
-  </div>
-</footer>
 
-<!-- ═══════════ HAVI — corner companion ═══════════ -->
-<div class="havi" id="havi" data-state="idle" aria-hidden="true">
-  <svg viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg">
-    <path class="havi__body" fill-rule="evenodd" clip-rule="evenodd"
-      d="M38.5 41H42V37.5H45V27H42V23H38.5V3.00001H34.5V7.62939e-06H28.5V2.50001H24.5V20.5H20.5V2.50001H16.5V7.62939e-06H10.5V3.00001H6.5V23H3V27H-4.76837e-07V37.5H3V41H6.5V45H38.5V41ZM31.5 28.5C31.5 27.3954 30.6046 26.5 29.5 26.5C28.3954 26.5 27.5 27.3954 27.5 28.5V32.5C27.5 33.6046 28.3954 34.5 29.5 34.5C30.6046 34.5 31.5 33.6046 31.5 32.5V28.5ZM24.5 34.5H20.5V38.5H24.5V34.5ZM17.5 28.5C17.5 27.3954 16.6046 26.5 15.5 26.5C14.3954 26.5 13.5 27.3954 13.5 28.5V32.5C13.5 33.6046 14.3954 34.5 15.5 34.5C16.6046 34.5 17.5 33.6046 17.5 32.5V28.5Z"/>
-  </svg>
-</div>
-
-<script src="script.js"></script>
+<script type="module" src="/src/main.js"></script>
 </body>
 </html>
