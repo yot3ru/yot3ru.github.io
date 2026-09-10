@@ -149,8 +149,16 @@ const compact = matchMedia("(max-width:1100px), (max-height:760px), (max-aspect-
     el.getBoundingClientRect().top - reel.getBoundingClientRect().top + reel.scrollTop;
 
   const nearestFrame = () => {
-    const height = Math.max(1, reel.clientHeight);
-    return clamp(Math.round(reel.scrollTop / height), 0, frames.length - 1);
+    let best = 0;
+    let distance = Infinity;
+    frames.forEach((frame, index) => {
+      const nextDistance = Math.abs(frame.offsetTop - reel.scrollTop);
+      if (nextDistance < distance) {
+        best = index;
+        distance = nextDistance;
+      }
+    });
+    return clamp(best, 0, frames.length - 1);
   };
 
   const normalizeWheel = (event) => {

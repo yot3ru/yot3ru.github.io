@@ -593,3 +593,81 @@ h3{font-size:1.1875rem;font-weight:600;line-height:1.25;letter-spacing:-.012em;c
   .frame--fit .fit__cols{gap:clamp(1.5rem,5svh,2.25rem)}
   .frame--end h2{font-size:clamp(2.75rem,12vw,4rem)}
 }
+
+/* Final responsive contract ------------------------------------------------
+   Mobile is the reference composition. Every chapter uses the same gutter,
+   readable measure, and clearance for the fixed section rail. Wide screens
+   may lock to one viewport; touch layouts stay content-led so no copy or
+   artwork is trapped behind a snap boundary. */
+:root{
+  --section-gutter:clamp(1rem,4vw,3.5rem);
+  --section-top:clamp(1.5rem,5svh,3.5rem);
+  --section-bottom:clamp(2rem,7svh,4.5rem);
+  --mobile-rail-h:4.5rem;
+}
+.frame__in{
+  width:min(calc(100% - (2 * var(--section-gutter))),96rem);
+  margin-inline:auto;
+  padding-inline:0;
+  padding-block:var(--section-top) var(--section-bottom);
+}
+@media (min-width:1101px){
+  :root{--section-gutter:clamp(2rem,4vw,4.5rem)}
+  .frame__in{
+    width:min(calc(100% - var(--rail-w) - var(--section-gutter)),96rem);
+    margin-left:calc(var(--rail-w) + var(--section-gutter));
+    margin-right:var(--section-gutter);
+  }
+  .reel{scroll-snap-type:y mandatory;scroll-padding-block:0}
+  .frame{height:100svh;min-height:100svh;max-height:100svh;overflow:hidden;scroll-snap-stop:always}
+  .frame__in{height:100%;min-height:0;max-height:100%;}
+}
+@media (min-width:761px) and (max-width:1100px){
+  :root{--section-gutter:clamp(1.5rem,4vw,3rem)}
+  .reel{scroll-snap-type:y proximity;scroll-padding-bottom:var(--mobile-rail-h)}
+  .frame{height:auto;min-height:100svh;max-height:none;overflow:visible;scroll-snap-stop:normal}
+  .frame__in{
+    width:calc(100% - (2 * var(--section-gutter)));
+    min-height:100svh;
+    height:auto;
+    padding:calc(var(--section-top) + var(--mobile-rail-h)) var(--section-gutter) calc(var(--section-bottom) + var(--mobile-rail-h));
+  }
+  .rail{min-height:var(--mobile-rail-h)}
+}
+@media (max-width:760px){
+  :root{
+    --section-gutter:clamp(1rem,5vw,1.25rem);
+    --section-top:1.25rem;
+    --section-bottom:2rem;
+  }
+  .reel{scroll-snap-type:y proximity;scroll-snap-stop:normal;scroll-padding-block:0 var(--mobile-rail-h)}
+  .frame{height:auto;min-height:100svh;max-height:none;overflow:visible;scroll-snap-stop:normal}
+  .frame__in{
+    width:100%;
+    min-height:100svh;
+    height:auto;
+    margin:0;
+    padding:calc(var(--section-top) + var(--mobile-rail-h)) var(--section-gutter) calc(var(--section-bottom) + var(--mobile-rail-h));
+  }
+  .rail{min-height:var(--mobile-rail-h)}
+
+  /* The horizontal rail is still swipeable, but the first project owns the
+     same left and right keyline as every other chapter. */
+  .frame--gal .reel-x{
+    width:100%;
+    margin-inline:0;
+    padding-right:0;
+    grid-auto-columns:100%;
+  }
+  .frame--gal .piece{
+    width:100%;
+    min-width:100%;
+  }
+  .frame--gal .piece__vis{
+    width:100%;
+    height:auto;
+    aspect-ratio:4/5;
+  }
+  .frame--gal .piece__vis img{object-fit:cover}
+  .frame--gal .piece__meta{max-width:34ch}
+}
