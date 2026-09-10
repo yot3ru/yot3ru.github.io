@@ -568,13 +568,15 @@ h3{font-size:1.1875rem;font-weight:600;line-height:1.25;letter-spacing:-.012em;c
 @media (max-width:760px){
   :root{
     --margin:clamp(1rem,5vw,1.35rem);
+    --mobile-rail-h:4.5rem;
     --page-block:clamp(1.25rem,4svh,2.25rem);
     --page-block-end:calc(var(--page-block) + 3rem);
     --copy-size:clamp(.875rem,3.7vw,1rem);
   }
-  .reel{height:100svh;overflow-x:hidden;overflow-y:auto;scroll-snap-type:y mandatory;scroll-padding-top:0;-webkit-overflow-scrolling:touch}
-  .frame{height:auto;min-height:100svh;max-height:none;overflow:visible;scroll-snap-align:start}
-  .frame__in{height:auto;min-height:100svh;max-height:none;overflow:visible;padding:calc(var(--page-block) + 3rem) var(--margin) calc(var(--page-block-end) + 2rem) calc(var(--margin) + var(--rail-w));gap:clamp(1.25rem,5svh,2.25rem)}
+  .reel{height:100svh;overflow-x:hidden;overflow-y:auto;scroll-snap-type:y proximity;scroll-snap-stop:normal;scroll-padding-top:0;scroll-padding-bottom:var(--mobile-rail-h);-webkit-overflow-scrolling:touch}
+  .frame{height:auto;min-height:100svh;max-height:none;overflow:visible;scroll-snap-align:start;scroll-snap-stop:normal}
+  .frame__in{height:auto;min-height:100svh;max-height:none;overflow:visible;padding:calc(var(--page-block) + 3rem) var(--margin) calc(var(--page-block-end) + var(--mobile-rail-h)) calc(var(--margin) + var(--rail-w));gap:clamp(1.25rem,5svh,2.25rem)}
+  .rail{min-height:var(--mobile-rail-h)}
   .frame--hero .frame__in,.frame--end .frame__in{min-height:100svh}
   .frame--hero .lockup__vis{width:min(68cqi,13rem)}
   .frame--hero .tagline{font-size:clamp(2.25rem,11vw,3.5rem);line-height:.96}
