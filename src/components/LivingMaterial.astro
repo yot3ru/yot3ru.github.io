@@ -1,0 +1,221 @@
+<div class="living-material" data-material aria-hidden="true">
+  <canvas></canvas>
+  <div class="living-material__fallback"></div>
+</div>
+
+<script>
+  const root = document.querySelector('[data-material]');
+  const canvas = root?.querySelector('canvas');
+
+  if (root instanceof HTMLElement && canvas instanceof HTMLCanvasElement) {
+    const gl = canvas.getContext('webgl2', { alpha: false, antialias: false, powerPreference: 'high-performance' });
+    if (gl) {
+      // Keep the folded chrome material used by the earlier LUFI site.
+      const vertex = `#version 300 es
+        void main() {
+          vec2 p = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2)) * 2.0 - 1.0;
+          gl_Position = vec4(p, 0.0, 1.0);
+        }
+      `;
+      const fragment = `#version 300 es
+        precision highp float;
+        uniform vec2 resolution;
+        uniform float time, seed, darkMode;
+        uniform vec2 pointer, pointerVelocity;
+        uniform float pointerEnergy;
+        out vec4 colour;
+        const vec3 bone = vec3(235, 231, 224) / 255.0;
+        const vec3 ink = vec3(24, 23, 21) / 255.0;
+        const vec3 red = vec3(205, 71, 76) / 255.0;
+
+        float surface(vec2 p) {
+          float t = time * 0.075 + seed * 0.09;
+          p += vec2(sin(p.y * 1.8 + t), cos(p.x * 1.4 - t)) * 0.6;
+          float fold = p.x * 2.7 + p.y * 1.5 + sin(p.y * 2.0 - p.x * 0.65 + t) * 1.9;
+          return sin(fold) * 0.62 + sin(fold * 1.72 + p.y * 1.3) * 0.22 + cos(p.y * 2.8 - p.x + t) * 0.20;
+        }
+
+        float jelly(vec2 uv) {
+          float aspect = resolution.x / resolution.y;
+          vec2 q = (uv - pointer) * vec2(aspect, 1.0);
+          vec2 motion = pointerVelocity * vec2(aspect, 1.0);
+          float speed = clamp(length(motion) * 10.0, 0.0, 1.0);
+          vec2 direction = normalize(motion + vec2(0.0001, 0.0));
+          vec2 side = vec2(-direction.y, direction.x);
+          vec2 local = vec2(dot(q, direction), dot(q, side));
+          local.x *= mix(1.0, 0.58, speed);
+          float d = dot(local, local);
+          float core = exp(-d * 54.0);
+          float shoulder = exp(-d * 18.0);
+          return pointerEnergy * (shoulder * 0.105 - core * 0.205);
+        }
+
+        float heightAt(vec2 uv) {
+          vec2 p = (uv - vec2(0.73, 0.49)) * vec2(resolution.x / resolution.y, 1.0) * 3.3;
+          return surface(p) + jelly(uv);
+        }
+
+        void main() {
+          vec2 uv = gl_FragCoord.xy / resolution;
+          float stepY = 1.5 / resolution.y;
+          vec2 e = vec2(stepY * resolution.y / resolution.x, stepY);
+          vec2 slope = vec2(
+            heightAt(uv + vec2(e.x, 0.0)) - heightAt(uv - vec2(e.x, 0.0)),
+            heightAt(uv + vec2(0.0, e.y)) - heightAt(uv - vec2(0.0, e.y))
+          ) / (2.0 * stepY * 3.3);
+          vec3 normal = normalize(vec3(-slope * 0.9, 1.0));
+          vec3 reflection = reflect(vec3(0.0, 0.0, -1.0), normal);
+          float card = smoothstep(-0.2, 0.5, reflection.y + reflection.x * 0.32);
+          float strip = exp(-pow((reflection.x + reflection.y * 0.48 - 0.15) * 9.0, 2.0));
+          float rim = pow(1.0 - max(normal.z, 0.0), 3.0);
+          float tone = clamp(0.04 + card * 0.64 + strip * 0.72 + rim * 0.20, 0.0, 1.0);
+          tone = mix(tone, pow(tone, 1.35) * 0.68, darkMode);
+          vec3 metal = mix(ink, bone, tone);
+          float redCard = exp(-pow((reflection.x - reflection.y * 0.25 + 0.64) * 5.5, 2.0));
+          metal = mix(metal, red, redCard * 0.58);
+          colour = vec4(metal, 1.0);
+        }
+      `;
+
+      const compile = (type: number, source: string): WebGLShader => {
+        const shader = gl.createShader(type);
+        if (!shader) throw new Error('Shader allocation failed');
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+          const reason = gl.getShaderInfoLog(shader) || 'Unknown shader error';
+          gl.deleteShader(shader);
+          throw new Error(reason);
+        }
+        return shader;
+      };
+
+      try {
+        const program = gl.createProgram();
+        if (!program) throw new Error('Program allocation failed');
+        const vs = compile(gl.VERTEX_SHADER, vertex);
+        const fs = compile(gl.FRAGMENT_SHADER, fragment);
+        gl.attachShader(program, vs);
+        gl.attachShader(program, fs);
+        gl.linkProgram(program);
+        gl.deleteShader(vs);
+        gl.deleteShader(fs);
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program) || 'Program link failed');
+        const vertexArray = gl.createVertexArray();
+        gl.bindVertexArray(vertexArray);
+        gl.useProgram(program);
+
+        const uniforms = Object.fromEntries(
+          ['resolution', 'time', 'seed', 'darkMode', 'pointer', 'pointerVelocity', 'pointerEnergy']
+            .map((name) => [name, gl.getUniformLocation(program, name)]),
+        );
+        const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+        const coarsePointer = matchMedia('(pointer: coarse)');
+        const pointer = { x: 2, y: 2, targetX: 2, targetY: 2, velocityX: 0, velocityY: 0, energy: 0, inside: false, lastX: NaN, lastY: NaN };
+        let visible = false;
+        let running = false;
+        let frameId = 0;
+        let lastFrame = 0;
+        let elapsed = 0;
+
+        const draw = () => {
+          if (gl.isContextLost()) return;
+          gl.viewport(0, 0, canvas.width, canvas.height);
+          gl.uniform2f(uniforms.resolution, canvas.width, canvas.height);
+          gl.uniform1f(uniforms.time, elapsed);
+          gl.uniform1f(uniforms.seed, 12);
+          gl.uniform1f(uniforms.darkMode, 1);
+          gl.uniform2f(uniforms.pointer, pointer.x, pointer.y);
+          gl.uniform2f(uniforms.pointerVelocity, pointer.velocityX, pointer.velocityY);
+          gl.uniform1f(uniforms.pointerEnergy, pointer.energy);
+          gl.drawArrays(gl.TRIANGLES, 0, 3);
+        };
+        const resize = () => {
+          const rect = root.getBoundingClientRect();
+          const cap = coarsePointer.matches ? 1.25 : 1.5;
+          const ratio = Math.min(devicePixelRatio || 1, cap, 1920 / Math.max(1, rect.width));
+          const width = Math.max(1, Math.round(rect.width * ratio));
+          const height = Math.max(1, Math.round(rect.height * ratio));
+          if (canvas.width !== width || canvas.height !== height) {
+            canvas.width = width;
+            canvas.height = height;
+          }
+          draw();
+        };
+        const tick = (now: number) => {
+          if (!running) return;
+          frameId = requestAnimationFrame(tick);
+          const frameGap = 1000 / (coarsePointer.matches ? 30 : 60);
+          if (now - lastFrame < frameGap - 1) return;
+          const delta = Math.min((now - lastFrame) / 1000, 1 / 30);
+          lastFrame = now;
+          const positionEase = 1 - Math.exp(-delta * 13);
+          const energyEase = 1 - Math.exp(-delta * 8);
+          pointer.x += (pointer.targetX - pointer.x) * positionEase;
+          pointer.y += (pointer.targetY - pointer.y) * positionEase;
+          pointer.energy += (Number(pointer.inside) - pointer.energy) * energyEase;
+          pointer.velocityX *= Math.exp(-delta * 7);
+          pointer.velocityY *= Math.exp(-delta * 7);
+          elapsed += delta;
+          draw();
+        };
+        const stop = () => {
+          running = false;
+          cancelAnimationFrame(frameId);
+          pointer.inside = false;
+          pointer.lastX = NaN;
+        };
+        const sync = () => {
+          if (visible && !document.hidden && !reducedMotion.matches) {
+            if (!running) {
+              running = true;
+              lastFrame = performance.now() - 1000 / (coarsePointer.matches ? 30 : 60);
+              frameId = requestAnimationFrame(tick);
+            }
+          } else {
+            stop();
+          }
+        };
+        const movePointer = (event: PointerEvent) => {
+          if (event.pointerType !== 'mouse' || reducedMotion.matches) return;
+          const rect = root.getBoundingClientRect();
+          const x = (event.clientX - rect.left) / rect.width;
+          const y = 1 - (event.clientY - rect.top) / rect.height;
+          if (x < 0 || x > 1 || y < 0 || y > 1) {
+            pointer.inside = false;
+            pointer.lastX = NaN;
+            return;
+          }
+          if (Number.isFinite(pointer.lastX)) {
+            pointer.velocityX += Math.max(-.08, Math.min(.08, x - pointer.lastX));
+            pointer.velocityY += Math.max(-.08, Math.min(.08, y - pointer.lastY));
+          }
+          pointer.targetX = x;
+          pointer.targetY = y;
+          pointer.inside = true;
+          pointer.lastX = x;
+          pointer.lastY = y;
+        };
+
+        new ResizeObserver(resize).observe(root);
+        new IntersectionObserver(([entry]) => {
+          visible = entry.isIntersecting;
+          sync();
+        }, { threshold: .01 }).observe(root);
+        document.addEventListener('visibilitychange', sync);
+        reducedMotion.addEventListener('change', sync);
+        window.addEventListener('pointermove', movePointer, { passive: true });
+        document.documentElement.addEventListener('pointerleave', () => { pointer.inside = false; pointer.lastX = NaN; });
+        canvas.addEventListener('webglcontextlost', (event) => {
+          event.preventDefault();
+          stop();
+          root.dataset.ready = 'false';
+        });
+        resize();
+        root.dataset.ready = 'true';
+      } catch (error) {
+        console.warn('LUFI material unavailable:', error);
+      }
+    }
+  }
+</script>

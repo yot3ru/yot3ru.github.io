@@ -1,14 +1,17 @@
 {
-  "name": "lufi",
+  "name": "lufi-studio",
+  "version": "2.0.0",
   "private": true,
-  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "node scripts/astro.mjs dev",
+    "build": "node scripts/astro.mjs check && node scripts/astro.mjs build",
+    "preview": "node scripts/astro.mjs preview",
+    "check": "node scripts/astro.mjs check"
   },
-  "dependencies": {
-    "vite": "^8.2.2"
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "astro": "^7.3.3",
+    "typescript": "^6.0.3"
   }
 }

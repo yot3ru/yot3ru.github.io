@@ -1,105 +1,36 @@
 # LUFI
 
-LUFI is a creative production studio based in Colombo, Sri Lanka. We help
-culture-first brands close the gap between a good idea and the work people
-actually see, use, and remember.
+LUFI is an independent creative studio in Colombo, Sri Lanka. The studio works across graphic design, photography, film and digital experiences. This website is an expression of LUFI's thinking and craft: its typography, visual language, motion and responsive behavior serve as the demonstration.
 
-The studio brings graphic design, video editing, photography, videography, and
-UI/UX into one point of view. The site is a commercial portfolio: it explains
-what LUFI makes, shows how the studio works, presents self-initiated studio
-pieces, and moves visitors toward a conversation.
-
-## Website direction
-
-The interface uses an editorial-academia language built from:
-
-- Bone, Ink, and Cinnabar as the complete color palette.
-- Funnel Display for display type and numerals.
-- DM Sans for body copy and interface labels.
-- Zodiak for the single process pull quote.
-- Ruled lists, folios, generous margins, and a responsive editorial grid.
-- A dark liquid-metal material that stays within the LUFI palette.
-
-The page is organized as six chapters:
-
-1. Start
-2. What we make
-3. How we work
-4. Studio pieces
-5. Fit
-6. Brief us
-
-The work chapter advances one project per wheel step on desktop and tablet. On
-mobile, each project is a landscape spread that advances with a horizontal
-swipe.
-
-## Stack
-
-- Vite
-- Vanilla JavaScript
-- CSS
-- WebGL2 material with a static SVG fallback
-- Self-hosted WOFF2 fonts
-
-There is no UI framework, scroll library, or animation dependency.
+The site does not present concept art as commissioned client work. Its images and motion are labeled LUFI studies or studio experiments. There are no fictional case studies, client names, results or testimonials.
 
 ## Run locally
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-Open the local URL shown by Vite. The production build can be checked with:
+`npm run build` checks Astro and TypeScript, then writes the static site to `dist`. `npm run preview` serves that build locally.
 
-```bash
-npm run build
-npm run preview
-```
+## Deployment
 
-## GitHub Pages
+The GitHub Actions workflow in `.github/workflows/deploy.yml` builds `dist` and deploys it to GitHub Pages when `main` is pushed. Set the repository's Pages source to **GitHub Actions**. `public/CNAME` declares the `lufi.lk` custom domain, and `astro.config.mjs` uses that origin for canonical and social URLs.
 
-The repository includes a GitHub Actions workflow at
-`.github/workflows/static.yml`. Push the `main` branch, then set the
-repository's Pages source to **GitHub Actions** under Settings → Pages. The
-workflow builds `dist` and publishes that output; GitHub Pages must not publish
-the repository root because the source `index.html` still points to Vite's
-development entrypoint.
+The repository root is source code; Pages must publish the `dist` artifact, not the root directory.
 
-Vite uses relative production URLs, so the same build works at both a project
-URL such as `https://name.github.io/lufi/` and a custom domain root.
-The repository also includes `public/CNAME` for `lufi.lk`.
+## Site structure
 
-## Project structure
+- `src/pages/index.astro` — single-page narrative and content
+- `src/components/` — navigation, footer and hero material
+- `src/styles/global.css` — layout, type, color and responsive behavior
+- `public/img/` — logos and optimized LUFI studies
+- `public/video/` — Higgsfield LUFI material loop
+- `DESIGN.md` — art direction and interaction rules
+- `PRODUCT.md` — product goals and truth boundaries
 
-```text
-index.html                 Six-section site markup and content
-src/main.js                Section paging, project rail, cursor, material mount
-src/chrome.js              Liquid-metal WebGL renderer
-src/styles/tokens.css      Brand tokens, fonts, and motion curves
-src/styles/app.css         Base layout and component styles
-src/styles/redesign.css    Dark editorial system and responsive overrides
-public/fonts               Self-hosted brand typefaces
-public/img                 Logos, fallback material, and studio pieces
-PRODUCT.md                 Product context and content constraints
-DESIGN.md                  Visual direction
-UX-SYSTEM.md               UX flow, spacing system, and research basis
-```
+## Before launch
 
-## Before publishing
+Replace the contact placeholder in `src/pages/index.astro` with LUFI's **verified** WhatsApp number and email. Do not invent them. Run `npm run build` after any content or asset change.
 
-- Replace the `[TK]` WhatsApp, email, and Instagram placeholders in
-  `index.html` with the final contact details.
-- Confirm that every studio image and logo asset is cleared for publication.
-- Run `npm run build` and test the final build at desktop, tablet, and 320px
-  mobile widths.
-- Keep `prefers-reduced-motion` and the static material fallback enabled.
-
-The portfolio currently labels the five projects as self-initiated studio work.
-No client names, testimonials, awards, or performance claims should be added
-without real evidence.
-
-## License
-
-No open-source license has been assigned yet. Add the appropriate license and
-copyright notice before distributing the repository publicly.
+The private `brand/` directory is ignored and must stay out of the published repository. No open-source license has been assigned to the site or brand assets.

@@ -1,0 +1,114 @@
+---
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  light?: boolean;
+}
+
+const {
+  title,
+  description,
+  image = '/img/lufi-material-hero.webp',
+  light = false,
+} = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const socialImage = new URL(image, Astro.site);
+---
+
+<!doctype html>
+<html lang="en" class:list={{ 'page-light': light }}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content={light ? '#EBE7E0' : '#181715'} />
+    <meta name="description" content={description} />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="LUFI" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={socialImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
+    <meta name="view-transition" content="same-origin" />
+    <link rel="icon" href="/img/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/img/lufi-mark.svg" />
+    <link rel="preload" href="/fonts/FunnelDisplay-0.woff2" as="font" type="font/woff2" crossorigin />
+    <title>{title}</title>
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <SiteHeader />
+    <main id="main"><slot /></main>
+    <SiteFooter />
+    <span class="pointer-mark" aria-hidden="true"></span>
+
+    <script>
+      const menu = document.querySelector('[data-menu]');
+      const openMenu = document.querySelector('[data-menu-open]');
+      const closeMenu = document.querySelector('[data-menu-close]');
+      if (menu instanceof HTMLDialogElement && openMenu instanceof HTMLButtonElement) {
+        openMenu.addEventListener('click', () => menu.showModal());
+        closeMenu?.addEventListener('click', () => menu.close());
+        menu.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => menu.close()));
+        menu.addEventListener('click', (event) => { if (event.target === menu) menu.close(); });
+      }
+
+      const capability = document.querySelector('[data-capability]');
+      if (capability instanceof HTMLElement) {
+        const buttons = [...capability.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+        const panels = [...capability.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
+        const activate = (button: HTMLButtonElement) => {
+          buttons.forEach((item) => {
+            const selected = item === button;
+            item.setAttribute('aria-selected', String(selected));
+            item.setAttribute('tabindex', selected ? '0' : '-1');
+          });
+          panels.forEach((panel) => { panel.hidden = panel.id !== button.getAttribute('aria-controls'); });
+          capability.dataset.active = button.dataset.key;
+        };
+        buttons.forEach((button, index) => {
+          button.addEventListener('click', () => activate(button));
+          button.addEventListener('keydown', (event) => {
+            if (!['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+            event.preventDefault();
+            const step = ['ArrowDown', 'ArrowRight'].includes(event.key) ? 1 : -1;
+            const next = buttons[(index + step + buttons.length) % buttons.length];
+            activate(next);
+            next.focus();
+          });
+        });
+      }
+
+      const pointer = document.querySelector('.pointer-mark');
+      const fine = matchMedia('(hover: hover) and (pointer: fine)');
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+      if (pointer instanceof HTMLElement && fine.matches && !reduce.matches) {
+        let tx = innerWidth / 2, ty = innerHeight / 2, x = tx, y = ty;
+        addEventListener('pointermove', (event) => {
+          tx = event.clientX; ty = event.clientY; pointer.dataset.on = 'true';
+        }, { passive: true });
+        document.querySelectorAll('a, button').forEach((item) => {
+          item.addEventListener('pointerenter', () => pointer.dataset.over = 'true');
+          item.addEventListener('pointerleave', () => delete pointer.dataset.over);
+        });
+        const frame = () => {
+          x += (tx - x) * .2; y += (ty - y) * .2;
+          pointer.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
+          requestAnimationFrame(frame);
+        };
+        requestAnimationFrame(frame);
+      }
+    </script>
+  </body>
+</html>
