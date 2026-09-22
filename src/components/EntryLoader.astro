@@ -59,20 +59,22 @@
   if (!root.classList.contains('entry-active') || !loader || !stage) {
     loader?.remove();
   } else {
+    // The inline watchdog is only for a missing loader script. Real asset loading
+    // takes as long as it needs once this module has started.
+    window.clearTimeout((window as Window & { __lufiEntryFailSafe?: number }).__lufiEntryFailSafe);
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const mode = root.dataset.entryMode === 'warm' ? 'warm' : 'cold';
+    const startedAt = performance.now();
     if (reducedMotion) {
       stage.querySelector<SVGSVGElement>('[data-entry-wave]')?.pauseAnimations();
     }
     const timing = reducedMotion
-      ? { minimum: 180, assets: 280, settle: 60, exit: 160, heroDelay: 0 }
+      ? { minimum: 0, settle: 60, exit: 160, heroDelay: 0 }
       : mode === 'warm'
-        ? { minimum: 720, assets: 800, settle: 180, exit: 300, heroDelay: 25 }
-        : { minimum: 1450, assets: 1650, settle: 220, exit: 380, heroDelay: 45 };
+        ? { minimum: 650, settle: 180, exit: 300, heroDelay: 25 }
+        : { minimum: 900, settle: 220, exit: 380, heroDelay: 45 };
     let aborted = false;
     let released = false;
-
-    loader.style.setProperty('--entry-fill-duration', `${timing.minimum}ms`);
 
     const wait = (duration: number) => new Promise<void>((resolve) => window.setTimeout(resolve, duration));
     const nextPaint = () => new Promise<void>((resolve) => {
@@ -88,42 +90,65 @@
     document.addEventListener('keydown', tabGuard, true);
     window.addEventListener('lufi-entry-abort', abort, { once: true });
 
-    const fontReady = async () => {
-      if (!document.fonts) return;
-      await Promise.allSettled([
-        document.fonts.load('650 64px Funnel'),
-        document.fonts.load('400 64px Zodiak'),
-        document.fonts.load('600 16px DM'),
-      ]);
-    };
-    const imageReady = async () => {
+    const decodeImage = (source: string) => {
       const image = new Image();
-      image.src = '/img/chrome-still.svg';
-      try { await image.decode(); } catch {}
+      image.decoding = 'async';
+      image.src = source;
+      return image.decode();
     };
     const materialReady = () => new Promise<void>((resolve) => {
-      if (reducedMotion) {
+      const material = document.querySelector<HTMLElement>('.hero [data-material]');
+      if (!material || ['true', 'fallback'].includes(material.dataset.ready ?? '')) {
         resolve();
         return;
       }
-      const material = document.querySelector<HTMLElement>('.hero [data-material]');
-      if (!material || material.dataset.ready === 'true') {
-        requestAnimationFrame(() => resolve());
-        return;
-      }
-      let settled = false;
       const done = () => {
-        if (settled) return;
-        settled = true;
         observer.disconnect();
         resolve();
       };
       const observer = new MutationObserver(() => {
-        if (material.dataset.ready === 'true') requestAnimationFrame(done);
+        if (['true', 'fallback'].includes(material.dataset.ready ?? '')) done();
       });
       observer.observe(material, { attributes: true, attributeFilter: ['data-ready'] });
-      window.setTimeout(done, mode === 'warm' ? 520 : 1050);
     });
+
+    const loadAssets = async () => {
+      const images = [...document.images];
+      // Lazy images would otherwise remain offscreen and load after the reveal.
+      images.forEach((image) => { image.loading = 'eager'; });
+      const tasks: Promise<unknown>[] = [
+        decodeImage('/img/lufi-mark.svg'),
+        materialReady(),
+        ...images.map((image) => image.decode()),
+      ];
+      if (document.fonts) {
+        tasks.push(
+          document.fonts.load('650 64px Funnel'),
+          document.fonts.load('400 64px Zodiak'),
+          document.fonts.load('600 16px DM'),
+        );
+      }
+
+      let complete = 0;
+      let failed = 0;
+      const counted = tasks.map((task) => Promise.resolve(task).then(
+        () => { complete++; },
+        () => { complete++; failed++; },
+      ).then(() => {
+        const progress = complete / tasks.length;
+        loader.style.setProperty('--entry-fill-offset', `${(102 - progress * 100).toFixed(3)}%`);
+      }));
+      // A stalled connection must not trap a visitor behind the loader forever.
+      let emergencyTimeout = 0;
+      const emergency = new Promise<void>((resolve) => {
+        emergencyTimeout = window.setTimeout(resolve, 60000);
+      });
+      await Promise.race([Promise.all(counted), emergency]);
+      window.clearTimeout(emergencyTimeout);
+      root.dataset.entryLoadMs = String(Math.round(performance.now() - startedAt));
+      if (complete < tasks.length || failed > 0) root.dataset.entryDegraded = String(tasks.length - complete + failed);
+      else root.dataset.entryReady = 'true';
+    };
 
     const release = async () => {
       if (released || aborted) return;
@@ -151,18 +176,15 @@
       loader.remove();
       root.classList.remove('entry-active');
       delete root.dataset.entryMode;
-      window.clearTimeout((window as Window & { __lufiEntryFailSafe?: number }).__lufiEntryFailSafe);
     };
 
     const run = async () => {
-      const assetGate = Promise.race([
-        Promise.allSettled([fontReady(), imageReady(), materialReady(), nextPaint()]),
-        wait(timing.assets),
-      ]);
       await nextPaint();
       if (aborted) return;
       loader.dataset.phase = 'forming';
-      await Promise.all([wait(timing.minimum), assetGate]);
+      await Promise.all([wait(timing.minimum), loadAssets()]);
+      // Let the last real progress step finish inside the mark before its exit.
+      if (!reducedMotion) await wait(500);
       await release();
     };
 

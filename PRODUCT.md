@@ -18,7 +18,7 @@ One static page: LUFI hero → point of view → capabilities → LUFI Lab → h
 
 ## Technical delivery
 
-Astro + TypeScript + CSS, built to static files and deployed to GitHub Pages. No runtime backend, form or scroll library. Images are optimized WebP. The Lab gallery animates only near view and can be paused or browsed manually. WebGL2 is a progressive enhancement with a static image fallback and reduced-motion behavior.
+Astro + TypeScript + CSS, built to static files and deployed to GitHub Pages. No runtime backend, form or scroll library. Images are optimized WebP. The Lab gallery animates only near view and can be paused or browsed manually. The material shader runs through WebGL2 or WebGL1 when available; unsupported contexts show solid Ink.
 
 ## Brand
 
@@ -29,8 +29,8 @@ Bone `#EBE7E0`, Ink `#181715`, Cinnabar `#CD474C`. Funnel Display, DM Sans and Z
 - Mobile first, readable at 320px without horizontal overflow.
 - No cut-off content or forced section paging.
 - Keyboard-accessible navigation and tabs, visible focus and semantic HTML.
-- Reduced-motion stills, no essential content hidden by JavaScript.
-- Fast static HTML, lazy image decoding, no video in the critical path.
+- Reduced-motion control for text and galleries, no essential content hidden by JavaScript.
+- Fast static HTML and an entry gate that decodes page imagery and fonts before reveal; no video in the critical path.
 - Build must pass `npm run build` before publication.
 
 ## Pending owner input

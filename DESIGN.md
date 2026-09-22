@@ -13,8 +13,8 @@ LUFI's website is the studio's current demonstration of taste. It does not imita
 ## Interaction
 
 - Native scrolling; no scroll interception or snap.
-- First entry begins as a clean Ink field at true zero. The LUFI mark behaves as a flat vessel: a Bone liquid level rises from below while its Cinnabar surface changes through irregular Bézier contours, then settles above the mask before the finished mark dissolves into the already-painted hero. The level itself stays on a compositor transform; only the small bounded surface repaints. Cold entry resolves within roughly 2.5 seconds, warm reloads in roughly 1.5 seconds, and internal navigation never replays it. Reduced motion uses a short static fill, and a 5.2-second fail-safe releases the page with a fade.
-- One primary interactive moment: the folded chrome material from LUFI's earlier live site, with a slow jelly-like response to pointer movement. A long, gradual horizontal mask leaves the headline on Ink while the metal comes forward on the right. The original chrome still appears if WebGL2 is unavailable or motion is reduced.
+- First entry begins as a clean Ink field at true zero. The LUFI mark behaves as a flat vessel: a Bone liquid level rises from below while its Cinnabar surface changes through irregular Bézier contours. Its fill reflects decoded page images, brand fonts, the logo and the hero material. Offscreen images are brought into the loading gate before reveal; the fill reaches the top only after those assets settle. The finished mark then dissolves into the already-painted hero. Warm reloads use the same asset gate. Reduced motion keeps the asset gate but removes the liquid transition. If loading stalls for a full minute, the page releases in a degraded state rather than trapping the visitor.
+- One primary interactive moment: the folded chrome material from LUFI's earlier live site, with a slow jelly-like response to pointer movement. A long, gradual horizontal mask leaves the headline on Ink while the metal comes forward on the right. The shader tries WebGL2, then WebGL1. If neither can render, the field remains solid Ink without a substitute image.
 - The hero keeps “Make something” fixed and rotates 22 short endings. Each cycle is shuffled; endings with the same starting letter have at least two other endings between them. Reduced-motion visitors see the original static line.
 - Capability titles are real tabs, work by click, touch and arrow keys, and update a labeled LUFI study. All content remains available without hover.
 - LUFI Lab has two continuous artwork streams moving in opposite directions. A visible control pauses both streams; mouse hover and keyboard focus pause them temporarily. Paused and reduced-motion visitors can browse each row manually. Motion stops offscreen and in hidden tabs.
@@ -28,7 +28,7 @@ LUFI's website is the studio's current demonstration of taste. It does not imita
 - Once the entry overlay begins to clear, the hero resolves in one short sequence: navigation, label, two display lines, then secondary controls and material. The two sequences overlap so the site is already alive as it appears.
 - Section motion runs once and begins near the lower edge of the viewport. Editorial rules draw across, display lines rise inside masks, copy settles by a few pixels and media is uncovered with a restrained scale correction.
 - Mobile uses shorter travel, no staggered lists and no pointer behavior. Capability changes, menu actions and touch feedback remain immediate.
-- Reduced motion removes continuous, pointer-led and translated movement. Text, images and controls remain visible in their final state, while WebGL uses its static fallback and the Lab rows remain manually scrollable.
+- Reduced motion still calms text and gallery movement. The material shader remains active wherever WebGL runs; unsupported or failed contexts show solid Ink. The Lab rows remain manually scrollable.
 
 ## Asset truth
 

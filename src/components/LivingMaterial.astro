@@ -8,7 +8,6 @@ const { priority = false } = Astro.props;
 
 <div class="living-material" data-material data-material-priority={priority ? '' : undefined} aria-hidden="true">
   <canvas></canvas>
-  <div class="living-material__fallback"></div>
 </div>
 
 <script>
@@ -16,23 +15,37 @@ const { priority = false } = Astro.props;
 
   const initialiseMaterial = (root: HTMLElement, instanceIndex: number) => {
     const canvas = root.querySelector('canvas');
-    if (canvas instanceof HTMLCanvasElement) {
-    const gl = canvas.getContext('webgl2', { alpha: false, antialias: false, powerPreference: 'high-performance' });
-    if (gl) {
+    if (!(canvas instanceof HTMLCanvasElement)) {
+      root.dataset.ready = 'fallback';
+      return;
+    }
+    const contextOptions: WebGLContextAttributes = { alpha: false, antialias: false };
+    let gl2: WebGL2RenderingContext | null = null;
+    let gl: WebGL2RenderingContext | WebGLRenderingContext | null = null;
+    try { gl2 = canvas.getContext('webgl2', contextOptions); } catch {}
+    if (gl2) gl = gl2;
+    else try { gl = canvas.getContext('webgl', contextOptions); } catch {}
+    if (!gl) {
+      root.dataset.ready = 'fallback';
+      return;
+    }
       // Keep the folded chrome material used by the earlier LUFI site.
-      const vertex = `#version 300 es
+      const vertex = gl2 ? `#version 300 es
         void main() {
           vec2 p = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2)) * 2.0 - 1.0;
           gl_Position = vec4(p, 0.0, 1.0);
         }
+      ` : `attribute vec2 position;
+        void main() { gl_Position = vec4(position, 0.0, 1.0); }
       `;
-      const fragment = `#version 300 es
-        precision highp float;
+      const fragmentPrecision = gl2 || (gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.HIGH_FLOAT)?.precision ?? 0) > 0 ? 'highp' : 'mediump';
+      const fragment = `${gl2 ? '#version 300 es' : ''}
+        precision ${fragmentPrecision} float;
         uniform vec2 resolution;
         uniform float time, seed, darkMode;
         uniform vec2 pointer, pointerVelocity;
         uniform float pointerEnergy;
-        out vec4 colour;
+        ${gl2 ? 'out vec4 colour;' : ''}
         const vec3 bone = vec3(235, 231, 224) / 255.0;
         const vec3 ink = vec3(24, 23, 21) / 255.0;
         const vec3 red = vec3(205, 71, 76) / 255.0;
@@ -82,7 +95,7 @@ const { priority = false } = Astro.props;
           vec3 metal = mix(ink, bone, tone);
           float redCard = exp(-pow((reflection.x - reflection.y * 0.25 + 0.64) * 5.5, 2.0));
           metal = mix(metal, red, redCard * 0.58);
-          colour = vec4(metal, 1.0);
+          ${gl2 ? 'colour' : 'gl_FragColor'} = vec4(metal, 1.0);
         }
       `;
 
@@ -110,16 +123,25 @@ const { priority = false } = Astro.props;
         gl.deleteShader(vs);
         gl.deleteShader(fs);
         if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program) || 'Program link failed');
-        const vertexArray = gl.createVertexArray();
-        gl.bindVertexArray(vertexArray);
+        if (gl2) {
+          const vertexArray = gl2.createVertexArray();
+          gl2.bindVertexArray(vertexArray);
+        } else {
+          const buffer = gl.createBuffer();
+          if (!buffer) throw new Error('Vertex buffer allocation failed');
+          gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+          const position = gl.getAttribLocation(program, 'position');
+          if (position < 0) throw new Error('Vertex position unavailable');
+          gl.enableVertexAttribArray(position);
+          gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+        }
         gl.useProgram(program);
 
         const uniforms = Object.fromEntries(
           ['resolution', 'time', 'seed', 'darkMode', 'pointer', 'pointerVelocity', 'pointerEnergy']
             .map((name) => [name, gl.getUniformLocation(program, name)]),
         );
-        const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-        const coarsePointer = matchMedia('(pointer: coarse)');
         const pointer = { x: 2, y: 2, targetX: 2, targetY: 2, velocityX: 0, velocityY: 0, energy: 0, inside: false, lastX: NaN, lastY: NaN };
         let visible = false;
         let running = false;
@@ -141,8 +163,7 @@ const { priority = false } = Astro.props;
         };
         const resize = () => {
           const rect = root.getBoundingClientRect();
-          const cap = coarsePointer.matches ? 1.5 : 1.75;
-          const ratio = Math.min(devicePixelRatio || 1, cap, 1920 / Math.max(1, rect.width));
+          const ratio = Math.min(devicePixelRatio || 1, 2, 2400 / Math.max(1, rect.width));
           const width = Math.max(1, Math.round(rect.width * ratio));
           const height = Math.max(1, Math.round(rect.height * ratio));
           if (canvas.width !== width || canvas.height !== height) {
@@ -154,7 +175,7 @@ const { priority = false } = Astro.props;
         const tick = (now: number) => {
           if (!running) return;
           frameId = requestAnimationFrame(tick);
-          const frameGap = 1000 / (coarsePointer.matches ? 30 : 60);
+          const frameGap = 1000 / 60;
           if (now - lastFrame < frameGap - 1) return;
           const delta = Math.min((now - lastFrame) / 1000, 1 / 30);
           lastFrame = now;
@@ -175,10 +196,10 @@ const { priority = false } = Astro.props;
           pointer.lastX = NaN;
         };
         const sync = () => {
-          if (visible && !document.hidden && !reducedMotion.matches) {
+          if (visible && !document.hidden) {
             if (!running) {
               running = true;
-              lastFrame = performance.now() - 1000 / (coarsePointer.matches ? 30 : 60);
+              lastFrame = performance.now() - 1000 / 60;
               frameId = requestAnimationFrame(tick);
             }
           } else {
@@ -186,7 +207,7 @@ const { priority = false } = Astro.props;
           }
         };
         const movePointer = (event: PointerEvent) => {
-          if (event.pointerType !== 'mouse' || reducedMotion.matches) return;
+          if (event.pointerType !== 'mouse') return;
           const rect = root.getBoundingClientRect();
           const x = (event.clientX - rect.left) / rect.width;
           const y = 1 - (event.clientY - rect.top) / rect.height;
@@ -206,27 +227,39 @@ const { priority = false } = Astro.props;
           pointer.lastY = y;
         };
 
-        new ResizeObserver(resize).observe(root);
-        new IntersectionObserver(([entry]) => {
+        const sizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(resize);
+        if (sizeObserver) sizeObserver.observe(root);
+        else window.addEventListener('resize', resize);
+        const viewObserver = typeof IntersectionObserver === 'undefined' ? null : new IntersectionObserver(([entry]) => {
           visible = entry.isIntersecting;
           sync();
-        }, { threshold: .01 }).observe(root);
+        }, { threshold: .01 });
+        if (viewObserver) viewObserver.observe(root);
+        else { visible = true; sync(); }
+        const leavePointer = () => { pointer.inside = false; pointer.lastX = NaN; };
         document.addEventListener('visibilitychange', sync);
-        reducedMotion.addEventListener('change', sync);
         window.addEventListener('pointermove', movePointer, { passive: true });
-        document.documentElement.addEventListener('pointerleave', () => { pointer.inside = false; pointer.lastX = NaN; });
+        document.documentElement.addEventListener('pointerleave', leavePointer);
         canvas.addEventListener('webglcontextlost', (event) => {
           event.preventDefault();
           stop();
-          root.dataset.ready = 'false';
-        });
+          sizeObserver?.disconnect();
+          viewObserver?.disconnect();
+          window.removeEventListener('resize', resize);
+          document.removeEventListener('visibilitychange', sync);
+          window.removeEventListener('pointermove', movePointer);
+          document.documentElement.removeEventListener('pointerleave', leavePointer);
+          root.dataset.ready = 'fallback';
+        }, { once: true });
+        canvas.addEventListener('webglcontextrestored', () => {
+          initialiseMaterial(root, instanceIndex);
+        }, { once: true });
         resize();
         root.dataset.ready = 'true';
       } catch (error) {
         console.warn('LUFI material unavailable:', error);
+        root.dataset.ready = 'fallback';
       }
-    }
-    }
   };
 
   roots.forEach((root, instanceIndex) => {

@@ -13,6 +13,8 @@ npm run dev
 
 `npm run build` checks Astro and TypeScript, writes the static site to `dist`, then verifies required Pages files and local asset references. `npm run preview` serves that build locally.
 
+The entry mark is a real asset-loading indicator. It waits for page images, brand fonts, the logo and the hero material before revealing the site. Slow or failed requests can lengthen the first visit; a one-minute emergency release prevents an indefinite blocking screen.
+
 ## Deployment
 
 The GitHub Actions workflow in `.github/workflows/deploy.yml` checks the project, builds `dist`, packages the Pages artifact and deploys it whenever `main` is pushed. In the repository, set **Settings → Pages → Source** to **GitHub Actions**. Set the custom domain there to `lufi.lk`; `public/CNAME` and `astro.config.mjs` preserve the same canonical origin in the generated site.
