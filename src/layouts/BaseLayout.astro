@@ -1,6 +1,7 @@
 ---
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import EntryLoader from '../components/EntryLoader.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -8,13 +9,15 @@ interface Props {
   description: string;
   image?: string;
   light?: boolean;
+  robots?: string;
 }
 
 const {
   title,
   description,
-  image = '/img/lufi-material-hero.webp',
+  image = '/img/lufi-social.webp',
   light = false,
+  robots = 'index, follow',
 } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const socialImage = new URL(image, Astro.site);
@@ -25,9 +28,60 @@ const socialImage = new URL(image, Astro.site);
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <style is:inline>
+      html{background:#181715}
+      .entry-loader{display:none;position:fixed;inset:0;z-index:2147483647;place-items:center;width:100%;height:100svh;min-height:100svh;background:#181715;pointer-events:auto;contain:strict}
+      @supports(height:100dvh){.entry-loader{height:100dvh}}
+      html[data-entry-mode] .entry-loader{display:grid}
+      html.entry-active,html.entry-active body{overflow:hidden}
+      .entry-loader__stage{position:relative;width:clamp(4.5rem,10vw,7rem);aspect-ratio:879/1654;isolation:isolate}
+      .entry-loader__mark{--entry-surface:100%;position:absolute;z-index:1;inset:0;overflow:hidden;background:transparent;opacity:0;transition:opacity 90ms linear;-webkit-mask:url('/img/lufi-mark.svg') center/contain no-repeat;mask:url('/img/lufi-mark.svg') center/contain no-repeat}
+      .entry-loader[data-phase="tracing"] .entry-loader__mark,.entry-loader[data-phase="filling"] .entry-loader__mark,.entry-loader[data-phase="completing"] .entry-loader__mark,.entry-loader[data-phase="complete"] .entry-loader__mark{opacity:1}
+      .entry-loader__orbit{position:absolute;z-index:2;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;clip-path:polygon(0 100%,100% 100%,100% 100%,0 100%);transition:opacity 260ms ease;pointer-events:none;will-change:clip-path,opacity}
+      .entry-loader[data-phase="tracing"] .entry-loader__orbit,.entry-loader[data-phase="completing"] .entry-loader__orbit{opacity:.92}
+      .entry-loader[data-phase="complete"] .entry-loader__orbit{opacity:0}
+      .entry-loader__liquid{position:absolute;z-index:1;inset:0;background:#ebe7e0;clip-path:polygon(0 100%,100% 100%,100% 100%,0 100%);will-change:clip-path}
+      .entry-loader__tide{position:absolute;z-index:3;inset:0;width:100%;height:100%;overflow:visible;opacity:0;transition:opacity 180ms ease;pointer-events:none}
+      .entry-loader__tide path{fill:none;stroke:#cd474c;stroke-width:1.25;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+      .entry-loader[data-phase="tracing"] .entry-loader__tide,.entry-loader[data-phase="completing"] .entry-loader__tide{opacity:1}
+      .entry-loader[data-phase="complete"] .entry-loader__tide{opacity:0}
+      .entry-loader__release{position:absolute;z-index:0;left:50%;top:64.63%;width:38%;aspect-ratio:1;border:1px solid #cd474c;border-radius:50%;opacity:0;transform:translate(-50%,-50%) scale(.2);pointer-events:none}
+      .entry-loader__release::after{content:"";position:absolute;inset:20%;border:1px solid #cd474c;border-radius:inherit}
+      .entry-loader[data-phase="completing"] .entry-loader__release{animation:lufi-loader-release 420ms cubic-bezier(.22,1,.36,1) both}
+      .entry-loader[data-phase="complete"] .entry-loader__stage{animation:lufi-loader-lock 400ms cubic-bezier(.22,1,.36,1) both}
+      @keyframes lufi-loader-release{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}22%{opacity:.68}100%{opacity:0;transform:translate(-50%,-50%) scale(2.25)}}
+      @keyframes lufi-loader-lock{0%{transform:scale(1)}38%{transform:scale(.965)}100%{transform:scale(1)}}
+      @media(prefers-reduced-motion:reduce){.entry-loader__orbit,.entry-loader__tide,.entry-loader__release{display:none}.entry-loader[data-phase="complete"] .entry-loader__stage{animation:none}}
+    </style>
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        root.classList.add('js');
+        let mode = 'cold';
+        try {
+          const seen = sessionStorage.getItem('lufi-entry-seen') === '1';
+          const navigation = performance.getEntriesByType('navigation')[0];
+          mode = !seen ? 'cold' : navigation && navigation.type === 'reload' ? 'warm' : 'skip';
+        } catch {}
+        if (mode === 'skip') {
+          root.classList.add('motion-ready');
+          return;
+        }
+        root.dataset.entryMode = mode;
+        root.classList.add('entry-active');
+        window.__lufiEntryFailSafe = window.setTimeout(() => {
+          window.dispatchEvent(new Event('lufi-entry-abort'));
+          root.classList.remove('entry-active');
+          root.classList.add('motion-ready');
+          delete root.dataset.entryMode;
+          document.querySelector('[data-entry-loader]')?.remove();
+        }, 6500);
+      })();
+    </script>
+    <meta name="color-scheme" content="only light" />
     <meta name="theme-color" content={light ? '#EBE7E0' : '#181715'} />
     <meta name="description" content={description} />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content={robots} />
     <link rel="canonical" href={canonical} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="LUFI" />
@@ -35,46 +89,127 @@ const socialImage = new URL(image, Astro.site);
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={socialImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="LUFI — independent creative studio" />
+    <meta property="og:locale" content="en_LK" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImage} />
+    <meta name="twitter:image:alt" content="LUFI — independent creative studio" />
     <meta name="view-transition" content="same-origin" />
     <link rel="icon" href="/img/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/img/lufi-mark.svg" />
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
     <link rel="preload" href="/fonts/FunnelDisplay-0.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/Zodiak-Italic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/DMSans-0.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/img/lufi-mark.svg" as="image" type="image/svg+xml" />
+    <link rel="preload" href="/img/chrome-still.svg" as="image" type="image/svg+xml" />
     <title>{title}</title>
     <slot name="head" />
   </head>
   <body>
+    <EntryLoader />
     <a class="skip-link" href="#main">Skip to content</a>
     <SiteHeader />
     <main id="main"><slot /></main>
     <SiteFooter />
-    <span class="pointer-mark" aria-hidden="true"></span>
+    <div class="custom-cursor" data-cursor-overlay data-state="hidden" data-theme="dark" aria-hidden="true">
+      <span class="custom-cursor__core"></span>
+      <span class="custom-cursor__follower"></span>
+    </div>
 
     <script>
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+      const motionStyles = getComputedStyle(document.documentElement);
+      const motionTime = (token: string, fallback: number) => Number.parseFloat(motionStyles.getPropertyValue(token)) || fallback;
+      const motion = {
+        micro: motionTime('--duration-micro', 160),
+        fast: motionTime('--duration-fast', 240),
+        base: motionTime('--duration-base', 450),
+        reveal: motionTime('--duration-reveal', 650),
+        ease: motionStyles.getPropertyValue('--ease-out-primary').trim() || 'cubic-bezier(.22,1,.36,1)',
+        soft: motionStyles.getPropertyValue('--ease-out-soft').trim() || 'cubic-bezier(.16,1,.3,1)',
+      };
       const menu = document.querySelector('[data-menu]');
       const openMenu = document.querySelector('[data-menu-open]');
       const closeMenu = document.querySelector('[data-menu-close]');
       if (menu instanceof HTMLDialogElement && openMenu instanceof HTMLButtonElement) {
-        openMenu.addEventListener('click', () => menu.showModal());
-        closeMenu?.addEventListener('click', () => menu.close());
-        menu.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => menu.close()));
-        menu.addEventListener('click', (event) => { if (event.target === menu) menu.close(); });
+        let closing = false;
+        const openDialog = () => {
+          if (menu.open) return;
+          const cursorLayer = document.querySelector<HTMLElement>('[data-cursor-overlay]');
+          if (cursorLayer) menu.append(cursorLayer);
+          menu.showModal();
+          if (reduce.matches) return;
+          menu.animate(
+            [{ opacity: 0 }, { opacity: 1 }],
+            { duration: motion.base, easing: motion.ease },
+          );
+          menu.querySelector('.menu__inner')?.animate(
+            [{ opacity: .82, transform: 'translate3d(0,12px,0)' }, { opacity: 1, transform: 'none' }],
+            { duration: motion.base, easing: motion.soft },
+          );
+          menu.querySelectorAll('nav a').forEach((link, index) => link.animate(
+            [{ opacity: 0, transform: 'translate3d(0,8px,0)' }, { opacity: 1, transform: 'none' }],
+            { duration: motion.base, delay: motion.micro * .35 + Math.min(index, 3) * motion.micro * .25, easing: motion.ease, fill: 'backwards' },
+          ));
+        };
+        const closeDialog = async () => {
+          if (!menu.open || closing) return;
+          if (reduce.matches) {
+            menu.close();
+            const cursorLayer = menu.querySelector<HTMLElement>('[data-cursor-overlay]');
+            if (cursorLayer) document.body.append(cursorLayer);
+            return;
+          }
+          closing = true;
+          const animation = menu.animate(
+            [{ opacity: 1 }, { opacity: 0 }],
+            { duration: motion.fast, easing: 'cubic-bezier(.4,0,1,1)' },
+          );
+          try { await animation.finished; } catch {}
+          menu.close();
+          const cursorLayer = menu.querySelector<HTMLElement>('[data-cursor-overlay]');
+          if (cursorLayer) document.body.append(cursorLayer);
+          closing = false;
+        };
+        openMenu.addEventListener('click', openDialog);
+        closeMenu?.addEventListener('click', closeDialog);
+        menu.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeDialog));
+        menu.addEventListener('click', (event) => { if (event.target === menu) closeDialog(); });
+        menu.addEventListener('cancel', (event) => { event.preventDefault(); closeDialog(); });
       }
 
       const capability = document.querySelector('[data-capability]');
       if (capability instanceof HTMLElement) {
         const buttons = [...capability.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
         const panels = [...capability.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
+        const panelTimers = new WeakMap<HTMLElement, number>();
         const activate = (button: HTMLButtonElement) => {
+          if (button.getAttribute('aria-selected') === 'true') return;
           buttons.forEach((item) => {
             const selected = item === button;
             item.setAttribute('aria-selected', String(selected));
             item.setAttribute('tabindex', selected ? '0' : '-1');
           });
-          panels.forEach((panel) => { panel.hidden = panel.id !== button.getAttribute('aria-controls'); });
+          panels.forEach((panel) => {
+            const selected = panel.id === button.getAttribute('aria-controls');
+            panel.hidden = !selected;
+            if (selected && !reduce.matches) {
+              const previousTimer = panelTimers.get(panel);
+              if (previousTimer) window.clearTimeout(previousTimer);
+              delete panel.dataset.entering;
+              requestAnimationFrame(() => {
+                panel.dataset.entering = '';
+                panelTimers.set(panel, window.setTimeout(() => {
+                  delete panel.dataset.entering;
+                  panelTimers.delete(panel);
+                }, motion.base + motion.micro * .5));
+              });
+            }
+          });
           capability.dataset.active = button.dataset.key;
         };
         buttons.forEach((button, index) => {
@@ -90,24 +225,196 @@ const socialImage = new URL(image, Astro.site);
         });
       }
 
-      const pointer = document.querySelector('.pointer-mark');
-      const fine = matchMedia('(hover: hover) and (pointer: fine)');
-      const reduce = matchMedia('(prefers-reduced-motion: reduce)');
-      if (pointer instanceof HTMLElement && fine.matches && !reduce.matches) {
-        let tx = innerWidth / 2, ty = innerHeight / 2, x = tx, y = ty;
-        addEventListener('pointermove', (event) => {
-          tx = event.clientX; ty = event.clientY; pointer.dataset.on = 'true';
-        }, { passive: true });
-        document.querySelectorAll('a, button').forEach((item) => {
-          item.addEventListener('pointerenter', () => pointer.dataset.over = 'true');
-          item.addEventListener('pointerleave', () => delete pointer.dataset.over);
-        });
-        const frame = () => {
-          x += (tx - x) * .2; y += (ty - y) * .2;
-          pointer.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
-          requestAnimationFrame(frame);
+      const cursor = document.querySelector<HTMLElement>('[data-cursor-overlay]');
+      const cursorCore = cursor?.querySelector<HTMLElement>('.custom-cursor__core');
+      const cursorFollower = cursor?.querySelector<HTMLElement>('.custom-cursor__follower');
+      const fine = matchMedia('(any-hover: hover) and (any-pointer: fine)');
+      if (cursor && cursorCore && cursorFollower) {
+        type CursorState = 'default' | 'link' | 'cta' | 'media' | 'text' | 'hidden';
+        const cursorScale: Record<CursorState, number> = { default: 1, link: 1.3, cta: 1.55, media: 1.22, text: .8, hidden: .8 };
+        const coreScale: Record<CursorState, number> = { default: 1, link: 1, cta: 1, media: .86, text: .8, hidden: .8 };
+        let enabled = false;
+        let visible = false;
+        let pressed = false;
+        let state: CursorState = 'hidden';
+        let targetX = innerWidth / 2;
+        let targetY = innerHeight / 2;
+        let followerX = targetX;
+        let followerY = targetY;
+        let followerScale = .8;
+        let preciseScale = .8;
+        let velocity = 0;
+        let angle = 0;
+        let previousX = Number.NaN;
+        let previousY = Number.NaN;
+        let nativeText: HTMLElement | null = null;
+        let frameId = 0;
+        let lastFrame = performance.now();
+        let needsClassification = false;
+
+        const eligible = () => fine.matches && !reduce.matches;
+        const clearNativeText = () => {
+          nativeText?.classList.remove('cursor-native-text');
+          nativeText = null;
         };
-        requestAnimationFrame(frame);
+        const disableCursor = () => {
+          enabled = false;
+          visible = false;
+          pressed = false;
+          cursor.dataset.state = 'hidden';
+          delete cursor.dataset.pressed;
+          delete document.documentElement.dataset.cursorReady;
+          clearNativeText();
+          cancelAnimationFrame(frameId);
+          frameId = 0;
+        };
+        const enableCursor = () => {
+          if (enabled || !eligible()) return;
+          enabled = true;
+          document.documentElement.dataset.cursorReady = 'true';
+        };
+        const setState = (target: Element | null) => {
+          const theme = target?.closest<HTMLElement>('[data-cursor-theme]')?.dataset.cursorTheme;
+          cursor.dataset.theme = theme || 'dark';
+          const explicit = target?.closest<HTMLElement>('[data-cursor]')?.dataset.cursor;
+          const interactive = target?.closest('a,button,[role="button"],[role="tab"]');
+          const textTarget = !explicit && !interactive
+            ? target?.closest<HTMLElement>('p,h1,h2,h3,li,figcaption,small,span,input,textarea,[contenteditable="true"]') ?? null
+            : null;
+
+          let next: CursorState = 'default';
+          if (explicit === 'cta') next = 'cta';
+          else if (explicit === 'media') next = 'media';
+          else if (interactive) next = 'link';
+          else if (textTarget) next = 'text';
+
+          if (nativeText !== textTarget) {
+            clearNativeText();
+            nativeText = textTarget;
+            nativeText?.classList.add('cursor-native-text');
+          }
+          state = next;
+          cursor.dataset.state = next;
+        };
+        const startLoop = () => {
+          if (frameId || !enabled || !visible || document.hidden) return;
+          lastFrame = performance.now();
+          frameId = requestAnimationFrame(updateCursor);
+        };
+        const updateCursor = (now: number) => {
+          frameId = 0;
+          if (!enabled || !visible || document.hidden) return;
+          const delta = Math.min((now - lastFrame) / 1000, .05);
+          lastFrame = now;
+          if (needsClassification) {
+            setState(document.elementFromPoint(targetX, targetY));
+            needsClassification = false;
+          }
+          const followEase = 1 - Math.exp(-delta * 21);
+          const scaleEase = 1 - Math.exp(-delta * 24);
+          followerX += (targetX - followerX) * followEase;
+          followerY += (targetY - followerY) * followEase;
+          followerScale += (cursorScale[state] - followerScale) * scaleEase;
+          preciseScale += (coreScale[state] * (pressed ? .86 : 1) - preciseScale) * (1 - Math.exp(-delta * 34));
+          velocity *= Math.exp(-delta * 18);
+          const compression = pressed ? .9 : 1;
+          const stretch = 1 + velocity * .06;
+          cursorCore.style.transform = `translate3d(${targetX}px,${targetY}px,0) translate(-50%,-50%) scale(${preciseScale})`;
+          cursorFollower.style.transform = `translate3d(${followerX}px,${followerY}px,0) translate(-50%,-50%) rotate(${angle}rad) scale(${followerScale * compression * stretch},${followerScale * compression / Math.sqrt(stretch)})`;
+          const unsettled = Math.hypot(targetX - followerX, targetY - followerY) > .05
+            || Math.abs(cursorScale[state] - followerScale) > .002
+            || Math.abs(coreScale[state] * (pressed ? .86 : 1) - preciseScale) > .002
+            || velocity > .003
+            || needsClassification;
+          if (unsettled) frameId = requestAnimationFrame(updateCursor);
+        };
+
+        addEventListener('pointermove', (event) => {
+          if (event.pointerType !== 'mouse') {
+            visible = false;
+            delete cursor.dataset.visible;
+            clearNativeText();
+            cancelAnimationFrame(frameId);
+            frameId = 0;
+            return;
+          }
+          if (!eligible()) return;
+          enableCursor();
+          targetX = event.clientX;
+          targetY = event.clientY;
+          if (!visible) {
+            visible = true;
+            followerX = targetX;
+            followerY = targetY;
+            followerScale = .8;
+            preciseScale = .8;
+            cursor.dataset.visible = 'true';
+          }
+          if (Number.isFinite(previousX)) {
+            const dx = targetX - previousX;
+            const dy = targetY - previousY;
+            velocity = Math.min(Math.hypot(dx, dy) / 42, 1);
+            if (Math.abs(dx) + Math.abs(dy) > .1) angle = Math.atan2(dy, dx);
+          }
+          previousX = targetX;
+          previousY = targetY;
+          setState(event.target instanceof Element ? event.target : null);
+          startLoop();
+        }, { passive: true });
+        addEventListener('pointerdown', (event) => {
+          if (!enabled || event.pointerType !== 'mouse') return;
+          pressed = true;
+          cursor.dataset.pressed = 'true';
+          startLoop();
+        }, { passive: true });
+        const releaseCursor = (event: PointerEvent) => {
+          if (!enabled || event.pointerType !== 'mouse') return;
+          pressed = false;
+          delete cursor.dataset.pressed;
+          startLoop();
+        };
+        addEventListener('pointerup', releaseCursor, { passive: true });
+        addEventListener('pointercancel', releaseCursor, { passive: true });
+        addEventListener('scroll', () => {
+          if (!enabled || !visible) return;
+          needsClassification = true;
+          startLoop();
+        }, { passive: true });
+        document.documentElement.addEventListener('pointerleave', () => {
+          visible = false;
+          cursor.dataset.state = 'hidden';
+          delete cursor.dataset.visible;
+          previousX = Number.NaN;
+          previousY = Number.NaN;
+          clearNativeText();
+          cancelAnimationFrame(frameId);
+          frameId = 0;
+        });
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            cancelAnimationFrame(frameId);
+            frameId = 0;
+          } else if (visible) startLoop();
+        });
+        fine.addEventListener('change', () => { if (!eligible()) disableCursor(); });
+        reduce.addEventListener('change', () => { if (!eligible()) disableCursor(); });
+      }
+
+      const motionSections = [...document.querySelectorAll<HTMLElement>('[data-motion-section]')];
+      if (!reduce.matches && 'IntersectionObserver' in window) {
+        const reveal = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            (entry.target as HTMLElement).dataset.inView = '';
+            reveal.unobserve(entry.target);
+          });
+        }, { threshold: 0, rootMargin: '0px 0px -15% 0px' });
+        motionSections.forEach((section) => reveal.observe(section));
+      } else {
+        motionSections.forEach((section) => section.dataset.inView = '');
+      }
+      if (!document.documentElement.classList.contains('entry-active')) {
+        requestAnimationFrame(() => document.documentElement.classList.add('motion-ready'));
       }
     </script>
   </body>

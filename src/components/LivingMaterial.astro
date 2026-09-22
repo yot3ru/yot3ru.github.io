@@ -1,13 +1,22 @@
-<div class="living-material" data-material aria-hidden="true">
+---
+interface Props {
+  priority?: boolean;
+}
+
+const { priority = false } = Astro.props;
+---
+
+<div class="living-material" data-material data-material-priority={priority ? '' : undefined} aria-hidden="true">
   <canvas></canvas>
   <div class="living-material__fallback"></div>
 </div>
 
 <script>
-  const root = document.querySelector('[data-material]');
-  const canvas = root?.querySelector('canvas');
+  const roots = [...document.querySelectorAll<HTMLElement>('[data-material]')];
 
-  if (root instanceof HTMLElement && canvas instanceof HTMLCanvasElement) {
+  const initialiseMaterial = (root: HTMLElement, instanceIndex: number) => {
+    const canvas = root.querySelector('canvas');
+    if (canvas instanceof HTMLCanvasElement) {
     const gl = canvas.getContext('webgl2', { alpha: false, antialias: false, powerPreference: 'high-performance' });
     if (gl) {
       // Keep the folded chrome material used by the earlier LUFI site.
@@ -123,7 +132,7 @@
           gl.viewport(0, 0, canvas.width, canvas.height);
           gl.uniform2f(uniforms.resolution, canvas.width, canvas.height);
           gl.uniform1f(uniforms.time, elapsed);
-          gl.uniform1f(uniforms.seed, 12);
+          gl.uniform1f(uniforms.seed, 12 + instanceIndex * 5.7);
           gl.uniform1f(uniforms.darkMode, 1);
           gl.uniform2f(uniforms.pointer, pointer.x, pointer.y);
           gl.uniform2f(uniforms.pointerVelocity, pointer.velocityX, pointer.velocityY);
@@ -132,7 +141,7 @@
         };
         const resize = () => {
           const rect = root.getBoundingClientRect();
-          const cap = coarsePointer.matches ? 1.25 : 1.5;
+          const cap = coarsePointer.matches ? 1.5 : 1.75;
           const ratio = Math.min(devicePixelRatio || 1, cap, 1920 / Math.max(1, rect.width));
           const width = Math.max(1, Math.round(rect.width * ratio));
           const height = Math.max(1, Math.round(rect.height * ratio));
@@ -217,5 +226,20 @@
         console.warn('LUFI material unavailable:', error);
       }
     }
-  }
+    }
+  };
+
+  roots.forEach((root, instanceIndex) => {
+    if (root.hasAttribute('data-material-priority') || !('IntersectionObserver' in window)) {
+      initialiseMaterial(root, instanceIndex);
+      return;
+    }
+
+    const warmup = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      warmup.disconnect();
+      initialiseMaterial(root, instanceIndex);
+    }, { rootMargin: '320px 0px', threshold: 0 });
+    warmup.observe(root);
+  });
 </script>

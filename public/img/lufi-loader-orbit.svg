@@ -1,0 +1,98 @@
+<svg width="109" height="205" viewBox="905 437 109 205" fill="none" xmlns="http://www.w3.org/2000/svg">
+<style>
+@keyframes kf_Rectangle_53_transform_0 {
+  0% {
+    transform: translateX(888px) translateY(656px) translateX(5.212px) translateY(11.002px) translate(72px, 60px) scaleX(1) scaleY(1) translate(-72px, -60px);
+  }
+  1.07% {
+    animation-timing-function: ease-in-out;
+    transform: translateX(888px) translateY(656px) translateX(5.212px) translateY(11.002px) translate(72px, 60px) scaleX(1) scaleY(1) translate(-72px, -60px);
+  }
+  15.03% {
+    animation-timing-function: ease-in-out;
+    transform: translateX(888px) translateY(656px) translateX(131.291px) translateY(-44.533px) translate(72px, 60px) scaleX(1) scaleY(1) translate(-72px, -60px);
+  }
+  29.55% {
+    animation-timing-function: ease-in-out;
+    transform: translateX(888px) translateY(656px) translateX(150.036px) translateY(-183.77px) translate(72px, 60px) scaleX(1) scaleY(1) translate(-72px, -60px);
+  }
+  45.77% {
+    animation-timing-function: ease-in-out;
+    transform: translateX(888px) translateY(656px) translateX(-0.256px) translateY(-292.372px) translate(72px, 60px) scaleX(1) scaleY(1) translate(-72px, -60px);
+  }
+  64.37% {
+    animation-timing-function: ease-in-out;
+    transform: translateX(888px) translateY(656px) translateX(-149.263px) translateY(-187.649px) translate(72px, 60px) scaleX(1) scaleY(1) translate(-72px, -60px);
+  }
+  80.81% {
+    transform: translateX(888px) translateY(656px) translateX(-116.949px) translateY(-38.682px) translate(72px, 60px) scaleX(1) scaleY(1) translate(-72px, -60px);
+  }
+  100% {
+    transform: translateX(888px) translateY(656px) translateX(-0.096px) translateY(10.33px) translate(72px, 60px) scaleX(1) scaleY(1) translate(-72px, -60px);
+  }
+}
+#Rectangle_53 {
+  transform-origin: 0 0;
+  animation: kf_Rectangle_53_transform_0 3.00756s linear infinite;
+}
+@keyframes kf_Rectangle_52_transform_0 {
+  0% {
+    animation-timing-function: ease-in-out;
+    transform: translateX(888px) translateY(656px) translateX(0px) translateY(0px) translate(72px, 60px) scaleX(1) scaleY(1) translate(-72px, -60px);
+  }
+  20.75% {
+    animation-timing-function: ease-in-out;
+    transform: translateX(888px) translateY(656px) translateX(-103.941px) translateY(-43.686px) translate(72px, 60px) scaleX(1) scaleY(1) translate(-72px, -60px);
+  }
+  36.91% {
+    animation-timing-function: ease-in-out;
+    transform: translateX(888px) translateY(656px) translateX(-120.867px) translateY(-187.649px) translate(72px, 60px) scaleX(1) scaleY(1) translate(-72px, -60px);
+  }
+  50.91% {
+    animation-timing-function: ease-in-out;
+    transform: translateX(888px) translateY(656px) translateX(-1.834px) translateY(-252.933px) translate(72px, 60px) scaleX(1) scaleY(1) translate(-72px, -60px);
+  }
+  67.56% {
+    animation-timing-function: ease-in-out;
+    transform: translateX(888px) translateY(656px) translateX(113.562px) translateY(-175.12px) translate(72px, 60px) scaleX(1) scaleY(1) translate(-72px, -60px);
+  }
+  82.13% {
+    animation-timing-function: ease-in-out;
+    transform: translateX(888px) translateY(656px) translateX(103.722px) translateY(-56.348px) translate(72px, 60px) scaleX(1) scaleY(1) translate(-72px, -60px);
+  }
+  100% {
+    transform: translateX(888px) translateY(656px) translateX(3.243px) translateY(0.171px) translate(72px, 60px) scaleX(1) scaleY(1) translate(-72px, -60px);
+  }
+}
+#Rectangle_52 {
+  transform-origin: 0 0;
+  animation: kf_Rectangle_52_transform_0 3.00756s linear infinite;
+}
+</style>
+<g id="_7" clip-path="url(#clip0_157_325)">
+<mask id="mask0_157_325" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+<path id="Vector" transform="translate(905 437)" d="M68.5745 16.2364C68.5745 10.5955 70.508 5.40593 73.7487 1.29368C73.9927 0.984033 73.8108 0.519619 73.4188 0.47615C70.6572 0.169884 67.5187 6.28892e-06 63.9296 7.56482e-06L42.7796 0C19.1531 -1.8912e-06 1.62563e-05 19.143 1.41909e-05 42.7571L0 205H28.4456C28.4456 205 29.0333 204.892 29.3591 204.771C29.5774 204.69 29.8141 204.602 30.0871 204.533C32.7525 203.867 36.8929 202.568 38.7826 201.805C43.8693 199.751 46.9398 197.075 49.2254 192.702C49.7035 191.788 50.2426 190.583 50.4233 190.026L50.7518 189.013L49.9596 187.459C49.0907 185.754 47.7747 184.061 46.0696 182.454L44.9638 181.412L46.3029 180.108C48.7409 177.733 50.0658 175.597 51.2051 172.204C51.7665 170.532 52.2957 167.802 52.7419 164.392V156.595C40.2373 155.665 30.3811 145.23 30.3811 132.494C30.3811 119.758 40.2373 109.323 52.7419 108.393V94.4101C52.3048 91.1073 51.7889 88.4624 51.2419 86.8335C50.1154 83.4782 48.8053 81.366 46.3946 79.0182L45.0704 77.7284L46.1639 76.6977C47.8499 75.1087 49.1512 73.4342 50.0104 71.7486L50.7937 70.212L50.4689 69.21C50.2902 68.659 49.7571 67.4678 49.2844 66.5633C47.0244 62.2397 43.9882 59.593 38.9583 57.562C37.0897 56.8075 32.9956 55.5226 30.36 54.8638C29.2808 54.594 28.3976 54.3162 28.397 54.2467C28.3965 54.1772 29.5075 53.8448 30.8661 53.5081C44.3237 50.1729 48.9555 46.2101 51.8135 35.5863C52.657 32.4502 53.8707 26.237 54.4853 21.9451C54.4994 21.9341 54.5036 21.9364 54.5147 21.9451C55.1294 26.237 56.343 32.4502 57.1865 35.5863C60.0445 46.2101 64.6764 50.1729 78.1339 53.5081C79.4925 53.8448 80.6035 54.1772 80.603 54.2467C80.6024 54.3163 79.7192 54.594 78.64 54.8638C76.0044 55.5227 71.9103 56.8075 70.0417 57.562C65.0118 59.593 61.9756 62.2397 59.7156 66.5633C59.2429 67.4678 58.7098 68.659 58.5311 69.21L58.2063 70.212L58.9896 71.7486C59.8488 73.4342 61.1501 75.1087 62.8361 76.6978L63.9296 77.7284L62.6054 79.0182C60.1947 81.366 58.8846 83.4782 57.7581 86.8335C57.2111 88.4624 56.6952 91.1073 56.2581 94.41V108.384C68.8214 109.254 78.7429 119.716 78.7429 132.494C78.7429 145.272 68.8214 155.734 56.258 156.604V164.392C56.7043 167.802 57.2335 170.532 57.7949 172.204C58.9342 175.597 60.2591 177.733 62.697 180.108L64.0362 181.412L62.9304 182.454C61.2253 184.061 59.9093 185.754 59.0404 187.459L58.2482 189.013L58.5767 190.026C58.7574 190.583 59.2965 191.788 59.7746 192.702C62.0601 197.075 65.1306 199.751 70.2174 201.805C72.1071 202.568 76.2475 203.867 78.9129 204.533C79.19 204.603 79.4392 204.692 79.6676 204.774C79.9998 204.894 80.2883 204.998 80.5544 205L109 205L109 51.5428C109 49.537 108.943 47.5846 108.828 45.6857C108.626 42.3416 108.247 39.1634 107.69 36.1511C107.623 35.7886 107.196 35.6277 106.897 35.8435C102.92 38.7137 98.0353 40.4051 92.7554 40.4051C79.4006 40.4051 68.5745 29.5844 68.5745 16.2364Z" stroke="#EBE7E0" stroke-width="3"/>
+</mask>
+<g mask="url(#mask0_157_325)">
+<rect id="Rectangle_53" transform="translate(888 656)" width="144" height="120" fill="url(#paint0_linear_157_325)"/>
+<rect id="Rectangle_52" transform="translate(888 656)" width="144" height="120" fill="url(#paint1_linear_157_325)"/>
+</g>
+</g>
+<defs>
+<linearGradient id="paint0_linear_157_325" x1="72" y1="0" x2="72" y2="120" gradientUnits="userSpaceOnUse">
+<stop stop-color="#CD474C" stop-opacity="0"/>
+<stop offset="0.495192" stop-color="#CD474C"/>
+<stop offset="1" stop-color="#CD474C" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="paint1_linear_157_325" x1="72" y1="0" x2="72" y2="120" gradientUnits="userSpaceOnUse">
+<stop stop-color="#CD474C" stop-opacity="0"/>
+<stop offset="0.495192" stop-color="#CD474C"/>
+<stop offset="1" stop-color="#CD474C" stop-opacity="0"/>
+</linearGradient>
+<clipPath id="clip0_157_325">
+<rect width="1920" height="1080" fill="#EBE7E0"/>
+</clipPath>
+</defs>
+</svg>
+
+

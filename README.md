@@ -11,13 +11,13 @@ npm ci
 npm run dev
 ```
 
-`npm run build` checks Astro and TypeScript, then writes the static site to `dist`. `npm run preview` serves that build locally.
+`npm run build` checks Astro and TypeScript, writes the static site to `dist`, then verifies required Pages files and local asset references. `npm run preview` serves that build locally.
 
 ## Deployment
 
-The GitHub Actions workflow in `.github/workflows/deploy.yml` builds `dist` and deploys it to GitHub Pages when `main` is pushed. Set the repository's Pages source to **GitHub Actions**. `public/CNAME` declares the `lufi.lk` custom domain, and `astro.config.mjs` uses that origin for canonical and social URLs.
+The GitHub Actions workflow in `.github/workflows/deploy.yml` checks the project, builds `dist`, packages the Pages artifact and deploys it whenever `main` is pushed. In the repository, set **Settings → Pages → Source** to **GitHub Actions**. Set the custom domain there to `lufi.lk`; `public/CNAME` and `astro.config.mjs` preserve the same canonical origin in the generated site.
 
-The repository root is source code; Pages must publish the `dist` artifact, not the root directory.
+The repository root is source code; Pages must publish the `dist` artifact, not the root directory. The workflow is the only deployment workflow this project needs. Remove any older “Static HTML” workflow from `.github/workflows/` before pushing if one exists in the repository.
 
 ## Site structure
 

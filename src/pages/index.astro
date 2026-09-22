@@ -3,29 +3,33 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import LivingMaterial from '../components/LivingMaterial.astro';
 
 const capabilities = [
-  { key: 'identity', name: 'Graphic design', detail: 'Identities, campaigns and visual systems built to be recognized, then used.', proof: 'Type, image and hierarchy in one visual language.', image: '/img/lufi-lab-type.webp', alt: 'LUFI typographic study made with layered paper, black print and Cinnabar registration marks.' },
-  { key: 'film', name: 'Film & motion', detail: 'Edit, titles and moving images with a reason for every frame.', proof: 'Pace, cut and feeling working together.', image: '/img/lufi-material-hero.webp', alt: 'LUFI material study of folded paper, black metal and red fabric.' },
-  { key: 'image', name: 'Photography', detail: 'Images with clear framing, light and intent—from product to people and place.', proof: 'Art direction before the shutter.', image: '/img/lufi-lab-material.webp', alt: 'LUFI close-up material study of paper, ink and reflective black surface.' },
-  { key: 'production', name: 'Video production', detail: 'A visual idea carried from shoot planning through the final cut.', proof: 'A point of view that survives production.', image: '/img/studio-launch-film.webp', alt: 'Self-initiated LUFI film image study.' },
-  { key: 'digital', name: 'Digital experiences', detail: 'Websites and interfaces that are clear to use and distinctive to see.', proof: 'Structure and interaction that earn their place.', image: '/img/lufi-lab-digital.webp', alt: 'LUFI digital interface study in translucent layers and a Cinnabar control.' },
+  { key: 'identity', name: 'Graphic design', detail: 'Identities, campaigns and visual systems built to be recognized, then used.', proof: 'Type, image and hierarchy in one visual language.', image: '/img/lufi-lab-type.webp', small: '/img/lufi-lab-type-640.webp', width: 896, height: 1120, alt: 'LUFI typographic study made with layered paper, black print and Cinnabar registration marks.' },
+  { key: 'film', name: 'Film & motion', detail: 'Edit, titles and moving images with a reason for every frame.', proof: 'Pace, cut and feeling working together.', image: '/img/lufi-material-hero.webp', small: '/img/lufi-material-hero-640.webp', width: 896, height: 1120, alt: 'LUFI material study of folded paper, black metal and red fabric.' },
+  { key: 'image', name: 'Photography', detail: 'Images with clear framing, light and intent—from product to people and place.', proof: 'Art direction before the shutter.', image: '/img/lufi-lab-material.webp', small: '/img/lufi-lab-material-640.webp', width: 1024, height: 688, alt: 'LUFI close-up material study of paper, ink and reflective black surface.' },
+  { key: 'production', name: 'Video production', detail: 'A visual idea carried from shoot planning through the final cut.', proof: 'A point of view that survives production.', image: '/img/studio-launch-film.webp', small: '/img/studio-launch-film-640.webp', width: 1122, height: 1402, alt: 'Self-initiated LUFI film image study.' },
+  { key: 'digital', name: 'Digital experiences', detail: 'Websites and interfaces that are clear to use and distinctive to see.', proof: 'Structure and interaction that earn their place.', image: '/img/lufi-lab-digital.webp', small: '/img/lufi-lab-digital-640.webp', width: 1344, height: 752, alt: 'LUFI digital interface study in translucent layers and a Cinnabar control.' },
 ];
 ---
 
-<BaseLayout title="LUFI — Independent creative studio" description="LUFI is an independent creative studio in Colombo. We make identities, images, film and digital experiences with a clear point of view." image="/img/lufi-material-hero.webp">
-  <section class="hero" id="start" aria-labelledby="hero-title">
-    <div class="hero__field"><LivingMaterial /></div>
+<BaseLayout title="LUFI — Independent creative studio" description="LUFI is an independent creative studio in Colombo. We make identities, images, film and digital experiences with a clear point of view.">
+  <section class="hero" id="start" aria-labelledby="hero-title" data-cursor-theme="dark">
+    <div class="hero__field"><LivingMaterial priority /></div>
     <div class="hero__content">
       <p class="hero__pre">Design is a way to be seen.</p>
-      <h1 id="hero-title" class="hero__statement" aria-label="Make something worth noticing.">Make something<br /><em class="hero__phrase" aria-hidden="true" data-hero-phrase>worth noticing.</em></h1>
+      <h1 id="hero-title" class="hero__statement" aria-label="Make something worth noticing."><span class="motion-line"><span>Make something</span></span><span class="motion-line"><em class="hero__phrase" aria-hidden="true" data-hero-phrase>worth noticing.</em></span></h1>
     </div>
-    <a class="hero__scroll" href="#point-of-view">Scroll to explore <span aria-hidden="true">↓</span></a>
-    <button class="hero__rotation-toggle" type="button" data-hero-rotation-toggle aria-label="Pause rotating words" hidden>Pause</button>
+    <a class="hero__scroll" href="#point-of-view" data-cursor="cta" aria-label="Scroll to explore">
+      <svg class="hero__scroll-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 5v14" />
+        <path d="m7 14 5 5 5-5" />
+      </svg>
+    </a>
   </section>
 
-  <section class="intro section-pad" id="point-of-view" aria-labelledby="intro-title">
+  <section class="intro section-pad" id="point-of-view" aria-labelledby="intro-title" data-motion-section data-cursor-theme="light">
     <div class="section-index"><span>Point of view</span><span>What we do</span></div>
     <div class="intro__grid">
-      <h2 id="intro-title">Good design<br />has a <em>point.</em></h2>
+      <h2 id="intro-title" class="motion-heading"><span class="motion-line"><span>Good design</span></span><span class="motion-line"><span>has a <em>point.</em></span></span></h2>
       <div class="intro__copy">
         <p>LUFI makes identities, images, film and digital experiences for people with something to say.</p>
         <p>We look for the idea first. Then we give it form, a voice and a life beyond the presentation.</p>
@@ -34,63 +38,62 @@ const capabilities = [
     <p class="intro__line">One idea. Many ways to make it felt.</p>
   </section>
 
-  <section class="capabilities section-pad" id="capabilities" aria-labelledby="capabilities-title" data-capability data-active="identity">
+  <section class="capabilities section-pad" id="capabilities" aria-labelledby="capabilities-title" data-capability data-active="identity" data-motion-section data-cursor-theme="accent">
     <div class="section-index"><span>Capabilities</span><span>What we can make</span></div>
     <div class="section-heading">
-      <h2 id="capabilities-title">The work takes<br /><em>different forms.</em></h2>
+      <h2 id="capabilities-title" class="motion-heading"><span class="motion-line"><span>The work takes</span></span><span class="motion-line"><span><em>different forms.</em></span></span></h2>
       <p>Choose a discipline to see how we think through it.</p>
     </div>
     <div class="capabilities__layout">
       <div class="capabilities__tabs" role="tablist" aria-label="LUFI capabilities" aria-orientation="vertical">
-        {capabilities.map((item, index) => <button class="capability-tab" type="button" role="tab" id={`tab-${item.key}`} aria-controls={`panel-${item.key}`} aria-selected={index === 0 ? 'true' : 'false'} tabindex={index === 0 ? 0 : -1} data-key={item.key}><span class="capability-tab__name">{item.name}</span><span class="capability-tab__arrow" aria-hidden="true">↗</span></button>)}
+        {capabilities.map((item, index) => <button class="capability-tab" type="button" role="tab" id={`tab-${item.key}`} aria-controls={`panel-${item.key}`} aria-selected={index === 0 ? 'true' : 'false'} tabindex={index === 0 ? 0 : -1} data-key={item.key}><span class="capability-tab__name">{item.name}</span><span class="capability-tab__arrow" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 17 17 7" /><path d="M9 7h8v8" /></svg></span></button>)}
       </div>
       <div class="capabilities__panels">
         {capabilities.map((item, index) => <div class="capability-panel" role="tabpanel" id={`panel-${item.key}`} aria-labelledby={`tab-${item.key}`} hidden={index !== 0}>
-          <figure><img src={item.image} alt={item.alt} width="1600" height="1100" loading="lazy" decoding="async" /><figcaption>LUFI study / capability demonstration</figcaption></figure>
+          <figure data-cursor="media"><img src={item.image} srcset={`${item.small} 640w, ${item.image} ${item.width}w`} sizes="(min-width: 700px) 45vw, calc(100vw - 2.5rem)" alt={item.alt} width={item.width} height={item.height} loading="lazy" decoding="async" /><figcaption>LUFI study / capability demonstration</figcaption></figure>
           <div class="capability-panel__copy"><p class="capability-panel__detail">{item.detail}</p><p class="capability-panel__proof">{item.proof}</p></div>
         </div>)}
       </div>
     </div>
   </section>
 
-  <section class="lab section-pad" id="lab" aria-labelledby="lab-title">
+  <section class="lab section-pad" id="lab" aria-labelledby="lab-title" data-motion-section data-cursor-theme="dark">
     <div class="section-index"><span>LUFI Lab</span><span>Original studies</span></div>
-    <div class="lab__heading"><h2 id="lab-title">A place to<br /><em>test ideas.</em></h2><p>The lab is where we make without a brief. These are original studio experiments in type, material, interface and motion.</p></div>
+    <div class="lab__heading"><h2 id="lab-title" class="motion-heading"><span class="motion-line"><span>A place to</span></span><span class="motion-line"><span><em>test ideas.</em></span></span></h2><p>The lab is where we make without a brief. These are original studio experiments in type, material, interface and motion.</p></div>
     <div class="lab__grid">
-      <figure class="lab-piece lab-piece--type"><div class="lab-piece__media"><img src="/img/lufi-lab-type.webp" alt="Abstract typographic composition with black printed forms and red marks on textured paper" width="1024" height="1024" loading="lazy" decoding="async" /></div><figcaption><span>Type / 01</span><span>Structure becomes image</span><small>LUFI study</small></figcaption></figure>
-      <figure class="lab-piece lab-piece--material"><div class="lab-piece__media"><img src="/img/lufi-lab-material.webp" alt="Close material study of textured paper, black reflective surface and red ink" width="1536" height="1024" loading="lazy" decoding="async" /></div><figcaption><span>Material / 02</span><span>Where surfaces meet</span><small>LUFI study</small></figcaption></figure>
-      <figure class="lab-piece lab-piece--digital"><div class="lab-piece__media"><img src="/img/lufi-lab-digital.webp" alt="Experimental interface composition of translucent layers, black panels and red control" width="1536" height="1024" loading="lazy" decoding="async" /></div><figcaption><span>Digital / 03</span><span>Information takes form</span><small>LUFI study</small></figcaption></figure>
-      <figure class="lab-piece lab-piece--motion"><div class="lab-piece__media"><video data-lab-video muted loop playsinline preload="none" poster="/img/lufi-material-hero.webp" aria-label="Slow movement of a LUFI material sculpture made of paper, black metal and red fabric"><source src="/video/lufi-material-loop.mp4" type="video/mp4" /></video></div><figcaption><span>Motion / 04</span><span>Form in motion</span><small>LUFI study</small></figcaption></figure>
+      <figure class="lab-piece lab-piece--type"><div class="lab-piece__media" data-cursor="media"><img src="/img/lufi-lab-type.webp" srcset="/img/lufi-lab-type-640.webp 640w, /img/lufi-lab-type.webp 896w" sizes="(min-width: 700px) 45vw, calc(100vw - 2.5rem)" alt="Abstract typographic composition with black printed forms and red marks on textured paper" width="896" height="1120" loading="lazy" decoding="async" /></div><figcaption><span>Type / 01</span><span>Structure becomes image</span><small>LUFI study</small></figcaption></figure>
+      <figure class="lab-piece lab-piece--material"><div class="lab-piece__media" data-cursor="media"><img src="/img/lufi-lab-material.webp" srcset="/img/lufi-lab-material-640.webp 640w, /img/lufi-lab-material.webp 1024w" sizes="(min-width: 700px) 45vw, calc(100vw - 2.5rem)" alt="Close material study of textured paper, black reflective surface and red ink" width="1024" height="688" loading="lazy" decoding="async" /></div><figcaption><span>Material / 02</span><span>Where surfaces meet</span><small>LUFI study</small></figcaption></figure>
+      <figure class="lab-piece lab-piece--digital"><div class="lab-piece__media" data-cursor="media"><img src="/img/lufi-lab-digital.webp" srcset="/img/lufi-lab-digital-640.webp 640w, /img/lufi-lab-digital.webp 1344w" sizes="(min-width: 700px) 45vw, calc(100vw - 2.5rem)" alt="Experimental interface composition of translucent layers, black panels and red control" width="1344" height="752" loading="lazy" decoding="async" /></div><figcaption><span>Digital / 03</span><span>Information takes form</span><small>LUFI study</small></figcaption></figure>
+      <figure class="lab-piece lab-piece--motion"><div class="lab-piece__media" data-cursor="media"><video data-lab-video muted loop playsinline preload="none" poster="/img/lufi-material-hero.webp" aria-label="Slow movement of a LUFI material sculpture made of paper, black metal and red fabric"><source src="/video/lufi-material-loop.mp4" type="video/mp4" /></video></div><figcaption><span>Motion / 04</span><span>Form in motion</span><small>LUFI study</small></figcaption></figure>
     </div>
   </section>
 
-  <section class="thinking section-pad" id="thinking" aria-labelledby="thinking-title">
+  <section class="thinking section-pad" id="thinking" aria-labelledby="thinking-title" data-motion-section data-cursor-theme="light">
     <div class="section-index"><span>How we think</span><span>Principles</span></div>
-    <div class="thinking__grid"><h2 id="thinking-title">We don't start<br />with the <em>surface.</em></h2><div class="thinking__right"><p class="thinking__lead">A visual can get attention. An idea gives it somewhere to go.</p><ol class="principles"><li><strong>Find what matters.</strong><span>Understand the thing before making it look like anything.</span></li><li><strong>Give it a shape.</strong><span>Build a visual language people can recognize and use.</span></li><li><strong>Keep the necessary.</strong><span>Remove what distracts from the point.</span></li><li><strong>Make it move with purpose.</strong><span>Let every frame and interaction carry the idea.</span></li></ol></div></div>
+    <div class="thinking__grid"><h2 id="thinking-title" class="motion-heading"><span class="motion-line"><span>We don't start</span></span><span class="motion-line"><span>with the <em>surface.</em></span></span></h2><div class="thinking__right"><p class="thinking__lead">A visual can get attention. An idea gives it somewhere to go.</p><ol class="principles"><li><strong>Find what matters.</strong><span>Understand the thing before making it look like anything.</span></li><li><strong>Give it a shape.</strong><span>Build a visual language people can recognize and use.</span></li><li><strong>Keep the necessary.</strong><span>Remove what distracts from the point.</span></li><li><strong>Make it move with purpose.</strong><span>Let every frame and interaction carry the idea.</span></li></ol></div></div>
   </section>
 
-  <section class="process section-pad" id="process" aria-labelledby="process-title">
+  <section class="process section-pad" id="process" aria-labelledby="process-title" data-motion-section data-cursor-theme="dark">
     <div class="section-index"><span>How we work</span><span>A clear route from idea to delivery</span></div>
-    <div class="process__top"><h2 id="process-title">Thought through.<br /><em>Made real.</em></h2><p>No mystery in the process. We agree on the problem, make a direction, build the work and prepare it for use.</p></div>
+    <div class="process__top"><h2 id="process-title" class="motion-heading"><span class="motion-line"><span>Thought through.</span></span><span class="motion-line"><span><em>Made real.</em></span></span></h2><p>No mystery in the process. We agree on the problem, make a direction, build the work and prepare it for use.</p></div>
     <ol class="process__steps"><li><span>01</span><h3>Discover</h3><p>We listen, ask, look and understand what has to change.</p></li><li><span>02</span><h3>Define</h3><p>We decide on the idea and the visual direction.</p></li><li><span>03</span><h3>Make</h3><p>We design, produce, show and refine the work.</p></li><li><span>04</span><h3>Deliver</h3><p>We prepare the files and guidance for the work to live in the real world.</p></li></ol>
   </section>
 
-  <section class="studio section-pad" id="studio" aria-labelledby="studio-title">
+  <section class="studio section-pad" id="studio" aria-labelledby="studio-title" data-motion-section data-cursor-theme="light">
     <div class="section-index"><span>About LUFI</span><span>Independent by design</span></div>
-    <div class="studio__layout"><div class="studio__mark" aria-hidden="true"><img src="/img/lufi-mark.svg" width="879" height="1654" alt="" /></div><div class="studio__copy"><h2 id="studio-title">Small enough<br />to <em>care.</em></h2><p>LUFI is an independent creative studio in Colombo, Sri Lanka. We work across graphic design, photography, video and digital experiences.</p><p>We care about the thought behind the work, and the details that make it hold together.</p></div></div>
+    <div class="studio__layout"><div class="studio__mark" aria-hidden="true" data-cursor="media" data-cursor-theme="dark"><LivingMaterial /><img src="/img/lufi-mark.svg" width="879" height="1654" alt="" /></div><div class="studio__copy"><h2 id="studio-title" class="motion-heading"><span class="motion-line"><span>Small enough</span></span><span class="motion-line"><span>to <em>care.</em></span></span></h2><p>LUFI is an independent creative studio in Colombo, Sri Lanka. We work across graphic design, photography, video and digital experiences.</p><p>We care about the thought behind the work, and the details that make it hold together.</p></div></div>
   </section>
 
-  <section class="contact section-pad" id="contact" aria-labelledby="contact-title">
+  <section class="contact section-pad" id="contact" aria-labelledby="contact-title" data-motion-section data-cursor-theme="accent">
     <div class="section-index"><span>Contact</span><span>Start a conversation</span></div>
-    <div class="contact__body"><p>Have something worth making?</p><h2 id="contact-title">Let's give it<br /><em>a point.</em></h2><p class="contact__detail">Tell us what you're making, who it is for, and when you need it. We'll take it from there.</p><div class="contact__channels"><span>WhatsApp and email contact details coming soon.</span></div></div>
+    <div class="contact__body"><p>Have something worth making?</p><h2 id="contact-title" class="motion-heading"><span class="motion-line"><span>Let's give it</span></span><span class="motion-line"><span><em>a point.</em></span></span></h2><p class="contact__detail">Tell us what you're making, who it is for, and when you need it. We'll take it from there.</p><div class="contact__channels"><span>WhatsApp and email contact details coming soon.</span></div></div>
     <div class="contact__end"><span>LUFI / Colombo</span><span>Make something worth noticing.</span></div>
   </section>
 </BaseLayout>
 
 <script>
   const heroPhrase = document.querySelector<HTMLElement>('[data-hero-phrase]');
-  const rotationToggle = document.querySelector<HTMLButtonElement>('[data-hero-rotation-toggle]');
-  if (heroPhrase && rotationToggle) {
+  if (heroPhrase) {
     const phrases = [
       'worth noticing.',
       'feel good.',
@@ -116,6 +119,13 @@ const capabilities = [
       'make sense.',
     ];
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    const motionStyles = getComputedStyle(document.documentElement);
+    const motionTime = (token: string, fallback: number) => Number.parseFloat(motionStyles.getPropertyValue(token)) || fallback;
+    const phraseMotion = {
+      fast: Math.max(motionTime('--duration-fast', 240), 380),
+      base: Math.max(motionTime('--duration-base', 450), 620),
+      soft: motionStyles.getPropertyValue('--ease-out-soft').trim() || 'cubic-bezier(.16,1,.3,1)',
+    };
     const firstLetter = (phrase: string) => phrase[0].toLowerCase();
     const makeQueue = (items: string[], previousLetters: string[]) => {
       for (let attempt = 0; attempt < 200; attempt++) {
@@ -145,7 +155,6 @@ const capabilities = [
     let queue = makeQueue(phrases.slice(1), recentLetters);
     let inView = false;
     let running = false;
-    let paused = false;
     let timer: number | undefined;
     let currentAnimation: Animation | undefined;
 
@@ -158,8 +167,8 @@ const capabilities = [
     const advance = async () => {
       if (!running) return;
       const exit = heroPhrase.animate(
-        [{ opacity: 1, transform: 'translateY(0)' }, { opacity: 0, transform: 'translateY(-.12em)' }],
-        { duration: 200, easing: 'ease-in', fill: 'forwards' },
+        [{ opacity: 1, transform: 'translate3d(0,0,0)' }, { opacity: 0, transform: 'translate3d(0,-.38em,0)' }],
+        { duration: phraseMotion.fast, easing: 'cubic-bezier(.4,0,1,1)', fill: 'forwards' },
       );
       currentAnimation = exit;
       try { await exit.finished; } catch { return; }
@@ -171,8 +180,8 @@ const capabilities = [
       recentLetters = [...recentLetters.slice(-1), firstLetter(nextPhrase)];
       exit.cancel();
       const enter = heroPhrase.animate(
-        [{ opacity: 0, transform: 'translateY(.12em)' }, { opacity: 1, transform: 'translateY(0)' }],
-        { duration: 360, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' },
+        [{ opacity: 0, transform: 'translate3d(0,.42em,0)' }, { opacity: 1, transform: 'translate3d(0,0,0)' }],
+        { duration: phraseMotion.base, easing: phraseMotion.soft, fill: 'forwards' },
       );
       currentAnimation = enter;
       try { await enter.finished; } catch { return; }
@@ -186,8 +195,8 @@ const capabilities = [
       timer = window.setTimeout(advance, 3200);
     };
     const sync = () => {
-      rotationToggle.hidden = reducedMotion.matches;
-      if (inView && !document.hidden && !reducedMotion.matches && !paused) start();
+      const pageReady = document.documentElement.classList.contains('motion-ready');
+      if (inView && pageReady && !document.hidden && !reducedMotion.matches) start();
       else stop();
       if (reducedMotion.matches) {
         heroPhrase.textContent = phrases[0];
@@ -201,12 +210,7 @@ const capabilities = [
     }, { threshold: .2 }).observe(heroPhrase);
     document.addEventListener('visibilitychange', sync);
     reducedMotion.addEventListener('change', sync);
-    rotationToggle.addEventListener('click', () => {
-      paused = !paused;
-      rotationToggle.textContent = paused ? 'Play' : 'Pause';
-      rotationToggle.setAttribute('aria-label', paused ? 'Resume rotating words' : 'Pause rotating words');
-      sync();
-    });
+    new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
   }
 
   const video = document.querySelector('[data-lab-video]');

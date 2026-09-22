@@ -1,10 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
-<BaseLayout title="Page not found — LUFI" description="The page could not be found. Return to LUFI." light>
+<BaseLayout title="Page not found — LUFI" description="The page could not be found. Return to LUFI." robots="noindex, follow" light>
   <section class="not-found" style="min-height:80svh;padding:9rem var(--p) 5rem;background:var(--bone);display:flex;flex-direction:column;justify-content:center;gap:2rem">
     <p style="font-size:.75rem;text-transform:uppercase;letter-spacing:.12em">404 / Page not found</p>
     <h1 style="font:650 clamp(4rem,15vw,10rem)/.9 Funnel,sans-serif;letter-spacing:-.06em">Wrong turn.<br/><em>New direction.</em></h1>
-    <a href="/" style="text-decoration:underline;text-underline-offset:.3em;width:max-content">Back to LUFI ↗</a>
+    <a href="/" style="display:inline-flex;align-items:center;gap:.45em;text-decoration:underline;text-underline-offset:.3em;width:max-content">Back to LUFI <svg class="inline-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7" /><path d="M9 7h8v8" /></svg></a>
   </section>
 </BaseLayout>
