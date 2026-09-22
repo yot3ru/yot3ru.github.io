@@ -1,14 +1,53 @@
 <div class="entry-loader" data-entry-loader data-phase="waiting" aria-hidden="true">
   <div class="entry-loader__stage" data-entry-stage>
-    <span class="entry-loader__orbit"></span>
-    <span class="entry-loader__half entry-loader__half--left">
-      <span class="entry-loader__liquid"></span>
+    <span class="entry-loader__mark">
+      <svg
+        class="entry-loader__liquid"
+        data-entry-wave
+        viewBox="0 0 120 220"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <path
+          class="entry-loader__liquid-body"
+          d="M-8 14 C3 8 14 20 27 13 S50 7 63 15 S86 21 99 12 S118 9 128 16 L128 240 L-8 240 Z"
+        >
+          <animate
+            attributeName="d"
+            dur="1.55s"
+            repeatCount="indefinite"
+            calcMode="spline"
+            keyTimes="0;.17;.39;.62;.81;1"
+            keySplines=".37 0 .63 1;.31 0 .69 1;.42 0 .58 1;.34 0 .66 1;.39 0 .61 1"
+            values="M-8 14 C3 8 14 20 27 13 S50 7 63 15 S86 21 99 12 S118 9 128 16 L128 240 L-8 240 Z;
+                    M-8 16 C6 19 15 8 29 14 S52 20 65 11 S87 6 101 16 S118 21 128 13 L128 240 L-8 240 Z;
+                    M-8 12 C3 17 15 18 29 10 S51 8 64 16 S87 20 101 14 S117 7 128 12 L128 240 L-8 240 Z;
+                    M-8 15 C5 7 17 12 28 17 S50 19 64 12 S86 8 100 15 S118 18 128 11 L128 240 L-8 240 Z;
+                    M-8 13 C4 20 16 16 28 11 S51 6 65 15 S86 19 100 10 S117 11 128 17 L128 240 L-8 240 Z;
+                    M-8 14 C3 8 14 20 27 13 S50 7 63 15 S86 21 99 12 S118 9 128 16 L128 240 L-8 240 Z"
+          />
+        </path>
+        <path
+          class="entry-loader__liquid-surface"
+          d="M-8 14 C3 8 14 20 27 13 S50 7 63 15 S86 21 99 12 S118 9 128 16"
+        >
+          <animate
+            attributeName="d"
+            dur="1.55s"
+            repeatCount="indefinite"
+            calcMode="spline"
+            keyTimes="0;.17;.39;.62;.81;1"
+            keySplines=".37 0 .63 1;.31 0 .69 1;.42 0 .58 1;.34 0 .66 1;.39 0 .61 1"
+            values="M-8 14 C3 8 14 20 27 13 S50 7 63 15 S86 21 99 12 S118 9 128 16;
+                    M-8 16 C6 19 15 8 29 14 S52 20 65 11 S87 6 101 16 S118 21 128 13;
+                    M-8 12 C3 17 15 18 29 10 S51 8 64 16 S87 20 101 14 S117 7 128 12;
+                    M-8 15 C5 7 17 12 28 17 S50 19 64 12 S86 8 100 15 S118 18 128 11;
+                    M-8 13 C4 20 16 16 28 11 S51 6 65 15 S86 19 100 10 S117 11 128 17;
+                    M-8 14 C3 8 14 20 27 13 S50 7 63 15 S86 21 99 12 S118 9 128 16"
+          />
+        </path>
+      </svg>
     </span>
-    <span class="entry-loader__half entry-loader__half--right">
-      <span class="entry-loader__liquid"></span>
-    </span>
-    <span class="entry-loader__echo"></span>
-    <span class="entry-loader__point"></span>
   </div>
 </div>
 
@@ -22,11 +61,14 @@
   } else {
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const mode = root.dataset.entryMode === 'warm' ? 'warm' : 'cold';
+    if (reducedMotion) {
+      stage.querySelector<SVGSVGElement>('[data-entry-wave]')?.pauseAnimations();
+    }
     const timing = reducedMotion
-      ? { minimum: 200, assets: 300, settle: 70, exit: 180, heroDelay: 0 }
+      ? { minimum: 180, assets: 280, settle: 60, exit: 160, heroDelay: 0 }
       : mode === 'warm'
-        ? { minimum: 800, assets: 850, settle: 260, exit: 340, heroDelay: 35 }
-        : { minimum: 1580, assets: 1750, settle: 320, exit: 420, heroDelay: 55 };
+        ? { minimum: 720, assets: 800, settle: 180, exit: 300, heroDelay: 25 }
+        : { minimum: 1450, assets: 1650, settle: 220, exit: 380, heroDelay: 45 };
     let aborted = false;
     let released = false;
 
@@ -102,13 +144,7 @@
         [{ opacity: 1 }, { opacity: 0 }],
         { duration: timing.exit, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' },
       );
-      const stageExit = stage.animate(
-        reducedMotion
-          ? [{ opacity: 1 }, { opacity: 0 }]
-          : [{ opacity: 1, transform: 'translate3d(0,0,0) scale(1)' }, { opacity: .76, transform: 'translate3d(0,-4px,0) scale(.985)' }],
-        { duration: timing.exit, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' },
-      );
-      try { await Promise.all([exit.finished, stageExit.finished]); } catch {}
+      try { await exit.finished; } catch {}
 
       document.removeEventListener('keydown', tabGuard, true);
       window.removeEventListener('lufi-entry-abort', abort);
