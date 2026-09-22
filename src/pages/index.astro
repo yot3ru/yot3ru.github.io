@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import LivingMaterial from '../components/LivingMaterial.astro';
+import LabGallery from '../components/LabGallery.astro';
 
 const capabilities = [
   { key: 'identity', name: 'Graphic design', detail: 'Identities, campaigns and visual systems built to be recognized, then used.', proof: 'Type, image and hierarchy in one visual language.', image: '/img/lufi-lab-type.webp', small: '/img/lufi-lab-type-640.webp', width: 896, height: 1120, alt: 'LUFI typographic study made with layered paper, black print and Cinnabar registration marks.' },
@@ -56,16 +57,7 @@ const capabilities = [
     </div>
   </section>
 
-  <section class="lab section-pad" id="lab" aria-labelledby="lab-title" data-motion-section data-cursor-theme="dark">
-    <div class="section-index"><span>LUFI Lab</span><span>Original studies</span></div>
-    <div class="lab__heading"><h2 id="lab-title" class="motion-heading"><span class="motion-line"><span>A place to</span></span><span class="motion-line"><span><em>test ideas.</em></span></span></h2><p>The lab is where we make without a brief. These are original studio experiments in type, material, interface and motion.</p></div>
-    <div class="lab__grid">
-      <figure class="lab-piece lab-piece--type"><div class="lab-piece__media" data-cursor="media"><img src="/img/lufi-lab-type.webp" srcset="/img/lufi-lab-type-640.webp 640w, /img/lufi-lab-type.webp 896w" sizes="(min-width: 700px) 45vw, calc(100vw - 2.5rem)" alt="Abstract typographic composition with black printed forms and red marks on textured paper" width="896" height="1120" loading="lazy" decoding="async" /></div><figcaption><span>Type / 01</span><span>Structure becomes image</span><small>LUFI study</small></figcaption></figure>
-      <figure class="lab-piece lab-piece--material"><div class="lab-piece__media" data-cursor="media"><img src="/img/lufi-lab-material.webp" srcset="/img/lufi-lab-material-640.webp 640w, /img/lufi-lab-material.webp 1024w" sizes="(min-width: 700px) 45vw, calc(100vw - 2.5rem)" alt="Close material study of textured paper, black reflective surface and red ink" width="1024" height="688" loading="lazy" decoding="async" /></div><figcaption><span>Material / 02</span><span>Where surfaces meet</span><small>LUFI study</small></figcaption></figure>
-      <figure class="lab-piece lab-piece--digital"><div class="lab-piece__media" data-cursor="media"><img src="/img/lufi-lab-digital.webp" srcset="/img/lufi-lab-digital-640.webp 640w, /img/lufi-lab-digital.webp 1344w" sizes="(min-width: 700px) 45vw, calc(100vw - 2.5rem)" alt="Experimental interface composition of translucent layers, black panels and red control" width="1344" height="752" loading="lazy" decoding="async" /></div><figcaption><span>Digital / 03</span><span>Information takes form</span><small>LUFI study</small></figcaption></figure>
-      <figure class="lab-piece lab-piece--motion"><div class="lab-piece__media" data-cursor="media"><video data-lab-video muted loop playsinline preload="none" poster="/img/lufi-material-hero.webp" aria-label="Slow movement of a LUFI material sculpture made of paper, black metal and red fabric"><source src="/video/lufi-material-loop.mp4" type="video/mp4" /></video></div><figcaption><span>Motion / 04</span><span>Form in motion</span><small>LUFI study</small></figcaption></figure>
-    </div>
-  </section>
+  <LabGallery />
 
   <section class="thinking section-pad" id="thinking" aria-labelledby="thinking-title" data-motion-section data-cursor-theme="light">
     <div class="section-index"><span>How we think</span><span>Principles</span></div>
@@ -212,11 +204,4 @@ const capabilities = [
     new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
   }
 
-  const video = document.querySelector('[data-lab-video]');
-  if (video instanceof HTMLVideoElement && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) video.play().catch(() => {});
-      else video.pause();
-    }, { threshold: .15 }).observe(video);
-  }
 </script>

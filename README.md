@@ -2,7 +2,7 @@
 
 LUFI is an independent creative studio in Colombo, Sri Lanka. The studio works across graphic design, photography, film and digital experiences. This website is an expression of LUFI's thinking and craft: its typography, visual language, motion and responsive behavior serve as the demonstration.
 
-The site does not present concept art as commissioned client work. Its images and motion are labeled LUFI studies or studio experiments. There are no fictional case studies, client names, results or testimonials.
+The site does not present concept art as commissioned client work. LUFI Lab shows 19 real graphic artwork images supplied by the owner, without invented project claims. Generated images elsewhere are labeled LUFI studies or studio experiments. There are no fictional case studies, client names, results or testimonials.
 
 ## Run locally
 
@@ -22,10 +22,10 @@ The repository root is source code; Pages must publish the `dist` artifact, not 
 ## Site structure
 
 - `src/pages/index.astro` — single-page narrative and content
-- `src/components/` — navigation, footer and hero material
+- `src/components/` — navigation, footer, hero material and LUFI Lab gallery
+- `src/data/labWork.ts` — Lab artwork order, dimensions and descriptions
 - `src/styles/global.css` — layout, type, color and responsive behavior
-- `public/img/` — logos and optimized LUFI studies
-- `public/video/` — Higgsfield LUFI material loop
+- `public/img/` — logos, optimized LUFI studies and owner-supplied Lab artwork
 - `DESIGN.md` — art direction and interaction rules
 - `PRODUCT.md` — product goals and truth boundaries
 

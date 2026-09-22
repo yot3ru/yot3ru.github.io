@@ -8,7 +8,7 @@ LUFI's website is the studio's current demonstration of taste. It does not imita
 - **Type:** Funnel Display for statements and capability selection; DM Sans for reading and interface; Zodiak Italic for a restrained editorial accent. All fonts are self-hosted.
 - **Grid:** Mobile-first single column with `clamp(1.25rem, 5vw, 5.5rem)` outer gutters. At 700px, selected sections become asymmetric two-column spreads. Content can grow naturally; no section clips to the viewport.
 - **Rhythm:** Loud Ink hero, quiet Bone point of view, assertive Cinnabar capabilities, Ink Lab, quiet Bone thinking, Ink process and a strong Cinnabar contact finish.
-- **Motif:** Bone paper, Ink reflective material and Cinnabar fabric or pigment. The same responsive WebGL material animates in the hero and behind the studio mark; the lower instance initializes only near view. Higgsfield-generated stills and a short loop develop the same matter in LUFI Lab.
+- **Motif:** Bone paper, Ink reflective material and Cinnabar fabric or pigment. The same responsive WebGL material animates in the hero and behind the studio mark; the lower instance initializes only near view. LUFI Lab shows the studio's supplied graphic artwork on an Ink field.
 
 ## Interaction
 
@@ -17,7 +17,7 @@ LUFI's website is the studio's current demonstration of taste. It does not imita
 - One primary interactive moment: the folded chrome material from LUFI's earlier live site, with a slow jelly-like response to pointer movement. A long, gradual horizontal mask leaves the headline on Ink while the metal comes forward on the right. The original chrome still appears if WebGL2 is unavailable or motion is reduced.
 - The hero keeps “Make something” fixed and rotates 22 short endings. Each cycle is shuffled; endings with the same starting letter have at least two other endings between them. Reduced-motion visitors see the original static line.
 - Capability titles are real tabs, work by click, touch and arrow keys, and update a labeled LUFI study. All content remains available without hover.
-- The Lab loop loads only when near view and pauses offscreen. Reduced-motion users see the poster.
+- LUFI Lab has two continuous artwork streams moving in opposite directions. A visible control pauses both streams; mouse hover and keyboard focus pause them temporarily. Paused and reduced-motion visitors can browse each row manually. Motion stops offscreen and in hidden tabs.
 - Fine-pointer devices use a LUFI precision cursor: a tightly tracked 6px core and a 24px follower with slight inertia. It replaces the native arrow only after successful initialization. Ink and Bone are the default section-aware colors; Cinnabar appears for action states, while Cinnabar surfaces use Ink for contrast.
 - Link, CTA and media states come from one delegated state system. Presses compress by a few percent, fast movement introduces a maximum 6% directional stretch, and the single animation loop stops once the follower settles. Text restores the native I-beam. Touch, coarse-pointer and reduced-motion devices retain their native cursor.
 
@@ -28,11 +28,11 @@ LUFI's website is the studio's current demonstration of taste. It does not imita
 - Once the entry overlay begins to clear, the hero resolves in one short sequence: navigation, label, two display lines, then secondary controls and material. The two sequences overlap so the site is already alive as it appears.
 - Section motion runs once and begins near the lower edge of the viewport. Editorial rules draw across, display lines rise inside masks, copy settles by a few pixels and media is uncovered with a restrained scale correction.
 - Mobile uses shorter travel, no staggered lists and no pointer behavior. Capability changes, menu actions and touch feedback remain immediate.
-- Reduced motion removes continuous, pointer-led and translated movement. Text, images and controls remain visible in their final state, while WebGL and the Lab video use their static fallbacks.
+- Reduced motion removes continuous, pointer-led and translated movement. Text, images and controls remain visible in their final state, while WebGL uses its static fallback and the Lab rows remain manually scrollable.
 
 ## Asset truth
 
-The four new visual studies and the loop were generated through Higgsfield under one material brief. Every illustration is a LUFI study, not a client commission. No invented client names, metrics, testimonials or outcomes appear.
+The graphic artwork in LUFI Lab comes from the owner's `Graphic Designs` folder. Its 19 images are optimized for the web and shown without invented client names, dates, metrics, testimonials or outcomes. Other generated illustrations remain labeled as LUFI studies, not client commissions.
 
 ## Content and accessibility rules
 

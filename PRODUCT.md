@@ -10,7 +10,7 @@ Potential clients arrive by referral, Instagram or WhatsApp, often on a phone. T
 
 ## Truth boundaries
 
-LUFI offers graphic design, video editing, photography, videography and UI/UX. Art direction connects these disciplines. There is no verified client roster, award history, testimonial set or project outcomes to publish. Generated and self-initiated imagery is clearly labeled LUFI Study or studio experiment, never client work. Contact values remain unlinked until the owner supplies real details.
+LUFI offers graphic design, video editing, photography, videography and UI/UX. Art direction connects these disciplines. There is no verified client roster, award history, testimonial set or project outcomes to publish. LUFI Lab displays graphic artwork supplied by the owner without claiming unverified client work. Generated imagery elsewhere is labeled LUFI Study or studio experiment. Contact values remain unlinked until the owner supplies real details.
 
 ## Information architecture
 
@@ -18,7 +18,7 @@ One static page: LUFI hero → point of view → capabilities → LUFI Lab → h
 
 ## Technical delivery
 
-Astro + TypeScript + CSS, built to static files and deployed to GitHub Pages. No runtime backend, form or scroll library. Images are optimized WebP. A short MP4 plays only when visible. WebGL2 is a progressive enhancement with a static image fallback and reduced-motion behavior.
+Astro + TypeScript + CSS, built to static files and deployed to GitHub Pages. No runtime backend, form or scroll library. Images are optimized WebP. The Lab gallery animates only near view and can be paused or browsed manually. WebGL2 is a progressive enhancement with a static image fallback and reduced-motion behavior.
 
 ## Brand
 

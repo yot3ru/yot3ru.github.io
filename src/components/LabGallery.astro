@@ -1,0 +1,191 @@
+---
+import { labRows, type LabWork } from '../data/labWork';
+
+const image = (work: LabWork) => `/img/lab/${work.slug}`;
+const imageSizes = (work: LabWork) => {
+  const ratio = work.width / work.height;
+  return `(min-width: 1440px) ${Math.round(320 * ratio)}px, (min-width: 700px) ${Math.round(280 * ratio)}px, ${Math.round(200 * ratio)}px`;
+};
+---
+
+<section class="lab section-pad" id="lab" aria-labelledby="lab-title" data-motion-section data-cursor-theme="dark" data-lab-gallery>
+  <div class="section-index"><span>LUFI Lab</span><span>Selected graphic work</span></div>
+  <div class="lab__heading">
+    <h2 id="lab-title" class="motion-heading"><span class="motion-line"><span>Graphic work.</span></span></h2>
+    <button class="lab__motion-control" type="button" data-lab-toggle aria-pressed="false" aria-label="Pause gallery motion">
+      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path data-pause-icon d="M6 4v12M14 4v12" /><path data-play-icon d="m6 4 10 6-10 6z" /></svg>
+      <span data-lab-toggle-label>Pause motion</span>
+    </button>
+  </div>
+  <div class="lab__gallery" data-lab-streams>
+    {labRows.map((row, index) => (
+      <div class="lab__viewport" data-lab-viewport data-row={index} role="region" tabindex="0" aria-label={`Graphic work row ${index + 1}. Focus to pause and use arrow keys to browse.`}>
+        <div class="lab__track" data-lab-track>
+          {[false, true].map((duplicate) => (
+            <div class="lab__sequence" data-lab-sequence={!duplicate ? '' : undefined} aria-hidden={duplicate ? 'true' : undefined}>
+              {row.map((work) => (
+                <figure class="lab__artwork">
+                  <img
+                    src={`${image(work)}-sm.webp`}
+                    srcset={`${image(work)}-sm.webp 640w, ${image(work)}-lg.webp 1280w`}
+                    sizes={imageSizes(work)}
+                    width={work.width}
+                    height={work.height}
+                    alt={duplicate ? '' : work.alt}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </figure>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .lab{background:var(--ink);color:var(--bone);padding-block:clamp(4.5rem,8vw,8rem);overflow:hidden}
+  .lab__heading{display:flex;align-items:end;justify-content:space-between;gap:1.5rem;margin:clamp(2.75rem,5vw,4.5rem) 0 clamp(1.75rem,3vw,3rem)}
+  .lab h2{margin:0;line-height:.92}
+  .lab__motion-control{display:inline-flex;align-items:center;justify-content:flex-end;gap:.6rem;min-width:44px;min-height:44px;padding:.5rem 0;background:none;border:0;color:var(--bone);font:700 .68rem/1.2 DM,sans-serif;letter-spacing:.13em;text-transform:uppercase;white-space:nowrap;cursor:pointer}
+  .lab__motion-control svg{width:14px;height:14px;fill:none;stroke:var(--red);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .lab__motion-control [data-play-icon]{display:none}
+  .lab__motion-control[aria-pressed="true"] [data-pause-icon]{display:none}
+  .lab__motion-control[aria-pressed="true"] [data-play-icon]{display:block}
+  .lab__motion-control:hover span{text-decoration:underline;text-underline-offset:.35em}
+  .lab__motion-control:focus-visible,.lab__viewport:focus-visible{outline:2px solid var(--red);outline-offset:4px}
+  .lab__gallery{--art-height:clamp(10.5rem,48vw,13rem);--art-gap:clamp(.625rem,2.2vw,1.375rem);display:grid;gap:clamp(.75rem,1.6vw,1.375rem);margin-inline:calc(-1 * var(--p))}
+  .lab__viewport{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;touch-action:auto}
+  .lab__viewport::-webkit-scrollbar{display:none}
+  .lab[data-enhanced]:not([data-manual]) .lab__viewport{overflow-x:hidden;touch-action:pan-y}
+  .lab[data-manual] .lab__viewport{overflow-x:auto;touch-action:auto;overscroll-behavior-inline:contain}
+  .lab__track{display:flex;width:max-content;transform:translate3d(0,0,0)}
+  .lab[data-running] .lab__track{will-change:transform}
+  .lab__sequence{display:flex;align-items:stretch;gap:var(--art-gap);width:max-content;padding-right:var(--art-gap)}
+  .lab__artwork{display:block;flex:none;height:var(--art-height);width:auto;margin:0}
+  .lab__artwork img{display:block;width:auto;max-width:none;height:100%;object-fit:contain;transform:translateZ(0);transition:transform 280ms var(--ease-out-primary)}
+  @media (hover:hover) and (pointer:fine){.lab__artwork:hover img{transform:scale(1.012)}}
+  @media (min-width:700px){.lab__gallery{--art-height:clamp(13rem,25vw,18rem)}}
+  @media (min-width:1440px){.lab__gallery{--art-height:20rem}}
+  @media (max-width:699px){.lab__heading{align-items:end}.lab__motion-control span{font-size:.61rem}.lab__motion-control{gap:.35rem}}
+  @media (max-width:360px){.lab__heading{align-items:start;flex-direction:column;gap:.75rem}.lab__motion-control{justify-content:flex-start}}
+  @media (prefers-reduced-motion:reduce){.lab__motion-control{display:none}.lab__viewport{overflow-x:auto;touch-action:auto;overscroll-behavior-inline:contain}.lab__artwork img{transition:none}}
+</style>
+
+<script>
+  const gallery = document.querySelector<HTMLElement>('[data-lab-gallery]');
+  if (gallery) {
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+    const mobile = matchMedia('(max-width: 699px)');
+    const toggle = gallery.querySelector<HTMLButtonElement>('[data-lab-toggle]');
+    const toggleLabel = gallery.querySelector<HTMLElement>('[data-lab-toggle-label]');
+    const viewports = [...gallery.querySelectorAll<HTMLElement>('[data-lab-viewport]')];
+    const tracks = viewports.map((viewport) => viewport.querySelector<HTMLElement>('[data-lab-track]'));
+    const sequences = viewports.map((viewport) => viewport.querySelector<HTMLElement>('[data-lab-sequence]'));
+    const widths = [0, 0];
+    const offsets = [0, 0];
+    let initialized = false;
+    let visible = false;
+    let explicitPause = false;
+    let hoverPause = false;
+    let focusPause = false;
+    let frame = 0;
+    let previous = 0;
+
+    const measure = () => {
+      sequences.forEach((sequence, index) => {
+        if (!sequence) return;
+        const next = sequence.getBoundingClientRect().width;
+        if (next <= 0) return;
+        offsets[index] = initialized && widths[index] ? (offsets[index] / widths[index]) * next : next * (index === 0 ? .08 : .43);
+        widths[index] = next;
+      });
+      initialized = true;
+      render();
+    };
+    const render = () => {
+      if (reduced.matches) {
+        tracks.forEach((track) => { if (track) track.style.transform = ''; });
+        return;
+      }
+      tracks.forEach((track, index) => {
+        if (!track || !widths[index]) return;
+        const x = index === 0 ? -offsets[index] : -widths[index] + offsets[index];
+        track.style.transform = `translate3d(${x}px,0,0)`;
+      });
+    };
+    const stop = () => {
+      cancelAnimationFrame(frame);
+      frame = 0;
+      previous = 0;
+      delete gallery.dataset.running;
+    };
+    const tick = (now: number) => {
+      if (previous) {
+        const seconds = Math.min((now - previous) / 1000, .05);
+        const topSpeed = mobile.matches ? 25 : 32;
+        const bottomSpeed = mobile.matches ? 22 : 28;
+        if (widths[0]) offsets[0] = (offsets[0] + topSpeed * seconds) % widths[0];
+        if (widths[1]) offsets[1] = (offsets[1] + bottomSpeed * seconds) % widths[1];
+        render();
+      }
+      previous = now;
+      frame = requestAnimationFrame(tick);
+    };
+    const sync = () => {
+      const manual = explicitPause || focusPause || reduced.matches;
+      const moving = visible && !document.hidden && !manual && !hoverPause;
+      if (manual) gallery.dataset.manual = '';
+      else delete gallery.dataset.manual;
+      if (moving && !frame) {
+        gallery.dataset.running = '';
+        frame = requestAnimationFrame(tick);
+      } else if (!moving) stop();
+      render();
+    };
+    const absorbScroll = () => {
+      viewports.forEach((viewport, index) => {
+        if (!widths[index] || !viewport.scrollLeft) return;
+        offsets[index] = ((index === 0 ? offsets[index] + viewport.scrollLeft : offsets[index] - viewport.scrollLeft) % widths[index] + widths[index]) % widths[index];
+        viewport.scrollLeft = 0;
+      });
+      render();
+    };
+
+    toggle?.addEventListener('click', () => {
+      explicitPause = !explicitPause;
+      toggle.setAttribute('aria-pressed', String(explicitPause));
+      toggle.setAttribute('aria-label', explicitPause ? 'Resume gallery motion' : 'Pause gallery motion');
+      if (toggleLabel) toggleLabel.textContent = explicitPause ? 'Resume motion' : 'Pause motion';
+      if (!explicitPause && !focusPause) absorbScroll();
+      sync();
+    });
+    gallery.querySelector('[data-lab-streams]')?.addEventListener('pointerenter', (event) => {
+      if (event instanceof PointerEvent && event.pointerType === 'mouse') { hoverPause = true; sync(); }
+    });
+    gallery.querySelector('[data-lab-streams]')?.addEventListener('pointerleave', (event) => {
+      if (event instanceof PointerEvent && event.pointerType === 'mouse') { hoverPause = false; sync(); }
+    });
+    viewports.forEach((viewport) => {
+      viewport.addEventListener('focusin', () => { focusPause = true; sync(); });
+      viewport.addEventListener('focusout', () => {
+        focusPause = viewports.some((item) => item.matches(':focus-within'));
+        if (!focusPause && !explicitPause) absorbScroll();
+        sync();
+      });
+    });
+    reduced.addEventListener('change', () => { if (!reduced.matches && !explicitPause) absorbScroll(); sync(); });
+    document.addEventListener('visibilitychange', sync);
+    const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; sync(); }, { rootMargin: '250px 0px' });
+    observer.observe(gallery);
+    if ('ResizeObserver' in window) {
+      const resize = new ResizeObserver(measure);
+      sequences.forEach((sequence) => { if (sequence) resize.observe(sequence); });
+    }
+    measure();
+    gallery.dataset.enhanced = '';
+    sync();
+  }
+</script>
