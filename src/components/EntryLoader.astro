@@ -1,65 +1,51 @@
 <div class="entry-loader" data-entry-loader data-phase="waiting" aria-hidden="true">
-  <div class="entry-loader__stage">
-    <img class="entry-loader__orbit" src="/img/lufi-loader-orbit.svg" width="109" height="205" alt="" />
-    <div class="entry-loader__mark" data-entry-mark>
-      <div class="entry-loader__liquid" data-entry-liquid></div>
-      <svg class="entry-loader__tide" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        <path data-entry-tide d="M0 100L100 100"></path>
-      </svg>
-    </div>
-    <span class="entry-loader__release"></span>
+  <div class="entry-loader__stage" data-entry-stage>
+    <span class="entry-loader__orbit"></span>
+    <span class="entry-loader__half entry-loader__half--left">
+      <span class="entry-loader__liquid"></span>
+    </span>
+    <span class="entry-loader__half entry-loader__half--right">
+      <span class="entry-loader__liquid"></span>
+    </span>
+    <span class="entry-loader__echo"></span>
+    <span class="entry-loader__point"></span>
   </div>
 </div>
 
 <script>
   const root = document.documentElement;
   const loader = document.querySelector<HTMLElement>('[data-entry-loader]');
-  const mark = loader?.querySelector<HTMLElement>('[data-entry-mark]');
-  const liquid = loader?.querySelector<HTMLElement>('[data-entry-liquid]');
-  const orbit = loader?.querySelector<HTMLElement>('.entry-loader__orbit');
-  const tide = loader?.querySelector<SVGPathElement>('[data-entry-tide]');
+  const stage = loader?.querySelector<HTMLElement>('[data-entry-stage]');
 
-  if (!root.classList.contains('entry-active') || !loader || !mark || !liquid || !orbit || !tide) {
+  if (!root.classList.contains('entry-active') || !loader || !stage) {
     loader?.remove();
   } else {
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const mode = root.dataset.entryMode === 'warm' ? 'warm' : 'cold';
-    const timings = reducedMotion
-      ? { pour: 0, fill: 0, mid: 180, slow: 300, near: 420, complete: 180, hold: 120, exit: 220, heroLead: 80 }
+    const timing = reducedMotion
+      ? { minimum: 200, assets: 300, settle: 70, exit: 180, heroDelay: 0 }
       : mode === 'warm'
-        ? { pour: 100, fill: 100, mid: 650, slow: 950, near: 1250, complete: 280, hold: 250, exit: 500, heroLead: 110 }
-        : { pour: 180, fill: 180, mid: 2000, slow: 3100, near: 3800, complete: 420, hold: 400, exit: 650, heroLead: 130 };
-    const started = performance.now();
-    let previous = started;
-    let actualProgress = 0;
-    let displayedProgress = 0;
-    let ready = false;
-    let frame = 0;
-    let finishing = false;
-    let completionStarted = 0;
-    let completionOrigin = 0;
+        ? { minimum: 800, assets: 850, settle: 260, exit: 340, heroDelay: 35 }
+        : { minimum: 1580, assets: 1750, settle: 320, exit: 420, heroDelay: 55 };
+    let aborted = false;
+    let released = false;
 
-    const wait = (duration: number) => new Promise((resolve) => setTimeout(resolve, duration));
-    const clamp = (value: number, low = 0, high = 1) => Math.min(high, Math.max(low, value));
-    const mix = (from: number, to: number, amount: number) => from + (to - from) * clamp(amount);
-    const ease = (value: number) => 1 - Math.pow(1 - clamp(value), 3);
+    loader.style.setProperty('--entry-fill-duration', `${timing.minimum}ms`);
+
+    const wait = (duration: number) => new Promise<void>((resolve) => window.setTimeout(resolve, duration));
+    const nextPaint = () => new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+    });
     const tabGuard = (event: KeyboardEvent) => {
       if (event.key === 'Tab') event.preventDefault();
     };
     const abort = () => {
-      cancelAnimationFrame(frame);
+      aborted = true;
       document.removeEventListener('keydown', tabGuard, true);
     };
     document.addEventListener('keydown', tabGuard, true);
     window.addEventListener('lufi-entry-abort', abort, { once: true });
 
-    const track = async (task: Promise<unknown>, weight: number) => {
-      try { await task; } catch {}
-      actualProgress = Math.min(.94, actualProgress + weight);
-    };
-    const nextPaint = () => new Promise<void>((resolve) => {
-      requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-    });
     const fontReady = async () => {
       if (!document.fonts) return;
       await Promise.allSettled([
@@ -88,112 +74,62 @@
         if (settled) return;
         settled = true;
         observer.disconnect();
-        requestAnimationFrame(() => resolve());
+        resolve();
       };
       const observer = new MutationObserver(() => {
-        if (material.dataset.ready === 'true') done();
+        if (material.dataset.ready === 'true') requestAnimationFrame(done);
       });
       observer.observe(material, { attributes: true, attributeFilter: ['data-ready'] });
-      window.setTimeout(done, mode === 'warm' ? 500 : 1200);
+      window.setTimeout(done, mode === 'warm' ? 520 : 1050);
     });
 
-    Promise.allSettled([
-      track(fontReady(), .28),
-      track(imageReady(), .18),
-      track(materialReady(), .28),
-      track(nextPaint(), .10),
-    ]).then(() => {
-      actualProgress = 1;
-      ready = true;
-    });
+    const release = async () => {
+      if (released || aborted) return;
+      released = true;
+      loader.dataset.phase = 'settling';
+      await wait(timing.settle);
+      if (aborted) return;
 
-    const timelineProgress = (elapsed: number) => {
-      if (elapsed < timings.fill) return 0;
-      if (elapsed < timings.mid) return mix(0, .45, (elapsed - timings.fill) / (timings.mid - timings.fill));
-      if (elapsed < timings.slow) return mix(.45, .75, (elapsed - timings.mid) / (timings.slow - timings.mid));
-      if (elapsed < timings.near) return mix(.75, .92, (elapsed - timings.slow) / (timings.near - timings.slow));
-      return .92;
-    };
-    const renderProgress = (progress: number, now = performance.now()) => {
-      const safeProgress = clamp(progress);
-      const surface = (1 - safeProgress) * 100;
-      const amplitude = reducedMotion ? 0 : Math.sin(Math.PI * safeProgress) * 2.4;
-      const phase = now * .00235;
-      const points = Array.from({ length: 7 }, (_, index) => {
-        const x = index * (100 / 6);
-        const y = clamp(surface + Math.sin(phase + index * .92) * amplitude, 0, 100);
-        return { x, y };
-      });
-      const clip = `polygon(${points.map(({ x, y }) => `${x.toFixed(2)}% ${y.toFixed(2)}%`).join(',')},100% 100%,0 100%)`;
-      liquid.style.clipPath = clip;
-      orbit.style.clipPath = clip;
-      tide.setAttribute('d', points.map(({ x, y }, index) => `${index ? 'L' : 'M'}${x.toFixed(2)} ${y.toFixed(2)}`).join(''));
-      mark.style.setProperty('--entry-surface', `${surface}%`);
-    };
-
-    const finish = async () => {
-      if (finishing) return;
-      finishing = true;
-      cancelAnimationFrame(frame);
-      displayedProgress = 1;
-      renderProgress(1);
       loader.dataset.phase = 'complete';
-      await wait(timings.hold);
-
-      root.style.setProperty('--entry-motion-delay', `${Math.max(0, timings.exit - timings.heroLead - 180)}ms`);
+      root.style.setProperty('--entry-motion-delay', `${timing.heroDelay}ms`);
       root.classList.add('motion-ready');
-      root.classList.remove('entry-active');
       try { sessionStorage.setItem('lufi-entry-seen', '1'); } catch {}
 
+      await nextPaint();
+      if (aborted) return;
+      loader.style.pointerEvents = 'none';
       const exit = loader.animate(
+        [{ opacity: 1 }, { opacity: 0 }],
+        { duration: timing.exit, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' },
+      );
+      const stageExit = stage.animate(
         reducedMotion
           ? [{ opacity: 1 }, { opacity: 0 }]
-          : [{ clipPath: 'inset(0 0 0 0)' }, { clipPath: 'inset(0 0 100% 0)' }],
-        { duration: timings.exit, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' },
+          : [{ opacity: 1, transform: 'translate3d(0,0,0) scale(1)' }, { opacity: .76, transform: 'translate3d(0,-4px,0) scale(.985)' }],
+        { duration: timing.exit, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' },
       );
-      try { await exit.finished; } catch {}
+      try { await Promise.all([exit.finished, stageExit.finished]); } catch {}
+
       document.removeEventListener('keydown', tabGuard, true);
       window.removeEventListener('lufi-entry-abort', abort);
       loader.remove();
+      root.classList.remove('entry-active');
       delete root.dataset.entryMode;
       window.clearTimeout((window as Window & { __lufiEntryFailSafe?: number }).__lufiEntryFailSafe);
     };
 
-    const tick = (now: number) => {
-      if (!root.classList.contains('entry-active') || finishing) return;
-      const elapsed = now - started;
-      const delta = Math.min((now - previous) / 1000, .05);
-      previous = now;
-
-      if (!reducedMotion && elapsed >= timings.pour && displayedProgress > .02 && loader.dataset.phase === 'waiting') {
-        loader.dataset.phase = 'tracing';
-      }
-
-      if (!completionStarted && ready && elapsed >= timings.near) {
-        completionStarted = now;
-        completionOrigin = displayedProgress;
-        loader.dataset.phase = reducedMotion ? 'filling' : 'completing';
-      }
-
-      if (completionStarted) {
-        const completion = clamp((now - completionStarted) / timings.complete);
-        displayedProgress = mix(completionOrigin, 1, ease(completion));
-        renderProgress(displayedProgress, now);
-        if (completion >= 1) finish();
-        else frame = requestAnimationFrame(tick);
-        return;
-      }
-
-      if (reducedMotion && loader.dataset.phase === 'waiting') loader.dataset.phase = 'filling';
-      const visualTarget = Math.min(timelineProgress(elapsed), actualProgress);
-      const response = visualTarget < .75 ? 5.2 : 3.2;
-      displayedProgress += (visualTarget - displayedProgress) * (1 - Math.exp(-delta * response));
-      displayedProgress = Math.max(0, Math.min(displayedProgress, .94));
-      renderProgress(displayedProgress, now);
-      frame = requestAnimationFrame(tick);
+    const run = async () => {
+      const assetGate = Promise.race([
+        Promise.allSettled([fontReady(), imageReady(), materialReady(), nextPaint()]),
+        wait(timing.assets),
+      ]);
+      await nextPaint();
+      if (aborted) return;
+      loader.dataset.phase = 'forming';
+      await Promise.all([wait(timing.minimum), assetGate]);
+      await release();
     };
 
-    renderProgress(0);
-    frame = requestAnimationFrame(tick);
+    void run();
   }
 </script>

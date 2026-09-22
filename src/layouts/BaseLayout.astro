@@ -30,28 +30,38 @@ const socialImage = new URL(image, Astro.site);
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <style is:inline>
       html{background:#181715}
-      .entry-loader{display:none;position:fixed;inset:0;z-index:2147483647;place-items:center;width:100%;height:100svh;min-height:100svh;background:#181715;pointer-events:auto;contain:strict}
+      .entry-loader{--entry-fill-duration:1650ms;display:none;position:fixed;inset:0;z-index:2147483647;place-items:center;width:100%;height:100svh;min-height:100svh;background:#181715;opacity:1;pointer-events:auto;contain:strict;will-change:opacity}
       @supports(height:100dvh){.entry-loader{height:100dvh}}
       html[data-entry-mode] .entry-loader{display:grid}
       html.entry-active,html.entry-active body{overflow:hidden}
-      .entry-loader__stage{position:relative;width:clamp(4.5rem,10vw,7rem);aspect-ratio:879/1654;isolation:isolate}
-      .entry-loader__mark{--entry-surface:100%;position:absolute;z-index:1;inset:0;overflow:hidden;background:transparent;opacity:0;transition:opacity 90ms linear;-webkit-mask:url('/img/lufi-mark.svg') center/contain no-repeat;mask:url('/img/lufi-mark.svg') center/contain no-repeat}
-      .entry-loader[data-phase="tracing"] .entry-loader__mark,.entry-loader[data-phase="filling"] .entry-loader__mark,.entry-loader[data-phase="completing"] .entry-loader__mark,.entry-loader[data-phase="complete"] .entry-loader__mark{opacity:1}
-      .entry-loader__orbit{position:absolute;z-index:2;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;clip-path:polygon(0 100%,100% 100%,100% 100%,0 100%);transition:opacity 260ms ease;pointer-events:none;will-change:clip-path,opacity}
-      .entry-loader[data-phase="tracing"] .entry-loader__orbit,.entry-loader[data-phase="completing"] .entry-loader__orbit{opacity:.92}
-      .entry-loader[data-phase="complete"] .entry-loader__orbit{opacity:0}
-      .entry-loader__liquid{position:absolute;z-index:1;inset:0;background:#ebe7e0;clip-path:polygon(0 100%,100% 100%,100% 100%,0 100%);will-change:clip-path}
-      .entry-loader__tide{position:absolute;z-index:3;inset:0;width:100%;height:100%;overflow:visible;opacity:0;transition:opacity 180ms ease;pointer-events:none}
-      .entry-loader__tide path{fill:none;stroke:#cd474c;stroke-width:1.25;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
-      .entry-loader[data-phase="tracing"] .entry-loader__tide,.entry-loader[data-phase="completing"] .entry-loader__tide{opacity:1}
-      .entry-loader[data-phase="complete"] .entry-loader__tide{opacity:0}
-      .entry-loader__release{position:absolute;z-index:0;left:50%;top:64.63%;width:38%;aspect-ratio:1;border:1px solid #cd474c;border-radius:50%;opacity:0;transform:translate(-50%,-50%) scale(.2);pointer-events:none}
-      .entry-loader__release::after{content:"";position:absolute;inset:20%;border:1px solid #cd474c;border-radius:inherit}
-      .entry-loader[data-phase="completing"] .entry-loader__release{animation:lufi-loader-release 420ms cubic-bezier(.22,1,.36,1) both}
-      .entry-loader[data-phase="complete"] .entry-loader__stage{animation:lufi-loader-lock 400ms cubic-bezier(.22,1,.36,1) both}
-      @keyframes lufi-loader-release{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}22%{opacity:.68}100%{opacity:0;transform:translate(-50%,-50%) scale(2.25)}}
-      @keyframes lufi-loader-lock{0%{transform:scale(1)}38%{transform:scale(.965)}100%{transform:scale(1)}}
-      @media(prefers-reduced-motion:reduce){.entry-loader__orbit,.entry-loader__tide,.entry-loader__release{display:none}.entry-loader[data-phase="complete"] .entry-loader__stage{animation:none}}
+      .entry-loader__stage{position:relative;width:clamp(4.8rem,12vw,7.25rem);aspect-ratio:879/1654;isolation:isolate;transform:translateZ(0);will-change:transform,opacity}
+      .entry-loader__orbit{position:absolute;z-index:0;inset:-38% -70%;border:1px solid rgba(205,71,76,.16);border-radius:50%;opacity:0;transform:rotate(-4deg) scale(.88);transition:opacity 600ms ease,transform 1000ms cubic-bezier(.16,1,.3,1);pointer-events:none}
+      .entry-loader__orbit::after{content:"";position:absolute;inset:13%;border:1px solid rgba(235,231,224,.07);border-radius:inherit;transform:rotate(7deg)}
+      .entry-loader__half{position:absolute;z-index:1;inset:0;overflow:hidden;-webkit-mask:url('/img/lufi-mark.svg') center/contain no-repeat;mask:url('/img/lufi-mark.svg') center/contain no-repeat}
+      .entry-loader__half--left{clip-path:inset(0 50% 0 0)}
+      .entry-loader__half--right{clip-path:inset(0 0 0 50%)}
+      .entry-loader__liquid{position:absolute;inset:-11% -28% -8%;overflow:hidden;background:#ebe7e0;border-radius:48% 52% 0 0/7% 9% 0 0;transform:translate3d(0,112%,0);transition:transform var(--entry-fill-duration) cubic-bezier(.16,1,.3,1);will-change:transform}
+      .entry-loader__half--right .entry-loader__liquid{border-radius:52% 48% 0 0/9% 7% 0 0;transition-delay:90ms}
+      .entry-loader__liquid::before,.entry-loader__liquid::after{content:"";position:absolute;left:-18%;width:136%;border-radius:50%;pointer-events:none;will-change:transform}
+      .entry-loader__liquid::before{top:-1.2%;height:7%;border-top:1.5px solid #cd474c;opacity:.88;animation:lufi-loader-current-a 2200ms ease-in-out infinite alternate}
+      .entry-loader__liquid::after{top:9%;height:13%;border-top:1px solid rgba(205,71,76,.48);opacity:.72;animation:lufi-loader-current-b 2800ms ease-in-out infinite alternate}
+      .entry-loader__point{position:absolute;z-index:3;left:50%;top:64.63%;width:44.4%;aspect-ratio:1;border-radius:50%;background:#cd474c;opacity:0;transform:translate(-50%,-50%) scale(.08);transition:opacity 260ms ease 440ms,transform 720ms cubic-bezier(.16,1,.3,1) 440ms;will-change:transform,opacity}
+      .entry-loader__echo{position:absolute;z-index:2;left:50%;top:64.63%;width:44.4%;aspect-ratio:1;border:1px solid #cd474c;border-radius:50%;opacity:0;transform:translate(-50%,-50%) scale(.82);pointer-events:none}
+      .entry-loader[data-phase="forming"] .entry-loader__orbit{opacity:1;transform:rotate(2deg) scale(1)}
+      .entry-loader[data-phase="forming"] .entry-loader__half--left .entry-loader__liquid{transform:translate3d(0,14%,0)}
+      .entry-loader[data-phase="forming"] .entry-loader__half--right .entry-loader__liquid{transform:translate3d(0,19%,0)}
+      .entry-loader[data-phase="forming"] .entry-loader__point{opacity:1;transform:translate(-50%,-50%) scale(.34)}
+      .entry-loader[data-phase="settling"] .entry-loader__orbit,.entry-loader[data-phase="complete"] .entry-loader__orbit{opacity:.38;transform:rotate(0) scale(.96)}
+      .entry-loader[data-phase="settling"] .entry-loader__liquid,.entry-loader[data-phase="complete"] .entry-loader__liquid{transform:translate3d(0,0,0);transition-duration:360ms;transition-delay:0ms}
+      .entry-loader[data-phase="settling"] .entry-loader__liquid::before,.entry-loader[data-phase="settling"] .entry-loader__liquid::after,.entry-loader[data-phase="complete"] .entry-loader__liquid::before,.entry-loader[data-phase="complete"] .entry-loader__liquid::after{opacity:0;transition:opacity 240ms ease}
+      .entry-loader[data-phase="settling"] .entry-loader__point,.entry-loader[data-phase="complete"] .entry-loader__point{opacity:1;transform:translate(-50%,-50%) scale(1);transition-delay:0ms}
+      .entry-loader[data-phase="settling"] .entry-loader__echo{animation:lufi-loader-echo 560ms cubic-bezier(.16,1,.3,1) both}
+      .entry-loader[data-phase="complete"] .entry-loader__stage{animation:lufi-loader-resolve 420ms cubic-bezier(.16,1,.3,1) both}
+      @keyframes lufi-loader-current-a{from{transform:translate3d(-5%,0,0) rotate(-1.2deg) scaleX(.96)}to{transform:translate3d(5%,0,0) rotate(1.2deg) scaleX(1.04)}}
+      @keyframes lufi-loader-current-b{from{transform:translate3d(4%,0,0) rotate(.8deg) scaleX(1.03)}to{transform:translate3d(-4%,0,0) rotate(-.8deg) scaleX(.97)}}
+      @keyframes lufi-loader-echo{0%{opacity:0;transform:translate(-50%,-50%) scale(.82)}24%{opacity:.72}100%{opacity:0;transform:translate(-50%,-50%) scale(2.15)}}
+      @keyframes lufi-loader-resolve{0%{transform:scale(1)}44%{transform:scale(.975)}100%{transform:scale(1)}}
+      @media(prefers-reduced-motion:reduce){.entry-loader__orbit,.entry-loader__echo,.entry-loader__liquid::before,.entry-loader__liquid::after{display:none}.entry-loader__liquid{transition:none}.entry-loader[data-phase="forming"] .entry-loader__liquid,.entry-loader[data-phase="settling"] .entry-loader__liquid,.entry-loader[data-phase="complete"] .entry-loader__liquid{transform:none}.entry-loader__point{transition:opacity 150ms ease;transform:translate(-50%,-50%) scale(1)}.entry-loader[data-phase="complete"] .entry-loader__stage{animation:none}}
     </style>
     <script is:inline>
       (() => {
@@ -71,11 +81,22 @@ const socialImage = new URL(image, Astro.site);
         root.classList.add('entry-active');
         window.__lufiEntryFailSafe = window.setTimeout(() => {
           window.dispatchEvent(new Event('lufi-entry-abort'));
-          root.classList.remove('entry-active');
+          const loader = document.querySelector('[data-entry-loader]');
           root.classList.add('motion-ready');
-          delete root.dataset.entryMode;
-          document.querySelector('[data-entry-loader]')?.remove();
-        }, 6500);
+          const finish = () => {
+            loader?.remove();
+            root.classList.remove('entry-active');
+            delete root.dataset.entryMode;
+          };
+          if (!loader) {
+            finish();
+            return;
+          }
+          loader.style.pointerEvents = 'none';
+          loader.style.transition = 'opacity 220ms cubic-bezier(.22,1,.36,1)';
+          requestAnimationFrame(() => { loader.style.opacity = '0'; });
+          window.setTimeout(finish, 240);
+        }, 5200);
       })();
     </script>
     <meta name="color-scheme" content="only light" />
