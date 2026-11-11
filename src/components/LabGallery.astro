@@ -1,25 +1,34 @@
 ---
 import { labRows, type LabWork } from '../data/labWork';
 
-const image = (work: LabWork) => `/img/lab/${work.slug}`;
+interface Props {
+  rows?: [LabWork[], LabWork[]];
+  id?: string;
+  title?: string;
+  imageRoot?: string;
+}
+
+const {
+  rows = labRows,
+  id = 'lab',
+  title = 'Graphic work.',
+  imageRoot = '/img/lab',
+} = Astro.props;
+const titleId = `${id}-title`;
+const image = (work: LabWork) => `${imageRoot}/${work.slug}`;
 const imageSizes = (work: LabWork) => {
   const ratio = work.width / work.height;
   return `(min-width: 1440px) ${Math.round(320 * ratio)}px, (min-width: 700px) ${Math.round(280 * ratio)}px, ${Math.round(200 * ratio)}px`;
 };
 ---
 
-<section class="lab section-pad" id="lab" aria-labelledby="lab-title" data-motion-section data-cursor-theme="dark" data-lab-gallery>
-  <div class="section-index"><span>LUFI Lab</span><span>Selected graphic work</span></div>
+<section class="lab section-pad" id={id} aria-labelledby={titleId} data-motion-section data-cursor-theme="light" data-lab-gallery>
   <div class="lab__heading">
-    <h2 id="lab-title" class="motion-heading"><span class="motion-line"><span>Graphic work.</span></span></h2>
-    <button class="lab__motion-control" type="button" data-lab-toggle aria-pressed="false" aria-label="Pause gallery motion">
-      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path data-pause-icon d="M6 4v12M14 4v12" /><path data-play-icon d="m6 4 10 6-10 6z" /></svg>
-      <span data-lab-toggle-label>Pause motion</span>
-    </button>
+    <h2 id={titleId} class="motion-heading"><span class="motion-line"><span>{title}</span></span></h2>
   </div>
   <div class="lab__gallery" data-lab-streams>
-    {labRows.map((row, index) => (
-      <div class="lab__viewport" data-lab-viewport data-row={index} role="region" tabindex="0" aria-label={`Graphic work row ${index + 1}. Focus to pause and use arrow keys to browse.`}>
+    {rows.map((row, index) => (
+      <div class="lab__viewport" data-lab-viewport data-row={index} role="region" tabindex="0" aria-label={`${title} row ${index + 1}. Focus to pause and use arrow keys to browse.`}>
         <div class="lab__track" data-lab-track>
           {[false, true].map((duplicate) => (
             <div class="lab__sequence" data-lab-sequence={!duplicate ? '' : undefined} aria-hidden={duplicate ? 'true' : undefined}>
@@ -46,17 +55,11 @@ const imageSizes = (work: LabWork) => {
 </section>
 
 <style>
-  .lab{background:var(--ink);color:var(--bone);padding-block:clamp(4.5rem,8vw,8rem);overflow:hidden}
-  .lab__heading{display:flex;align-items:end;justify-content:space-between;gap:1.5rem;margin:clamp(2.75rem,5vw,4.5rem) 0 clamp(1.75rem,3vw,3rem)}
+  .lab{background:var(--bone);color:var(--ink);padding-block:clamp(4.5rem,8vw,8rem);overflow:visible}
+  .lab__heading{display:flex;align-items:end;justify-content:space-between;gap:1.5rem;margin:0 0 clamp(1.75rem,3vw,3rem)}
   .lab h2{margin:0;line-height:.92}
-  .lab__motion-control{display:inline-flex;align-items:center;justify-content:flex-end;gap:.6rem;min-width:44px;min-height:44px;padding:.5rem 0;background:none;border:0;color:var(--bone);font:700 .68rem/1.2 DM,sans-serif;letter-spacing:.13em;text-transform:uppercase;white-space:nowrap;cursor:pointer}
-  .lab__motion-control svg{width:14px;height:14px;fill:none;stroke:var(--red);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-  .lab__motion-control [data-play-icon]{display:none}
-  .lab__motion-control[aria-pressed="true"] [data-pause-icon]{display:none}
-  .lab__motion-control[aria-pressed="true"] [data-play-icon]{display:block}
-  .lab__motion-control:hover span{text-decoration:underline;text-underline-offset:.35em}
-  .lab__motion-control:focus-visible,.lab__viewport:focus-visible{outline:2px solid var(--red);outline-offset:4px}
-  .lab__gallery{--art-height:clamp(10.5rem,48vw,13rem);--art-gap:clamp(.625rem,2.2vw,1.375rem);display:grid;gap:clamp(.75rem,1.6vw,1.375rem);margin-inline:calc(-1 * var(--p))}
+  .lab__viewport:focus-visible{outline:2px solid var(--red);outline-offset:4px}
+  .lab__gallery{--art-height:clamp(10.5rem,48vw,13rem);--art-gap:clamp(.625rem,2.2vw,1.375rem);display:grid;gap:clamp(.75rem,1.6vw,1.375rem);margin-inline:calc(-1 * var(--p));overflow:hidden}
   .lab__viewport{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;touch-action:auto}
   .lab__viewport::-webkit-scrollbar{display:none}
   .lab[data-enhanced]:not([data-manual]) .lab__viewport{overflow-x:hidden;touch-action:pan-y}
@@ -69,14 +72,11 @@ const imageSizes = (work: LabWork) => {
   @media (hover:hover) and (pointer:fine){.lab__artwork:hover img{transform:scale(1.012)}}
   @media (min-width:700px){.lab__gallery{--art-height:clamp(13rem,25vw,18rem)}}
   @media (min-width:1440px){.lab__gallery{--art-height:20rem}}
-  @media (max-width:699px){.lab__heading{align-items:end}.lab__motion-control span{font-size:.61rem}.lab__motion-control{gap:.35rem}}
-  @media (max-width:360px){.lab__heading{align-items:start;flex-direction:column;gap:.75rem}.lab__motion-control{justify-content:flex-start}}
-  @media (prefers-reduced-motion:reduce){.lab__motion-control{display:none}.lab__viewport{overflow-x:auto;touch-action:auto;overscroll-behavior-inline:contain}.lab__artwork img{transition:none}}
+  @media (prefers-reduced-motion:reduce){.lab__viewport{overflow-x:auto;touch-action:auto;overscroll-behavior-inline:contain}.lab__artwork img{transition:none}}
 </style>
 
 <script>
-  const gallery = document.querySelector<HTMLElement>('[data-lab-gallery]');
-  if (gallery) {
+  document.querySelectorAll<HTMLElement>('[data-lab-gallery]').forEach((gallery) => {
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
     const mobile = matchMedia('(max-width: 699px)');
     const toggle = gallery.querySelector<HTMLButtonElement>('[data-lab-toggle]');
@@ -187,5 +187,5 @@ const imageSizes = (work: LabWork) => {
     measure();
     gallery.dataset.enhanced = '';
     sync();
-  }
+  });
 </script>

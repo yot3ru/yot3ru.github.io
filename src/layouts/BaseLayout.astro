@@ -1,6 +1,5 @@
 ---
 import SiteHeader from '../components/SiteHeader.astro';
-import SiteFooter from '../components/SiteFooter.astro';
 import EntryLoader from '../components/EntryLoader.astro';
 import '../styles/global.css';
 
@@ -109,10 +108,18 @@ const socialImage = new URL(image, Astro.site);
     <a class="skip-link" href="#main">Skip to content</a>
     <SiteHeader />
     <main id="main"><slot /></main>
-    <SiteFooter />
-    <div class="custom-cursor" data-cursor-overlay data-state="hidden" data-theme="dark" aria-hidden="true">
-      <span class="custom-cursor__core"></span>
-      <span class="custom-cursor__follower"></span>
+    <div class="custom-cursor" data-cursor-overlay aria-hidden="true">
+      <svg class="custom-cursor__shape" width="50" height="54" viewBox="0 0 50 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g filter="url(#smooth-cursor-shadow)">
+          <path d="M42.6817 41.1495 27.5103 6.79925c-.7834-1.77368-3.3021-1.77367-4.1176 0L7.59814 41.1495c-.83981 1.8264.92898 3.7407 2.81436 3.0459l13.9632-5.1458a2.25 2.25 0 0 1 1.5665 0l13.8699 5.1458c1.8728.6948 3.6763-1.2195 2.8696-3.0459Z" class="custom-cursor__fill" />
+          <path d="M43.7146 40.6933 28.5431 6.34306c-1.1875-2.68878-4.9659-2.6479-6.1763-.01551L6.57226 40.6778c-1.25886 2.7378 1.40012 5.6202 4.23074 4.5771l13.9632-5.1459c.2559-.0943.5337-.0934.7832-.0008l13.8699 5.1458c2.8068 1.0413 5.5061-1.8193 4.2953-4.5607Z" class="custom-cursor__outline" stroke-width="2.25825" />
+        </g>
+        <defs>
+          <filter id="smooth-cursor-shadow" x=".602" y=".952" width="49.059" height="52.428" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+            <feDropShadow dy="2.258" stdDeviation="2.258" flood-opacity=".08" />
+          </filter>
+        </defs>
+      </svg>
     </div>
 
     <script>
@@ -221,167 +228,111 @@ const socialImage = new URL(image, Astro.site);
       }
 
       const cursor = document.querySelector<HTMLElement>('[data-cursor-overlay]');
-      const cursorCore = cursor?.querySelector<HTMLElement>('.custom-cursor__core');
-      const cursorFollower = cursor?.querySelector<HTMLElement>('.custom-cursor__follower');
       const fine = matchMedia('(any-hover: hover) and (any-pointer: fine)');
-      if (cursor && cursorCore && cursorFollower) {
-        type CursorState = 'default' | 'link' | 'cta' | 'media' | 'text' | 'hidden';
-        const cursorScale: Record<CursorState, number> = { default: 1, link: 1.3, cta: 1.55, media: 1.22, text: .8, hidden: .8 };
-        const coreScale: Record<CursorState, number> = { default: 1, link: 1, cta: 1, media: .86, text: .8, hidden: .8 };
+      if (cursor) {
+        const spring = { damping: 45, stiffness: 400, mass: 1 };
+        const rotationSpring = { damping: 60, stiffness: 300, mass: 1 };
+        const scaleSpring = { damping: 35, stiffness: 500, mass: 1 };
         let enabled = false;
         let visible = false;
-        let pressed = false;
-        let state: CursorState = 'hidden';
-        let targetX = innerWidth / 2;
-        let targetY = innerHeight / 2;
-        let followerX = targetX;
-        let followerY = targetY;
-        let followerScale = .8;
-        let preciseScale = .8;
-        let velocity = 0;
-        let angle = 0;
-        let previousX = Number.NaN;
-        let previousY = Number.NaN;
-        let nativeText: HTMLElement | null = null;
+        let targetX = 0;
+        let targetY = 0;
+        let x = 0;
+        let y = 0;
+        let velocityX = 0;
+        let velocityY = 0;
+        let targetRotation = 0;
+        let rotation = 0;
+        let rotationVelocity = 0;
+        let previousAngle = 0;
+        let targetScale = 1;
+        let scale = 1;
+        let scaleVelocity = 0;
+        let previousX = 0;
+        let previousY = 0;
+        let previousPointerTime = performance.now();
         let frameId = 0;
         let lastFrame = performance.now();
-        let needsClassification = false;
+        let settleTimer = 0;
 
         const eligible = () => fine.matches && !reduce.matches;
-        const clearNativeText = () => {
-          nativeText?.classList.remove('cursor-native-text');
-          nativeText = null;
+        const stepSpring = (value: number, speed: number, target: number, config: typeof spring, delta: number) => {
+          const acceleration = ((target - value) * config.stiffness - speed * config.damping) / config.mass;
+          const nextSpeed = speed + acceleration * delta;
+          return [value + nextSpeed * delta, nextSpeed] as const;
         };
         const disableCursor = () => {
           enabled = false;
           visible = false;
-          pressed = false;
-          cursor.dataset.state = 'hidden';
-          delete cursor.dataset.pressed;
+          cursor.removeAttribute('data-visible');
           delete document.documentElement.dataset.cursorReady;
-          clearNativeText();
           cancelAnimationFrame(frameId);
+          clearTimeout(settleTimer);
           frameId = 0;
         };
-        const enableCursor = () => {
-          if (enabled || !eligible()) return;
-          enabled = true;
-          document.documentElement.dataset.cursorReady = 'true';
-        };
-        const setState = (target: Element | null) => {
-          const theme = target?.closest<HTMLElement>('[data-cursor-theme]')?.dataset.cursorTheme;
-          cursor.dataset.theme = theme || 'dark';
-          const explicit = target?.closest<HTMLElement>('[data-cursor]')?.dataset.cursor;
-          const interactive = target?.closest('a,button,[role="button"],[role="tab"]');
-          const textTarget = !explicit && !interactive
-            ? target?.closest<HTMLElement>('p,h1,h2,h3,li,figcaption,small,span,input,textarea,[contenteditable="true"]') ?? null
-            : null;
-
-          let next: CursorState = 'default';
-          if (explicit === 'cta') next = 'cta';
-          else if (explicit === 'media') next = 'media';
-          else if (interactive) next = 'link';
-          else if (textTarget) next = 'text';
-
-          if (nativeText !== textTarget) {
-            clearNativeText();
-            nativeText = textTarget;
-            nativeText?.classList.add('cursor-native-text');
-          }
-          state = next;
-          cursor.dataset.state = next;
+        const render = (now: number) => {
+          frameId = 0;
+          if (!enabled || !visible || document.hidden) return;
+          const delta = Math.min((now - lastFrame) / 1000, 1 / 30);
+          lastFrame = now;
+          [x, velocityX] = stepSpring(x, velocityX, targetX, spring, delta);
+          [y, velocityY] = stepSpring(y, velocityY, targetY, spring, delta);
+          [rotation, rotationVelocity] = stepSpring(rotation, rotationVelocity, targetRotation, rotationSpring, delta);
+          [scale, scaleVelocity] = stepSpring(scale, scaleVelocity, targetScale, scaleSpring, delta);
+          cursor.style.transform = `translate3d(${x}px,${y}px,0) translate(-50%,-50%) rotate(${rotation}deg) scale(${scale})`;
+          const moving = Math.abs(targetX - x) > .01 || Math.abs(targetY - y) > .01
+            || Math.abs(targetRotation - rotation) > .01 || Math.abs(targetScale - scale) > .001
+            || Math.abs(velocityX) > .01 || Math.abs(velocityY) > .01
+            || Math.abs(rotationVelocity) > .01 || Math.abs(scaleVelocity) > .001;
+          if (moving) frameId = requestAnimationFrame(render);
         };
         const startLoop = () => {
           if (frameId || !enabled || !visible || document.hidden) return;
           lastFrame = performance.now();
-          frameId = requestAnimationFrame(updateCursor);
-        };
-        const updateCursor = (now: number) => {
-          frameId = 0;
-          if (!enabled || !visible || document.hidden) return;
-          const delta = Math.min((now - lastFrame) / 1000, .05);
-          lastFrame = now;
-          if (needsClassification) {
-            setState(document.elementFromPoint(targetX, targetY));
-            needsClassification = false;
-          }
-          const followEase = 1 - Math.exp(-delta * 21);
-          const scaleEase = 1 - Math.exp(-delta * 24);
-          followerX += (targetX - followerX) * followEase;
-          followerY += (targetY - followerY) * followEase;
-          followerScale += (cursorScale[state] - followerScale) * scaleEase;
-          preciseScale += (coreScale[state] * (pressed ? .86 : 1) - preciseScale) * (1 - Math.exp(-delta * 34));
-          velocity *= Math.exp(-delta * 18);
-          const compression = pressed ? .9 : 1;
-          const stretch = 1 + velocity * .06;
-          cursorCore.style.transform = `translate3d(${targetX}px,${targetY}px,0) translate(-50%,-50%) scale(${preciseScale})`;
-          cursorFollower.style.transform = `translate3d(${followerX}px,${followerY}px,0) translate(-50%,-50%) rotate(${angle}rad) scale(${followerScale * compression * stretch},${followerScale * compression / Math.sqrt(stretch)})`;
-          const unsettled = Math.hypot(targetX - followerX, targetY - followerY) > .05
-            || Math.abs(cursorScale[state] - followerScale) > .002
-            || Math.abs(coreScale[state] * (pressed ? .86 : 1) - preciseScale) > .002
-            || velocity > .003
-            || needsClassification;
-          if (unsettled) frameId = requestAnimationFrame(updateCursor);
+          frameId = requestAnimationFrame(render);
         };
 
         addEventListener('pointermove', (event) => {
-          if (event.pointerType !== 'mouse') {
-            visible = false;
-            delete cursor.dataset.visible;
-            clearNativeText();
-            cancelAnimationFrame(frameId);
-            frameId = 0;
-            return;
+          if (event.pointerType === 'touch' || !eligible()) return;
+          if (!enabled) {
+            enabled = true;
+            document.documentElement.dataset.cursorReady = 'true';
           }
-          if (!eligible()) return;
-          enableCursor();
+          const now = performance.now();
+          const deltaTime = Math.max(now - previousPointerTime, 1);
+          const dx = event.clientX - previousX;
+          const dy = event.clientY - previousY;
+          const speed = Math.hypot(dx / deltaTime, dy / deltaTime);
           targetX = event.clientX;
           targetY = event.clientY;
           if (!visible) {
             visible = true;
-            followerX = targetX;
-            followerY = targetY;
-            followerScale = .8;
-            preciseScale = .8;
+            x = targetX;
+            y = targetY;
             cursor.dataset.visible = 'true';
           }
-          if (Number.isFinite(previousX)) {
-            const dx = targetX - previousX;
-            const dy = targetY - previousY;
-            velocity = Math.min(Math.hypot(dx, dy) / 42, 1);
-            if (Math.abs(dx) + Math.abs(dy) > .1) angle = Math.atan2(dy, dx);
+          if (speed > .1) {
+            const currentAngle = Math.atan2(dy, dx) * 180 / Math.PI + 90;
+            let difference = currentAngle - previousAngle;
+            if (difference > 180) difference -= 360;
+            if (difference < -180) difference += 360;
+            targetRotation += difference;
+            previousAngle = currentAngle;
+            targetScale = .95;
+            clearTimeout(settleTimer);
+            settleTimer = window.setTimeout(() => {
+              targetScale = 1;
+              startLoop();
+            }, 150);
           }
-          previousX = targetX;
-          previousY = targetY;
-          setState(event.target instanceof Element ? event.target : null);
-          startLoop();
-        }, { passive: true });
-        addEventListener('pointerdown', (event) => {
-          if (!enabled || event.pointerType !== 'mouse') return;
-          pressed = true;
-          cursor.dataset.pressed = 'true';
-          startLoop();
-        }, { passive: true });
-        const releaseCursor = (event: PointerEvent) => {
-          if (!enabled || event.pointerType !== 'mouse') return;
-          pressed = false;
-          delete cursor.dataset.pressed;
-          startLoop();
-        };
-        addEventListener('pointerup', releaseCursor, { passive: true });
-        addEventListener('pointercancel', releaseCursor, { passive: true });
-        addEventListener('scroll', () => {
-          if (!enabled || !visible) return;
-          needsClassification = true;
+          previousX = event.clientX;
+          previousY = event.clientY;
+          previousPointerTime = now;
           startLoop();
         }, { passive: true });
         document.documentElement.addEventListener('pointerleave', () => {
           visible = false;
-          cursor.dataset.state = 'hidden';
-          delete cursor.dataset.visible;
-          previousX = Number.NaN;
-          previousY = Number.NaN;
-          clearNativeText();
+          cursor.removeAttribute('data-visible');
           cancelAnimationFrame(frameId);
           frameId = 0;
         });
@@ -389,7 +340,7 @@ const socialImage = new URL(image, Astro.site);
           if (document.hidden) {
             cancelAnimationFrame(frameId);
             frameId = 0;
-          } else if (visible) startLoop();
+          } else startLoop();
         });
         fine.addEventListener('change', () => { if (!eligible()) disableCursor(); });
         reduce.addEventListener('change', () => { if (!eligible()) disableCursor(); });
@@ -399,9 +350,8 @@ const socialImage = new URL(image, Astro.site);
       if (!reduce.matches && 'IntersectionObserver' in window) {
         const reveal = new IntersectionObserver((entries) => {
           entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            (entry.target as HTMLElement).dataset.inView = '';
-            reveal.unobserve(entry.target);
+            if (entry.isIntersecting) (entry.target as HTMLElement).dataset.inView = '';
+            else delete (entry.target as HTMLElement).dataset.inView;
           });
         }, { threshold: 0, rootMargin: '0px 0px -15% 0px' });
         motionSections.forEach((section) => reveal.observe(section));

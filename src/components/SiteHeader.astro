@@ -1,12 +1,13 @@
 <header class="site-header" data-cursor-theme="dark">
   <a class="brand" href="/" aria-label="LUFI home">
-    <img src="/img/lufi-mark.svg" width="879" height="1654" alt="LUFI" />
+    <img src="/img/lufi-logo.svg" width="551" height="261" alt="LUFI" />
   </a>
   <nav class="nav-desktop" aria-label="Primary">
-    <a href="#capabilities">Capabilities</a>
-    <a href="#lab">Lab</a>
-    <a href="#studio">Studio</a>
-    <a href="#contact" data-cursor="cta">Contact</a>
+    <span class="nav-dot" aria-hidden="true"></span>
+    <a href="/#capabilities">Capabilities</a>
+    <a href="/#lab">Lab</a>
+    <a href="/#studio">Studio</a>
+    <a href="/#contact" data-cursor="cta">Contact</a>
   </nav>
   <button class="menu-open" data-menu-open type="button" aria-label="Open navigation">
     <span>Menu</span><i aria-hidden="true"></i>
@@ -24,3 +25,90 @@
     </div>
   </dialog>
 </header>
+
+<script>
+  const nav = document.querySelector<HTMLElement>('.nav-desktop');
+  const dot = nav?.querySelector<HTMLElement>('.nav-dot');
+  const links = [...(nav?.querySelectorAll<HTMLAnchorElement>('a') ?? [])];
+  const header = document.querySelector<HTMLElement>('.site-header');
+  const hero = document.querySelector<HTMLElement>('.hero');
+  const surfaces = [...document.querySelectorAll<HTMLElement>('[data-cursor-theme]')]
+    .filter((surface) => !surface.closest('.site-header'));
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let active = 0;
+  let hasSelection = false;
+  let animation: Animation | undefined;
+  let selectionTimer = 0;
+
+  function select(index: number, animate = true) {
+    if (!nav || !dot || !links[index] || nav.offsetParent === null) return;
+    links.forEach((link, i) => {
+      if (i === index) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+    if (index === active && hasSelection && animate) return;
+    const oldX = dot.getBoundingClientRect().left - nav.getBoundingClientRect().left;
+    const newX = links[index].offsetLeft + 4;
+    animation?.cancel();
+    dot.style.left = `${newX}px`;
+    if (animate && !reduced.matches && hasSelection) {
+      const distance = oldX - newX;
+      const height = Math.min(24, Math.max(12, Math.abs(distance) * .12));
+      animation = dot.animate([
+        { transform: `translate(${distance}px, -50%) scale(1.15, .85)`, offset: 0 },
+        { transform: `translate(${distance / 2}px, calc(-50% - ${height}px)) scale(.85, 1.2)`, offset: .5 },
+        { transform: 'translate(0, -50%) scale(1.2, .8)', offset: .9 },
+        { transform: 'translate(0, -50%) scale(1)', offset: 1 },
+      ], { duration: 560, easing: 'ease-in-out' });
+    }
+    active = index;
+    hasSelection = true;
+  }
+  function sync() {
+    if (location.pathname !== '/') return;
+    const current = links.reduce((last, link, index) => {
+      const section = document.getElementById(link.hash.slice(1));
+      return section && section.getBoundingClientRect().top <= innerHeight * .4 ? index : last;
+    }, -1);
+    if (current >= 0) select(current);
+  }
+  links.forEach((link, index) => link.addEventListener('click', () => {
+    select(index);
+    clearTimeout(selectionTimer);
+    selectionTimer = window.setTimeout(() => { selectionTimer = 0; sync(); }, 1200);
+  }));
+  function updateHeader() {
+    if (!header) return;
+    const sampleY = header.offsetHeight / 2;
+    const surface = surfaces.find((item) => {
+      const bounds = item.getBoundingClientRect();
+      return bounds.top <= sampleY && bounds.bottom > sampleY;
+    });
+    header.dataset.surface = surface?.dataset.cursorTheme ?? 'dark';
+    const pastHero = hero
+      ? hero.getBoundingClientRect().bottom <= header.offsetHeight
+      : window.scrollY > 0;
+    header.classList.toggle('is-scrolled', pastHero);
+  }
+  addEventListener('scroll', () => {
+    updateHeader();
+    if (!selectionTimer) sync();
+  }, { passive: true });
+  addEventListener('resize', () => {
+    updateHeader();
+    if (hasSelection) select(active, false);
+    else if (dot && links[0]) {
+      dot.style.left = `${links[0].offsetLeft + 4}px`;
+      hasSelection = true;
+    }
+  });
+  addEventListener('hashchange', sync);
+  document.fonts.ready.then(() => {
+    if (dot && links[0]) {
+      dot.style.left = `${links[0].offsetLeft + 4}px`;
+      hasSelection = true;
+    }
+    sync();
+  });
+  updateHeader();
+</script>

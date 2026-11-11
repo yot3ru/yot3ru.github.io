@@ -1,8 +1,9 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { extname, join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const root = new URL('../dist/', import.meta.url);
-const rootPath = root.pathname.replace(/^\/(.:\/)/, '$1');
+const rootPath = fileURLToPath(root);
 const required = ['index.html', '404.html', 'sitemap.xml', 'robots.txt', 'CNAME', '.nojekyll'];
 const errors = [];
 
