@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import LivingMaterial from '../components/LivingMaterial.astro';
 import LabGallery from '../components/LabGallery.astro';
+import VideoShowcase from '../components/VideoShowcase.astro';
 import { photographyRows } from '../data/photographyWork';
 
 const capabilities = [
@@ -70,6 +71,8 @@ const capabilities = [
   <section class="studio section-pad" id="studio" aria-labelledby="studio-title" data-motion-section data-cursor-theme="dark">
     <div class="studio__layout"><div class="studio__mark" aria-hidden="true" data-cursor="media" data-cursor-theme="dark"><LivingMaterial /><img src="/img/lufi-mark.svg" width="879" height="1654" alt="" /></div><div class="studio__copy"><h2 id="studio-title" class="motion-heading"><span class="motion-line"><span>Small enough</span></span><span class="motion-line"><span>to <em>care.</em></span></span></h2><p>LUFI is an independent creative studio in Colombo, Sri Lanka. We work across graphic design, photography, video and digital experiences.</p><p>We care about the thought behind the work, and the details that make it hold together.</p></div></div>
   </section>
+
+  <VideoShowcase />
 
   <section class="contact section-pad" id="contact" aria-labelledby="contact-title" data-motion-section data-cursor-theme="accent">
     <div class="contact__body">

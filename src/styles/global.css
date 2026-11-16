@@ -150,6 +150,7 @@ h1,h2,h3,p,figure{margin:0}h1,h2,h3{font-family:Funnel,Arial,sans-serif;font-wei
   .custom-cursor[data-visible="true"]{opacity:1}
   html[data-cursor-ready="true"],html[data-cursor-ready="true"] *{cursor:none!important}
   html[data-cursor-ready="true"] :is(input,textarea,select,[contenteditable="true"]){cursor:text!important}
+  html[data-cursor-ready="true"] :is(iframe,video){cursor:auto!important}
 }
 @media (prefers-reduced-motion:reduce){.custom-cursor{display:none!important}}
 /* Originkit-inspired active dot, adapted to the site's navigation links. */
@@ -673,6 +674,7 @@ main > section:not(:first-child)::before {
 .thinking { --section-surface: var(--ink); }
 .process { --section-surface: var(--red); }
 .studio { --section-surface: var(--ink); }
+.video-showcase { --section-surface: var(--bone); }
 .contact { --section-surface: var(--red); }
 
 /* Keep stacked surfaces connected. The curve grows into place while the
@@ -756,6 +758,7 @@ h1,h2,h3 { letter-spacing: -.04em; }
 .capabilities .capabilities__header h2,
 .section-heading h2,
 .lab h2,
+.video-showcase h2,
 .thinking h2,
 .studio__copy h2,
 .contact h2 {

@@ -277,8 +277,19 @@ const socialImage = new URL(image, Astro.site);
           frameId = requestAnimationFrame(render);
         };
 
+        const hideCursor = () => {
+          visible = false;
+          cursor.removeAttribute('data-visible');
+          cancelAnimationFrame(frameId);
+          frameId = 0;
+        };
+
         addEventListener('pointermove', (event) => {
           if (event.pointerType === 'touch' || !eligible()) return;
+          if (event.target instanceof Element && event.target.closest('iframe, video')) {
+            hideCursor();
+            return;
+          }
           if (!enabled) {
             enabled = true;
             document.documentElement.dataset.cursorReady = 'true';
@@ -329,12 +340,8 @@ const socialImage = new URL(image, Astro.site);
           targetScale = restScale;
           startLoop();
         }, { passive: true });
-        document.documentElement.addEventListener('pointerleave', () => {
-          visible = false;
-          cursor.removeAttribute('data-visible');
-          cancelAnimationFrame(frameId);
-          frameId = 0;
-        });
+        document.documentElement.addEventListener('pointerleave', hideCursor);
+        addEventListener('blur', hideCursor);
         document.addEventListener('visibilitychange', () => {
           if (document.hidden) {
             cancelAnimationFrame(frameId);
