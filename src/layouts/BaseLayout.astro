@@ -109,17 +109,7 @@ const socialImage = new URL(image, Astro.site);
     <SiteHeader />
     <main id="main"><slot /></main>
     <div class="custom-cursor" data-cursor-overlay aria-hidden="true">
-      <svg class="custom-cursor__shape" width="50" height="54" viewBox="0 0 50 54" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <g filter="url(#smooth-cursor-shadow)">
-          <path d="M42.6817 41.1495 27.5103 6.79925c-.7834-1.77368-3.3021-1.77367-4.1176 0L7.59814 41.1495c-.83981 1.8264.92898 3.7407 2.81436 3.0459l13.9632-5.1458a2.25 2.25 0 0 1 1.5665 0l13.8699 5.1458c1.8728.6948 3.6763-1.2195 2.8696-3.0459Z" class="custom-cursor__fill" />
-          <path d="M43.7146 40.6933 28.5431 6.34306c-1.1875-2.68878-4.9659-2.6479-6.1763-.01551L6.57226 40.6778c-1.25886 2.7378 1.40012 5.6202 4.23074 4.5771l13.9632-5.1459c.2559-.0943.5337-.0934.7832-.0008l13.8699 5.1458c2.8068 1.0413 5.5061-1.8193 4.2953-4.5607Z" class="custom-cursor__outline" stroke-width="2.25825" />
-        </g>
-        <defs>
-          <filter id="smooth-cursor-shadow" x=".602" y=".952" width="49.059" height="52.428" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-            <feDropShadow dy="2.258" stdDeviation="2.258" flood-opacity=".08" />
-          </filter>
-        </defs>
-      </svg>
+      <span class="custom-cursor__dot"></span>
     </div>
 
     <script>
@@ -231,7 +221,6 @@ const socialImage = new URL(image, Astro.site);
       const fine = matchMedia('(any-hover: hover) and (any-pointer: fine)');
       if (cursor) {
         const spring = { damping: 45, stiffness: 400, mass: 1 };
-        const rotationSpring = { damping: 60, stiffness: 300, mass: 1 };
         const scaleSpring = { damping: 35, stiffness: 500, mass: 1 };
         let enabled = false;
         let visible = false;
@@ -241,10 +230,7 @@ const socialImage = new URL(image, Astro.site);
         let y = 0;
         let velocityX = 0;
         let velocityY = 0;
-        let targetRotation = 0;
-        let rotation = 0;
-        let rotationVelocity = 0;
-        let previousAngle = 0;
+        let restScale = 1;
         let targetScale = 1;
         let scale = 1;
         let scaleVelocity = 0;
@@ -277,13 +263,12 @@ const socialImage = new URL(image, Astro.site);
           lastFrame = now;
           [x, velocityX] = stepSpring(x, velocityX, targetX, spring, delta);
           [y, velocityY] = stepSpring(y, velocityY, targetY, spring, delta);
-          [rotation, rotationVelocity] = stepSpring(rotation, rotationVelocity, targetRotation, rotationSpring, delta);
           [scale, scaleVelocity] = stepSpring(scale, scaleVelocity, targetScale, scaleSpring, delta);
-          cursor.style.transform = `translate3d(${x}px,${y}px,0) translate(-50%,-50%) rotate(${rotation}deg) scale(${scale})`;
+          cursor.style.transform = `translate3d(${x}px,${y}px,0) translate(-50%,-50%) scale(${scale})`;
           const moving = Math.abs(targetX - x) > .01 || Math.abs(targetY - y) > .01
-            || Math.abs(targetRotation - rotation) > .01 || Math.abs(targetScale - scale) > .001
+            || Math.abs(targetScale - scale) > .001
             || Math.abs(velocityX) > .01 || Math.abs(velocityY) > .01
-            || Math.abs(rotationVelocity) > .01 || Math.abs(scaleVelocity) > .001;
+            || Math.abs(scaleVelocity) > .001;
           if (moving) frameId = requestAnimationFrame(render);
         };
         const startLoop = () => {
@@ -303,6 +288,14 @@ const socialImage = new URL(image, Astro.site);
           const dx = event.clientX - previousX;
           const dy = event.clientY - previousY;
           const speed = Math.hypot(dx / deltaTime, dy / deltaTime);
+          const theme = event.target instanceof Element
+            ? event.target.closest<HTMLElement>('[data-cursor-theme]')?.dataset.cursorTheme
+            : undefined;
+          const interactive = event.target instanceof Element
+            ? event.target.closest('a,button,[role="button"],[role="tab"]')
+            : null;
+          cursor.dataset.theme = theme || 'dark';
+          restScale = interactive ? 1.75 : 1;
           targetX = event.clientX;
           targetY = event.clientY;
           if (!visible) {
@@ -312,22 +305,28 @@ const socialImage = new URL(image, Astro.site);
             cursor.dataset.visible = 'true';
           }
           if (speed > .1) {
-            const currentAngle = Math.atan2(dy, dx) * 180 / Math.PI + 90;
-            let difference = currentAngle - previousAngle;
-            if (difference > 180) difference -= 360;
-            if (difference < -180) difference += 360;
-            targetRotation += difference;
-            previousAngle = currentAngle;
-            targetScale = .95;
+            targetScale = restScale * .72;
             clearTimeout(settleTimer);
             settleTimer = window.setTimeout(() => {
-              targetScale = 1;
+              targetScale = restScale;
               startLoop();
             }, 150);
+          } else {
+            targetScale = restScale;
           }
           previousX = event.clientX;
           previousY = event.clientY;
           previousPointerTime = now;
+          startLoop();
+        }, { passive: true });
+        addEventListener('pointerdown', (event) => {
+          if (!enabled || event.pointerType !== 'mouse') return;
+          targetScale = restScale * .58;
+          startLoop();
+        }, { passive: true });
+        addEventListener('pointerup', (event) => {
+          if (!enabled || event.pointerType !== 'mouse') return;
+          targetScale = restScale;
           startLoop();
         }, { passive: true });
         document.documentElement.addEventListener('pointerleave', () => {
