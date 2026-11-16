@@ -70,7 +70,6 @@ const titleId = `${id}-title`;
       data-video-track
     >
       {works.map((work, index) => {
-        const directUrl = `https://drive.google.com/uc?export=download&id=${work.driveId}`;
         const embedUrl = `https://drive.google.com/file/d/${work.driveId}/preview`;
         const thumbUrl = work.poster ? '' : `https://drive.google.com/thumbnail?id=${work.driveId}&sz=w1280`;
         return (
@@ -86,7 +85,6 @@ const titleId = `${id}-title`;
             <div
               class="video-card__frame"
               data-video-frame
-              data-direct-src={directUrl}
               data-embed-src={embedUrl}
               data-poster-src={work.poster ?? ''}
               data-thumb-src={thumbUrl}
@@ -265,20 +263,6 @@ const titleId = `${id}-title`;
     border: 1px solid rgba(24, 23, 21, 0.14);
   }
 
-  /* Only expand vertical room on narrow screens if Drive iframe fallback is needed */
-  @media (max-width: 699px) {
-    .video-card__frame.is-iframe {
-      height: clamp(260px, 72vw, 380px);
-      padding-bottom: 0;
-    }
-  }
-
-  @media (min-width: 700px) and (max-width: 1023px) {
-    .video-card__frame.is-iframe {
-      padding-bottom: 62.5%;
-    }
-  }
-
   .video-card__backdrop {
     position: absolute;
     inset: 0;
@@ -363,20 +347,17 @@ const titleId = `${id}-title`;
     transform: translateX(6%);
   }
 
-  .video-card__frame :global(.video-card__video),
   .video-card__frame :global(.video-card__iframe) {
     position: absolute;
-    inset: 0;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     border: 0;
     display: block;
     background: #000;
+    transform-origin: top left;
     z-index: 3;
-  }
-
-  .video-card__frame :global(.video-card__video) {
-    object-fit: contain;
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -432,6 +413,11 @@ const titleId = `${id}-title`;
 
     if (!track || !slides.length) return;
 
+    // Google Drive's /preview player switches to a broken oversized mobile UI below ~960px.
+    // On narrower screens, render the iframe at 960x540 and scale it down proportionally.
+    const VIRTUAL_W = 960;
+    const VIRTUAL_H = 540;
+
     let activeIndex = 0;
     let lastWidth = track.clientWidth;
     let suppressScrollSync = false;
@@ -442,6 +428,24 @@ const titleId = `${id}-title`;
     const clearProgrammatic = () => {
       programmaticTarget = null;
       clearTimeout(programmaticTimer);
+    };
+
+    const scaleIframe = (frame: HTMLElement) => {
+      const iframe = frame.querySelector<HTMLIFrameElement>('.video-card__iframe');
+      if (!iframe) return;
+      const width = frame.clientWidth;
+      if (!width) return;
+
+      if (width < VIRTUAL_W) {
+        const scale = width / VIRTUAL_W;
+        iframe.style.width = `${VIRTUAL_W}px`;
+        iframe.style.height = `${VIRTUAL_H}px`;
+        iframe.style.transform = `scale(${scale})`;
+      } else {
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.transform = '';
+      }
     };
 
     const loadThumb = (frame: HTMLElement) => {
@@ -463,67 +467,29 @@ const titleId = `${id}-title`;
       img.src = thumbSrc;
     };
 
-    const mountIframeFallback = (frame: HTMLElement) => {
-      if (frame.dataset.playing !== 'true') return;
+    const bindTrigger = (frame: HTMLElement, trigger: HTMLButtonElement) => {
       const embedSrc = frame.dataset.embedSrc;
       const title = frame.dataset.videoTitle || 'Video player';
       if (!embedSrc) return;
-
-      const existingVideo = frame.querySelector<HTMLVideoElement>('.video-card__video');
-      if (existingVideo) {
-        existingVideo.pause();
-        existingVideo.removeAttribute('src');
-        existingVideo.remove();
-      }
-
-      frame.classList.add('is-iframe');
-      const iframe = document.createElement('iframe');
-      iframe.className = 'video-card__iframe';
-      iframe.src = embedSrc;
-      iframe.title = title;
-      iframe.allow = 'autoplay; fullscreen; picture-in-picture';
-      iframe.allowFullscreen = true;
-      iframe.loading = 'eager';
-      frame.append(iframe);
-    };
-
-    const bindTrigger = (frame: HTMLElement, trigger: HTMLButtonElement) => {
-      const directSrc = frame.dataset.directSrc;
-      const posterSrc = frame.dataset.posterSrc;
-      const title = frame.dataset.videoTitle || 'Video player';
-      if (!directSrc && !frame.dataset.embedSrc) return;
 
       trigger.addEventListener('click', () => {
         if (frame.dataset.playing === 'true') return;
         frame.dataset.playing = 'true';
 
+        const iframe = document.createElement('iframe');
+        iframe.className = 'video-card__iframe';
+        iframe.src = embedSrc;
+        iframe.title = title;
+        iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+        iframe.allowFullscreen = true;
+        iframe.loading = 'eager';
+
         trigger.remove();
         frame.querySelector('.video-card__poster')?.remove();
         frame.querySelector('.video-card__thumb')?.remove();
         frame.querySelector('.video-card__backdrop')?.remove();
-
-        if (!directSrc) {
-          mountIframeFallback(frame);
-          return;
-        }
-
-        const video = document.createElement('video');
-        video.className = 'video-card__video';
-        video.src = directSrc;
-        video.controls = true;
-        video.playsInline = true;
-        video.preload = 'auto';
-        video.setAttribute('aria-label', title);
-        if (posterSrc) video.poster = posterSrc;
-
-        video.addEventListener('error', () => {
-          mountIframeFallback(frame);
-        }, { once: true });
-
-        frame.append(video);
-        video.play().catch(() => {
-          // If browser blocks direct stream or autoplay, let user press native play or fallback on error
-        });
+        frame.append(iframe);
+        scaleIframe(frame);
       });
     };
 
@@ -531,15 +497,6 @@ const titleId = `${id}-title`;
       if (frame.dataset.playing !== 'true') return;
       delete frame.dataset.playing;
       delete frame.dataset.thumbLoaded;
-      frame.classList.remove('is-iframe');
-
-      const existingVideo = frame.querySelector<HTMLVideoElement>('.video-card__video');
-      if (existingVideo) {
-        existingVideo.pause();
-        existingVideo.removeAttribute('src');
-        existingVideo.load();
-        existingVideo.remove();
-      }
       frame.querySelector('.video-card__iframe')?.remove();
 
       const indexLabel = frame.dataset.videoIndex ?? '';
@@ -668,6 +625,10 @@ const titleId = `${id}-title`;
     }, { passive: true });
 
     const realignOnResize = () => {
+      slides.forEach((slide) => {
+        const frame = slide.querySelector<HTMLElement>('[data-video-frame]');
+        if (frame && frame.dataset.playing === 'true') scaleIframe(frame);
+      });
       const width = track.clientWidth;
       if (!width || width === lastWidth) return;
       lastWidth = width;
