@@ -70,7 +70,8 @@ const titleId = `${id}-title`;
       data-video-track
     >
       {works.map((work, index) => {
-        const embedUrl = `https://drive.google.com/file/d/${work.driveId}/preview?autoplay=1`;
+        const directUrl = `https://drive.google.com/uc?export=download&id=${work.driveId}`;
+        const embedUrl = `https://drive.google.com/file/d/${work.driveId}/preview`;
         const thumbUrl = work.poster ? '' : `https://drive.google.com/thumbnail?id=${work.driveId}&sz=w1280`;
         return (
           <article
@@ -85,6 +86,7 @@ const titleId = `${id}-title`;
             <div
               class="video-card__frame"
               data-video-frame
+              data-direct-src={directUrl}
               data-embed-src={embedUrl}
               data-poster-src={work.poster ?? ''}
               data-thumb-src={thumbUrl}
@@ -256,22 +258,24 @@ const titleId = `${id}-title`;
   .video-card__frame {
     position: relative;
     width: 100%;
-    height: clamp(260px, 72vw, 380px);
+    height: 0;
+    padding-bottom: 56.25%;
     overflow: hidden;
     background: var(--ink);
     border: 1px solid rgba(24, 23, 21, 0.14);
   }
 
-  @media (min-width: 700px) {
-    .video-card__frame {
-      height: 0;
-      padding-bottom: 62.5%;
+  /* Only expand vertical room on narrow screens if Drive iframe fallback is needed */
+  @media (max-width: 699px) {
+    .video-card__frame.is-iframe {
+      height: clamp(260px, 72vw, 380px);
+      padding-bottom: 0;
     }
   }
 
-  @media (min-width: 1024px) {
-    .video-card__frame {
-      padding-bottom: 56.25%;
+  @media (min-width: 700px) and (max-width: 1023px) {
+    .video-card__frame.is-iframe {
+      padding-bottom: 62.5%;
     }
   }
 
@@ -359,6 +363,7 @@ const titleId = `${id}-title`;
     transform: translateX(6%);
   }
 
+  .video-card__frame :global(.video-card__video),
   .video-card__frame :global(.video-card__iframe) {
     position: absolute;
     inset: 0;
@@ -368,6 +373,10 @@ const titleId = `${id}-title`;
     display: block;
     background: #000;
     z-index: 3;
+  }
+
+  .video-card__frame :global(.video-card__video) {
+    object-fit: contain;
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -454,28 +463,67 @@ const titleId = `${id}-title`;
       img.src = thumbSrc;
     };
 
-    const bindTrigger = (frame: HTMLElement, trigger: HTMLButtonElement) => {
+    const mountIframeFallback = (frame: HTMLElement) => {
+      if (frame.dataset.playing !== 'true') return;
       const embedSrc = frame.dataset.embedSrc;
       const title = frame.dataset.videoTitle || 'Video player';
       if (!embedSrc) return;
+
+      const existingVideo = frame.querySelector<HTMLVideoElement>('.video-card__video');
+      if (existingVideo) {
+        existingVideo.pause();
+        existingVideo.removeAttribute('src');
+        existingVideo.remove();
+      }
+
+      frame.classList.add('is-iframe');
+      const iframe = document.createElement('iframe');
+      iframe.className = 'video-card__iframe';
+      iframe.src = embedSrc;
+      iframe.title = title;
+      iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+      iframe.allowFullscreen = true;
+      iframe.loading = 'eager';
+      frame.append(iframe);
+    };
+
+    const bindTrigger = (frame: HTMLElement, trigger: HTMLButtonElement) => {
+      const directSrc = frame.dataset.directSrc;
+      const posterSrc = frame.dataset.posterSrc;
+      const title = frame.dataset.videoTitle || 'Video player';
+      if (!directSrc && !frame.dataset.embedSrc) return;
 
       trigger.addEventListener('click', () => {
         if (frame.dataset.playing === 'true') return;
         frame.dataset.playing = 'true';
 
-        const iframe = document.createElement('iframe');
-        iframe.className = 'video-card__iframe';
-        iframe.src = embedSrc;
-        iframe.title = title;
-        iframe.allow = 'autoplay; fullscreen; picture-in-picture';
-        iframe.allowFullscreen = true;
-        iframe.loading = 'eager';
-
         trigger.remove();
         frame.querySelector('.video-card__poster')?.remove();
         frame.querySelector('.video-card__thumb')?.remove();
         frame.querySelector('.video-card__backdrop')?.remove();
-        frame.append(iframe);
+
+        if (!directSrc) {
+          mountIframeFallback(frame);
+          return;
+        }
+
+        const video = document.createElement('video');
+        video.className = 'video-card__video';
+        video.src = directSrc;
+        video.controls = true;
+        video.playsInline = true;
+        video.preload = 'auto';
+        video.setAttribute('aria-label', title);
+        if (posterSrc) video.poster = posterSrc;
+
+        video.addEventListener('error', () => {
+          mountIframeFallback(frame);
+        }, { once: true });
+
+        frame.append(video);
+        video.play().catch(() => {
+          // If browser blocks direct stream or autoplay, let user press native play or fallback on error
+        });
       });
     };
 
@@ -483,6 +531,15 @@ const titleId = `${id}-title`;
       if (frame.dataset.playing !== 'true') return;
       delete frame.dataset.playing;
       delete frame.dataset.thumbLoaded;
+      frame.classList.remove('is-iframe');
+
+      const existingVideo = frame.querySelector<HTMLVideoElement>('.video-card__video');
+      if (existingVideo) {
+        existingVideo.pause();
+        existingVideo.removeAttribute('src');
+        existingVideo.load();
+        existingVideo.remove();
+      }
       frame.querySelector('.video-card__iframe')?.remove();
 
       const indexLabel = frame.dataset.videoIndex ?? '';
