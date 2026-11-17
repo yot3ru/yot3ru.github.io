@@ -16,6 +16,13 @@ const {
 } = Astro.props;
 
 const titleId = `${id}-title`;
+
+const aspectPadding = (ratio?: string) => {
+  if (!ratio) return '56.25%';
+  const [w, h] = ratio.split('/').map(Number);
+  if (!w || !h) return '56.25%';
+  return `${((h / w) * 100).toFixed(4).replace(/\.?0+$/, '')}%`;
+};
 ---
 
 <section
@@ -85,33 +92,36 @@ const titleId = `${id}-title`;
             data-video-slide
             data-slide-index={index}
           >
-            <div
-              class="video-card__frame"
-              data-video-frame
-              data-embed-src={embedUrl}
-              data-video-title={work.title}
-              data-video-index={work.indexLabel}
-              data-direct-embed={isVimeo ? 'true' : undefined}
-              data-cursor="media"
-            >
-              <div class="video-card__backdrop" aria-hidden="true">
-                <span class="video-card__watermark">{work.indexLabel}</span>
-              </div>
+            <div class="video-card">
+              <div
+                class="video-card__frame"
+                style={`padding-bottom: ${aspectPadding(work.aspectRatio)};`}
+                data-video-frame
+                data-embed-src={embedUrl}
+                data-video-title={work.title}
+                data-video-index={work.indexLabel}
+                data-direct-embed={isVimeo ? 'true' : undefined}
+                data-cursor="media"
+              >
+                <div class="video-card__backdrop" aria-hidden="true">
+                  <span class="video-card__watermark">{work.indexLabel}</span>
+                </div>
 
-              {!isVimeo && (
-                <button
-                  class="video-card__trigger"
-                  type="button"
-                  aria-label={`Play ${work.title}`}
-                  data-video-trigger
-                >
-                  <span class="video-card__badge" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" focusable="false">
-                      <path d="M8.5 5.5v13l10.5-6.5z" />
-                    </svg>
-                  </span>
-                </button>
-              )}
+                {!isVimeo && (
+                  <button
+                    class="video-card__trigger"
+                    type="button"
+                    aria-label={`Play ${work.title}`}
+                    data-video-trigger
+                  >
+                    <span class="video-card__badge" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M8.5 5.5v13l10.5-6.5z" />
+                      </svg>
+                    </span>
+                  </button>
+                )}
+              </div>
             </div>
           </article>
         );
@@ -124,7 +134,7 @@ const titleId = `${id}-title`;
   .video-showcase {
     background: var(--bone);
     color: var(--ink);
-    padding-block: clamp(4.5rem, 8vw, 8rem);
+    padding-block: var(--space-section-y);
     overflow: visible;
   }
 
@@ -132,8 +142,10 @@ const titleId = `${id}-title`;
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    gap: 1rem;
-    margin: 0 0 clamp(1.75rem, 3vw, 3rem);
+    gap: var(--space-2);
+    width: 100%;
+    max-width: var(--content);
+    margin: 0 auto var(--space-4);
   }
 
   .video-showcase h2 {
@@ -160,7 +172,7 @@ const titleId = `${id}-title`;
     flex: none;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-1);
   }
 
   .video-nav-btn {
@@ -213,15 +225,20 @@ const titleId = `${id}-title`;
   }
 
   .video-showcase__stage {
-    width: 100%;
+    width: auto;
+    margin-inline: calc(-1 * var(--p));
     min-width: 0;
   }
 
   .video-showcase__track {
+    --track-pad: max(var(--p), calc((100% - var(--content)) / 2));
     position: relative;
     display: flex;
+    gap: var(--track-pad);
     width: 100%;
     min-width: 0;
+    padding-left: var(--track-pad);
+    scroll-padding-left: var(--track-pad);
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
@@ -229,6 +246,12 @@ const titleId = `${id}-title`;
     scrollbar-width: none;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
+  }
+
+  .video-showcase__track::after {
+    content: "";
+    flex: 0 0 1px;
+    margin-left: -1px;
   }
 
   .video-showcase__track::-webkit-scrollbar {
@@ -241,12 +264,18 @@ const titleId = `${id}-title`;
   }
 
   .video-slide {
-    flex: 0 0 100%;
-    width: 100%;
-    min-width: 100%;
-    overflow: hidden;
+    flex: 0 0 calc(100% - 2 * var(--track-pad));
+    width: calc(100% - 2 * var(--track-pad));
+    min-width: calc(100% - 2 * var(--track-pad));
     scroll-snap-align: start;
     scroll-snap-stop: always;
+  }
+
+  .video-card {
+    padding: var(--radius-pad);
+    background: var(--ink);
+    border: 1px solid rgba(24, 23, 21, 0.16);
+    border-radius: var(--radius-frame);
   }
 
   .video-card__frame {
@@ -255,8 +284,15 @@ const titleId = `${id}-title`;
     height: 0;
     padding-bottom: 56.25%;
     overflow: hidden;
-    background: var(--ink);
-    border: 1px solid rgba(24, 23, 21, 0.14);
+    background: #0d0c0b;
+    border-radius: var(--radius-inner);
+  }
+
+  @supports (corner-shape: squircle) {
+    .video-card,
+    .video-card__frame {
+      corner-shape: squircle;
+    }
   }
 
   .video-card__backdrop {
@@ -330,6 +366,7 @@ const titleId = `${id}-title`;
     width: 100%;
     height: 100%;
     border: 0;
+    border-radius: var(--radius-inner);
     display: block;
     background: #000;
     z-index: 3;
@@ -394,6 +431,24 @@ const titleId = `${id}-title`;
       clearTimeout(programmaticTimer);
     };
 
+    const getTargetLeft = (index: number) => {
+      const baseLeft = slides[0]?.offsetLeft ?? 0;
+      return (slides[index]?.offsetLeft ?? baseLeft) - baseLeft;
+    };
+
+    const getNearestSlideIndex = () => {
+      let bestIndex = activeIndex;
+      let bestDist = Infinity;
+      slides.forEach((_, i) => {
+        const dist = Math.abs(track.scrollLeft - getTargetLeft(i));
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestIndex = i;
+        }
+      });
+      return bestIndex;
+    };
+
     const mountIframe = (frame: HTMLElement) => {
       if (frame.dataset.playing === 'true') return;
       const embedSrc = frame.dataset.embedSrc;
@@ -439,7 +494,7 @@ const titleId = `${id}-title`;
 
     const goToSlide = (index: number, instant = false) => {
       const target = Math.max(0, Math.min(index, slides.length - 1));
-      const targetLeft = slides[target]?.offsetLeft ?? target * track.clientWidth;
+      const targetLeft = getTargetLeft(target);
       const useInstant = instant || reduced.matches;
       updateUI(target);
 
@@ -460,24 +515,22 @@ const titleId = `${id}-title`;
       }
     };
 
-    const mountDirectEmbeds = () => {
-      slides.forEach((slide) => {
-        const frame = slide.querySelector<HTMLElement>('[data-video-frame]');
-        if (frame?.dataset.directEmbed === 'true') mountIframe(frame);
-      });
+    const mountActiveEmbed = () => {
+      const frame = slides[activeIndex]?.querySelector<HTMLElement>('[data-video-frame]');
+      if (frame?.dataset.directEmbed === 'true') mountIframe(frame);
     };
 
     if (typeof IntersectionObserver !== 'undefined') {
       const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
-          mountDirectEmbeds();
+          mountActiveEmbed();
           obs.disconnect();
         });
       }, { rootMargin: '320px 0px' });
       observer.observe(section);
     } else {
-      mountDirectEmbeds();
+      mountActiveEmbed();
     }
 
     slides.forEach((slide) => {
@@ -507,9 +560,10 @@ const titleId = `${id}-title`;
       if (suppressScrollSync || !track.clientWidth) return;
       cancelAnimationFrame(scrollFrame);
       scrollFrame = requestAnimationFrame(() => {
-        const nextIndex = Math.round(track.scrollLeft / track.clientWidth);
+        const nextIndex = getNearestSlideIndex();
         if (programmaticTarget !== null) {
-          if (nextIndex === programmaticTarget && Math.abs(track.scrollLeft - programmaticTarget * track.clientWidth) < 2) {
+          const targetLeft = getTargetLeft(programmaticTarget);
+          if (nextIndex === programmaticTarget && Math.abs(track.scrollLeft - targetLeft) < 2) {
             clearProgrammatic();
           }
           return;
