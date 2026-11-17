@@ -78,7 +78,7 @@ const aspectPadding = (ratio?: string) => {
     >
       {works.map((work, index) => {
         const embedUrl = work.vimeoId
-          ? `https://player.vimeo.com/video/${work.vimeoId}?autopause=0&player_id=0&app_id=58479`
+          ? `https://player.vimeo.com/video/${work.vimeoId}?autopause=0&player_id=0&app_id=58479&outro=nothing`
           : `https://drive.google.com/file/d/${work.driveId}/preview`;
         const isVimeo = Boolean(work.vimeoId);
 
@@ -464,6 +464,13 @@ const aspectPadding = (ratio?: string) => {
       iframe.referrerPolicy = 'strict-origin-when-cross-origin';
       iframe.allowFullscreen = true;
 
+      if (embedSrc.includes('player.vimeo.com')) {
+        iframe.addEventListener('load', () => {
+          iframe.contentWindow?.postMessage(JSON.stringify({ method: 'addEventListener', value: 'ended' }), 'https://player.vimeo.com');
+          iframe.contentWindow?.postMessage(JSON.stringify({ method: 'addEventListener', value: 'finish' }), 'https://player.vimeo.com');
+        });
+      }
+
       frame.querySelector('[data-video-trigger]')?.remove();
       frame.querySelector('.video-card__backdrop')?.remove();
       frame.append(iframe);
@@ -583,6 +590,23 @@ const aspectPadding = (ratio?: string) => {
       new ResizeObserver(realignOnResize).observe(track);
     }
     window.addEventListener('resize', realignOnResize, { passive: true });
+
+    window.addEventListener('message', (event) => {
+      if (event.origin !== 'https://player.vimeo.com') return;
+      let data: { event?: string } | null = null;
+      try {
+        data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+      } catch {
+        return;
+      }
+      if (!data || (data.event !== 'ended' && data.event !== 'finish')) return;
+      slides.forEach((slide) => {
+        const iframe = slide.querySelector<HTMLIFrameElement>('.video-card__iframe');
+        if (iframe && iframe.contentWindow === event.source) {
+          iframe.contentWindow?.postMessage(JSON.stringify({ method: 'unload' }), 'https://player.vimeo.com');
+        }
+      });
+    });
 
     updateUI(0);
   });
