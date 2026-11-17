@@ -817,11 +817,12 @@ h1,h2,h3 { letter-spacing: -.04em; }
 .contact__body {
   width: 100%;
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(22rem, .75fr);
+  grid-template-columns: minmax(0, 1.25fr) minmax(16rem, .75fr);
   align-items: center;
-  gap: clamp(4rem, 9vw, 10rem);
+  gap: clamp(2.5rem, 6vw, 8rem);
   padding: clamp(2rem, 5vw, 4.5rem) 0;
 }
+.contact__statement { min-width: 0; }
 .contact__statement > p {
   margin: 0 0 clamp(1.25rem, 2vw, 2rem);
   font-size: var(--type-label);
@@ -832,8 +833,8 @@ h1,h2,h3 { letter-spacing: -.04em; }
 }
 .contact h2 {
   max-width: none;
-  font-size: clamp(4.5rem, 7vw, 8.5rem);
-  line-height: .84;
+  font-size: clamp(3.25rem, 5.8vw, 8rem);
+  line-height: .86;
 }
 .contact h2 .motion-line > span { white-space: nowrap; }
 .contact h2 em { color: var(--ink); }
@@ -890,21 +891,23 @@ h1,h2,h3 { letter-spacing: -.04em; }
 .contact__link:hover .contact__arrow,
 .contact__link:focus-visible .contact__arrow { transform: translate(2px,-2px); }
 .contact__link:focus-visible { outline: 2px solid var(--bone); outline-offset: 3px; }
-@media (max-width: 699px) {
+@media (max-width: 859px) {
   .contact { min-height: auto; }
   .contact__body {
     grid-template-columns: 1fr;
     align-items: start;
-    gap: clamp(3rem, 12vw, 4rem);
+    gap: clamp(3rem, 10vw, 4rem);
     padding: 2.5rem 0 3rem;
   }
   .contact h2 {
-    max-width: 9ch;
-    font-size: clamp(3rem, 13vw, 3.5rem);
+    max-width: none;
+    font-size: clamp(2.65rem, 11vw, 5rem);
     line-height: .88;
   }
   .contact h2 .motion-line > span { white-space: normal; }
   .contact__detail { margin-bottom: 2rem; }
+}
+@media (max-width: 699px) {
   .contact__link {
     grid-template-columns: 4.5rem minmax(0, 1fr) auto;
     gap: .75rem;

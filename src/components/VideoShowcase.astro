@@ -70,8 +70,11 @@ const titleId = `${id}-title`;
       data-video-track
     >
       {works.map((work, index) => {
-        const embedUrl = `https://drive.google.com/file/d/${work.driveId}/preview`;
-        const thumbUrl = work.poster ? '' : `https://drive.google.com/thumbnail?id=${work.driveId}&sz=w1280`;
+        const embedUrl = work.vimeoId
+          ? `https://player.vimeo.com/video/${work.vimeoId}?autopause=0&player_id=0&app_id=58479`
+          : `https://drive.google.com/file/d/${work.driveId}/preview`;
+        const isVimeo = Boolean(work.vimeoId);
+
         return (
           <article
             class="video-slide"
@@ -86,38 +89,29 @@ const titleId = `${id}-title`;
               class="video-card__frame"
               data-video-frame
               data-embed-src={embedUrl}
-              data-poster-src={work.poster ?? ''}
-              data-thumb-src={thumbUrl}
               data-video-title={work.title}
               data-video-index={work.indexLabel}
+              data-direct-embed={isVimeo ? 'true' : undefined}
               data-cursor="media"
             >
               <div class="video-card__backdrop" aria-hidden="true">
                 <span class="video-card__watermark">{work.indexLabel}</span>
               </div>
 
-              {work.poster && (
-                <img
-                  src={work.poster}
-                  alt={work.title}
-                  class="video-card__poster"
-                  loading="lazy"
-                  decoding="async"
-                />
+              {!isVimeo && (
+                <button
+                  class="video-card__trigger"
+                  type="button"
+                  aria-label={`Play ${work.title}`}
+                  data-video-trigger
+                >
+                  <span class="video-card__badge" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                      <path d="M8.5 5.5v13l10.5-6.5z" />
+                    </svg>
+                  </span>
+                </button>
               )}
-
-              <button
-                class="video-card__trigger"
-                type="button"
-                aria-label={`Play ${work.title}`}
-                data-video-trigger
-              >
-                <span class="video-card__badge" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" focusable="false">
-                    <path d="M8.5 5.5v13l10.5-6.5z" />
-                  </svg>
-                </span>
-              </button>
             </div>
           </article>
         );
@@ -284,26 +278,6 @@ const titleId = `${id}-title`;
     user-select: none;
   }
 
-  .video-card__poster,
-  .video-card__frame :global(.video-card__thumb) {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    pointer-events: none;
-    transition: transform 520ms var(--ease-out-primary), opacity 420ms var(--ease-out-soft);
-  }
-
-  .video-card__frame :global(.video-card__thumb) {
-    opacity: 0;
-    transform: scale(1.01);
-  }
-
-  .video-card__frame :global(.video-card__thumb[data-loaded="true"]) {
-    opacity: 1;
-  }
-
   .video-card__trigger {
     position: absolute;
     inset: 0;
@@ -358,7 +332,6 @@ const titleId = `${id}-title`;
     border: 0;
     display: block;
     background: #000;
-    transform-origin: top left;
     z-index: 3;
   }
 
@@ -370,10 +343,6 @@ const titleId = `${id}-title`;
       transform: scale(1.08);
       background: var(--red);
       color: var(--bone);
-    }
-    .video-card__frame:hover .video-card__poster,
-    .video-card__frame:hover :global(.video-card__thumb[data-loaded="true"]) {
-      transform: scale(1.025);
     }
   }
 
@@ -392,8 +361,6 @@ const titleId = `${id}-title`;
     .video-showcase__track {
       scroll-behavior: auto;
     }
-    .video-card__poster,
-    .video-card__frame :global(.video-card__thumb),
     .video-card__trigger,
     .video-card__badge,
     .video-nav-btn,
@@ -415,11 +382,6 @@ const titleId = `${id}-title`;
 
     if (!track || !slides.length) return;
 
-    // Google Drive's /preview player switches to a broken oversized mobile UI below ~960px.
-    // On narrower screens, render the iframe at 960x540 and scale it down proportionally.
-    const VIRTUAL_W = 960;
-    const VIRTUAL_H = 540;
-
     let activeIndex = 0;
     let lastWidth = track.clientWidth;
     let suppressScrollSync = false;
@@ -432,120 +394,47 @@ const titleId = `${id}-title`;
       clearTimeout(programmaticTimer);
     };
 
-    const scaleIframe = (frame: HTMLElement) => {
-      const iframe = frame.querySelector<HTMLIFrameElement>('.video-card__iframe');
-      if (!iframe) return;
-      const width = frame.clientWidth;
-      if (!width) return;
-
-      if (width < VIRTUAL_W) {
-        const scale = width / VIRTUAL_W;
-        iframe.style.width = `${VIRTUAL_W}px`;
-        iframe.style.height = `${VIRTUAL_H}px`;
-        iframe.style.transform = `scale(${scale})`;
-      } else {
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
-        iframe.style.transform = '';
-      }
-    };
-
-    const loadThumb = (frame: HTMLElement) => {
-      if (frame.dataset.posterSrc || frame.dataset.thumbLoaded === 'true' || frame.dataset.playing === 'true') return;
-      const thumbSrc = frame.dataset.thumbSrc;
-      if (!thumbSrc) return;
-      frame.dataset.thumbLoaded = 'true';
-
-      const img = new Image();
-      img.decoding = 'async';
-      img.alt = '';
-      img.className = 'video-card__thumb';
-      img.referrerPolicy = 'no-referrer';
-      img.addEventListener('load', () => {
-        if (frame.dataset.playing === 'true') return;
-        img.dataset.loaded = 'true';
-        frame.prepend(img);
-      }, { once: true });
-      img.src = thumbSrc;
-    };
-
-    const bindTrigger = (frame: HTMLElement, trigger: HTMLButtonElement) => {
+    const mountIframe = (frame: HTMLElement) => {
+      if (frame.dataset.playing === 'true') return;
       const embedSrc = frame.dataset.embedSrc;
       const title = frame.dataset.videoTitle || 'Video player';
       if (!embedSrc) return;
 
-      trigger.addEventListener('click', () => {
-        if (frame.dataset.playing === 'true') return;
-        frame.dataset.playing = 'true';
+      frame.dataset.playing = 'true';
+      const iframe = document.createElement('iframe');
+      iframe.className = 'video-card__iframe';
+      iframe.src = embedSrc;
+      iframe.title = title;
+      iframe.allow = 'autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share';
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+      iframe.allowFullscreen = true;
 
-        const iframe = document.createElement('iframe');
-        iframe.className = 'video-card__iframe';
-        iframe.src = embedSrc;
-        iframe.title = title;
-        iframe.allow = 'autoplay; fullscreen; picture-in-picture';
-        iframe.allowFullscreen = true;
-        iframe.loading = 'eager';
-
-        trigger.remove();
-        frame.querySelector('.video-card__poster')?.remove();
-        frame.querySelector('.video-card__thumb')?.remove();
-        frame.querySelector('.video-card__backdrop')?.remove();
-        frame.append(iframe);
-        scaleIframe(frame);
-      });
+      frame.querySelector('[data-video-trigger]')?.remove();
+      frame.querySelector('.video-card__backdrop')?.remove();
+      frame.append(iframe);
     };
 
-    const mountFacade = (frame: HTMLElement) => {
-      if (frame.dataset.playing !== 'true') return;
-      delete frame.dataset.playing;
-      delete frame.dataset.thumbLoaded;
-      frame.querySelector('.video-card__iframe')?.remove();
-
-      const indexLabel = frame.dataset.videoIndex ?? '';
-      const posterSrc = frame.dataset.posterSrc;
-      const title = frame.dataset.videoTitle || 'Video player';
-
-      const backdrop = document.createElement('div');
-      backdrop.className = 'video-card__backdrop';
-      backdrop.setAttribute('aria-hidden', 'true');
-      const watermark = document.createElement('span');
-      watermark.className = 'video-card__watermark';
-      watermark.textContent = indexLabel;
-      backdrop.append(watermark);
-      frame.append(backdrop);
-
-      if (posterSrc) {
-        const poster = document.createElement('img');
-        poster.src = posterSrc;
-        poster.alt = title;
-        poster.className = 'video-card__poster';
-        poster.loading = 'lazy';
-        poster.decoding = 'async';
-        frame.append(poster);
+    const resetSlide = (frame: HTMLElement) => {
+      const iframe = frame.querySelector<HTMLIFrameElement>('.video-card__iframe');
+      const embedSrc = frame.dataset.embedSrc;
+      if (iframe && embedSrc) {
+        iframe.src = embedSrc;
       }
-
-      const trigger = document.createElement('button');
-      trigger.className = 'video-card__trigger';
-      trigger.type = 'button';
-      trigger.setAttribute('aria-label', `Play ${title}`);
-      trigger.setAttribute('data-video-trigger', '');
-      trigger.innerHTML =
-        '<span class="video-card__badge" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M8.5 5.5v13l10.5-6.5z" /></svg></span>';
-
-      frame.append(trigger);
-      bindTrigger(frame, trigger);
-      loadThumb(frame);
     };
 
     const updateUI = (index: number) => {
+      const prevIndex = activeIndex;
       activeIndex = Math.max(0, Math.min(index, slides.length - 1));
       if (prevBtn) prevBtn.disabled = activeIndex === 0;
       if (nextBtn) nextBtn.disabled = activeIndex === slides.length - 1;
-      slides.forEach((slide, i) => {
-        if (i === activeIndex) return;
-        const frame = slide.querySelector<HTMLElement>('[data-video-frame]');
-        if (frame && frame.dataset.playing === 'true') mountFacade(frame);
-      });
+
+      const activeFrame = slides[activeIndex]?.querySelector<HTMLElement>('[data-video-frame]');
+      if (activeFrame?.dataset.directEmbed === 'true') mountIframe(activeFrame);
+
+      if (prevIndex !== activeIndex) {
+        const prevFrame = slides[prevIndex]?.querySelector<HTMLElement>('[data-video-frame]');
+        if (prevFrame && prevFrame.dataset.playing === 'true') resetSlide(prevFrame);
+      }
     };
 
     const goToSlide = (index: number, instant = false) => {
@@ -571,29 +460,32 @@ const titleId = `${id}-title`;
       }
     };
 
+    const mountDirectEmbeds = () => {
+      slides.forEach((slide) => {
+        const frame = slide.querySelector<HTMLElement>('[data-video-frame]');
+        if (frame?.dataset.directEmbed === 'true') mountIframe(frame);
+      });
+    };
+
     if (typeof IntersectionObserver !== 'undefined') {
       const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
-          slides.forEach((slide) => {
-            const frame = slide.querySelector<HTMLElement>('[data-video-frame]');
-            if (frame) loadThumb(frame);
-          });
+          mountDirectEmbeds();
           obs.disconnect();
         });
       }, { rootMargin: '320px 0px' });
       observer.observe(section);
     } else {
-      slides.forEach((slide) => {
-        const frame = slide.querySelector<HTMLElement>('[data-video-frame]');
-        if (frame) loadThumb(frame);
-      });
+      mountDirectEmbeds();
     }
 
     slides.forEach((slide) => {
       const frame = slide.querySelector<HTMLElement>('[data-video-frame]');
       const trigger = frame?.querySelector<HTMLButtonElement>('[data-video-trigger]');
-      if (frame && trigger) bindTrigger(frame, trigger);
+      if (frame && trigger) {
+        trigger.addEventListener('click', () => mountIframe(frame));
+      }
     });
 
     prevBtn?.addEventListener('click', () => goToSlide(activeIndex - 1));
@@ -627,10 +519,6 @@ const titleId = `${id}-title`;
     }, { passive: true });
 
     const realignOnResize = () => {
-      slides.forEach((slide) => {
-        const frame = slide.querySelector<HTMLElement>('[data-video-frame]');
-        if (frame && frame.dataset.playing === 'true') scaleIframe(frame);
-      });
       const width = track.clientWidth;
       if (!width || width === lastWidth) return;
       lastWidth = width;
