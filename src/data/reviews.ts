@@ -35,7 +35,7 @@ export const reviews: ReviewItem[] = [
   {
     id: 'samanthi-ranasinghe',
     name: 'Samanthi Ranasinghe',
-    designation: 'Additional Secretary · Ministry of Health',
+    designation: 'Additional Secretary · MOH',
     quote:
       "I am extremely pleased with Lufi's designs for my presentations and social media posts. Their creativity, attention to detail, and professional quality exceeded expectations. Highly recommend!",
     avatar: '/img/reviews/samanthi-ranasinghe.jpg',
