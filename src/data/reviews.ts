@@ -32,4 +32,12 @@ export const reviews: ReviewItem[] = [
       'Lufi did an amazing job on our Digital Platform needs. From the creative concepts to the polished final files, everything was handled with great care and precision. Truly top-notch service!',
     avatar: '/img/reviews/nawod-medawela.jpg',
   },
+  {
+    id: 'samanthi-ranasinghe',
+    name: 'Samanthi Ranasinghe',
+    designation: 'Additional Secretary · Ministry of Health',
+    quote:
+      "I am extremely pleased with Lufi's designs for my presentations and social media posts. Their creativity, attention to detail, and professional quality exceeded expectations. Highly recommend!",
+    avatar: '/img/reviews/samanthi-ranasinghe.jpg',
+  },
 ];
