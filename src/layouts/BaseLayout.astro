@@ -176,29 +176,14 @@ const socialImage = new URL(image, Astro.site);
         const cards = [...capability.querySelectorAll<HTMLElement>('[data-card-index]')];
         const panelTimers = new WeakMap<HTMLElement, number>();
         let activeIndex = 0;
-        let dealTimer = 0;
 
         const updateDeck = (nextIndex: number) => {
           if (!cards.length) return;
-          const prevCard = cards[activeIndex];
           const total = cards.length;
-
-          if (prevCard && nextIndex !== activeIndex && !reduce.matches) {
-            clearTimeout(dealTimer);
-            cards.forEach((card) => delete card.dataset.leaving);
-            prevCard.dataset.leaving = 'true';
-            dealTimer = window.setTimeout(() => {
-              delete prevCard.dataset.leaving;
-              cards.forEach((card, idx) => {
-                card.dataset.offset = String((idx - nextIndex + total) % total);
-              });
-            }, 170);
-          } else {
-            cards.forEach((card, idx) => {
-              delete card.dataset.leaving;
-              card.dataset.offset = String((idx - nextIndex + total) % total);
-            });
-          }
+          cards.forEach((card, idx) => {
+            delete card.dataset.leaving;
+            card.dataset.offset = String((idx - nextIndex + total) % total);
+          });
         };
 
         const activate = (button: HTMLButtonElement) => {
