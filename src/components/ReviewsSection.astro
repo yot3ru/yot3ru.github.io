@@ -1,0 +1,604 @@
+---
+import Icon from './Icon.astro';
+import { reviews as defaultReviews, type ReviewItem } from '../data/reviews';
+
+interface Props {
+  title?: string;
+  accent?: string;
+  id?: string;
+  items?: ReviewItem[];
+}
+
+const {
+  title = 'Kind',
+  accent = 'words.',
+  id = 'reviews',
+  items = defaultReviews,
+} = Astro.props;
+
+const titleId = `${id}-title`;
+const totalLabel = String(items.length).padStart(2, '0');
+const initialsOf = (name: string) =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('');
+---
+
+<section
+  class="reviews section-pad"
+  id={id}
+  aria-labelledby={titleId}
+  data-motion-section
+  data-surface="dark"
+  data-reviews-section
+>
+  <div class="reviews__inner">
+    <div class="reviews__heading">
+      <h2 id={titleId} class="motion-heading">
+        <span class="motion-line">
+          <span>{title}{accent && <> <em>{accent}</em></>}</span>
+        </span>
+      </h2>
+
+      {items.length > 1 && (
+        <div class="reviews__controls" aria-label="Review navigation">
+          <span class="reviews__counter" aria-live="polite" data-review-counter>
+            01 / {totalLabel}
+          </span>
+          <div class="reviews__arrows">
+            <button
+              class="review-nav-btn"
+              type="button"
+              aria-label="Previous review"
+              data-review-prev
+            >
+              <Icon name="arrow-left" />
+            </button>
+            <button
+              class="review-nav-btn"
+              type="button"
+              aria-label="Next review"
+              data-review-next
+            >
+              <Icon name="arrow-right" />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+
+    <div
+      class="reviews__stage"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Client reviews"
+      tabindex="0"
+      data-review-stage
+    >
+      <div class="reviews__surface" aria-hidden="true">
+        {items.length > 1 && (
+          <div class="reviews__progress">
+            <span class="reviews__progress-bar" data-review-progress></span>
+          </div>
+        )}
+      </div>
+
+      {items.map((item, index) => (
+        <article
+          class="review-panel"
+          role="group"
+          aria-roledescription="slide"
+          aria-label={`${index + 1} of ${items.length}: ${item.name}`}
+          id={`review-panel-${item.id}`}
+          aria-hidden={index === 0 ? 'false' : 'true'}
+          data-active={index === 0 ? 'true' : 'false'}
+          data-review-panel={index}
+        >
+          <blockquote class="review-panel__quote">
+            <svg class="review-panel__qmark review-panel__qmark--open" viewBox="0 0 28 22" fill="none" aria-hidden="true">
+              <path d="M11.6 0H5.2L0 11.4V22H11.2V10.6H6.1L11.6 0ZM27.6 0H21.2L16 11.4V22H27.2V10.6H22.1L27.6 0Z" fill="currentColor" />
+            </svg>
+            <p>{item.quote}</p>
+          </blockquote>
+
+          <div class="review-panel__author">
+            <div class="review-avatar" aria-hidden="true">
+              {item.avatar ? (
+                <img
+                  src={item.avatar}
+                  alt=""
+                  width="80"
+                  height="80"
+                  loading="eager"
+                  decoding="async"
+                />
+              ) : (
+                <span>{initialsOf(item.name)}</span>
+              )}
+            </div>
+            <div class="review-author__meta">
+              <strong class="review-author__name">{item.name}</strong>
+              <span class="review-author__designation">{item.designation}</span>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .reviews {
+    background: var(--ink);
+    color: var(--bone);
+    padding-block: var(--space-section-y);
+    overflow: visible;
+  }
+
+  .reviews__inner {
+    width: 100%;
+    max-width: var(--content);
+    margin-inline: auto;
+  }
+
+  .reviews__heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-4);
+  }
+
+  .reviews h2 {
+    margin: 0;
+    min-width: 0;
+    font-size: var(--type-section);
+    line-height: var(--leading-display);
+  }
+
+  .reviews h2 .motion-line > span {
+    white-space: nowrap;
+  }
+
+  .reviews h2 em {
+    color: var(--red);
+  }
+
+  @media (max-width: 699px) {
+    .reviews__counter {
+      display: none;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .reviews__heading {
+      flex-wrap: wrap;
+    }
+  }
+
+  .reviews__controls {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .reviews__counter {
+    font-size: var(--type-label);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    font-variant-numeric: tabular-nums;
+    color: rgba(235, 231, 224, 0.62);
+  }
+
+  .reviews__arrows {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .review-nav-btn {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(235, 231, 224, 0.25);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--bone);
+    cursor: pointer;
+    transition:
+      background-color var(--duration-fast) var(--ease-out-soft),
+      border-color var(--duration-fast) var(--ease-out-soft),
+      color var(--duration-fast) var(--ease-out-soft),
+      transform var(--duration-fast) var(--ease-spring);
+  }
+
+  .review-nav-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .review-nav-btn:hover,
+  .review-nav-btn:focus-visible {
+    background: var(--bone);
+    border-color: var(--bone);
+    color: var(--ink);
+  }
+
+  .review-nav-btn:active {
+    transform: scale(0.95);
+  }
+
+  .review-nav-btn:focus-visible {
+    outline: 2px solid var(--red);
+    outline-offset: 3px;
+  }
+
+  .reviews__stage {
+    position: relative;
+    display: grid;
+    padding: clamp(1.75rem, 4vw, 3.25rem) clamp(1.5rem, 4vw, 3.25rem) clamp(3.25rem, 5.5vw, 4.25rem);
+    margin-bottom: 2.25rem;
+  }
+
+  .reviews__surface {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-frame);
+    background: rgba(235, 231, 224, 0.04);
+    border: 1px solid rgba(235, 231, 224, 0.14);
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .reviews__stage:focus-visible {
+    outline: 2px solid var(--red);
+    outline-offset: 4px;
+  }
+
+  .review-panel {
+    grid-column: 1;
+    grid-row: 1;
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: start;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .review-panel[data-active="true"] {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .review-panel__author {
+    position: absolute;
+    right: clamp(1rem, 3.5vw, 2.75rem);
+    bottom: 0;
+    transform: translateY(50%);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: min(19.5rem, calc(100% - 2rem));
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-inner);
+    background: color-mix(in srgb, var(--ink) 95%, var(--bone));
+    border: 1px solid rgba(235, 231, 224, 0.14);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.32);
+  }
+
+  .review-avatar {
+    flex: none;
+    width: 2.625rem;
+    height: 2.625rem;
+    border-radius: 999px;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    background: rgba(235, 231, 224, 0.08);
+    color: var(--bone);
+    border: 1px solid rgba(235, 231, 224, 0.16);
+    font: 650 0.875rem / 1 Funnel, sans-serif;
+    letter-spacing: 0.04em;
+  }
+
+  .review-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    display: block;
+  }
+
+  .review-author__meta {
+    min-width: 0;
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .review-author__name {
+    font-family: Funnel, sans-serif;
+    font-size: var(--type-body);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    color: var(--bone);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .review-author__designation {
+    font-size: var(--type-label);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(235, 231, 224, 0.58);
+  }
+
+  .review-panel__quote {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+  }
+
+  .review-panel__quote p {
+    margin: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+    font-family: DM, sans-serif;
+    font-size: var(--type-lead);
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: -0.012em;
+    color: rgba(235, 231, 224, 0.92);
+    text-wrap: pretty;
+  }
+
+  .review-panel__qmark {
+    flex: none;
+    width: clamp(1.125rem, 2vw, 1.625rem);
+    height: auto;
+    color: var(--red);
+    pointer-events: none;
+  }
+
+  .review-panel__qmark--open {
+    margin-top: 0.25em;
+  }
+
+  .reviews__progress {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: rgba(235, 231, 224, 0.08);
+    overflow: hidden;
+  }
+
+  @media (min-width: 760px) {
+    .reviews__progress {
+      display: block;
+    }
+  }
+
+  .reviews__progress-bar {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: var(--red);
+    transform-origin: left center;
+    transform: scaleX(0);
+  }
+
+  @supports (corner-shape: squircle) {
+    .reviews__surface,
+    .review-panel__author {
+      corner-shape: squircle;
+    }
+  }
+
+  /* Section reveal */
+  :global(.motion-ready) [data-reviews-section] .reviews__controls {
+    opacity: 0;
+    transform: translate3d(0, var(--distance-xs), 0);
+    transition: opacity var(--duration-base) var(--ease-out-soft), transform var(--duration-base) var(--ease-out-soft);
+  }
+  :global(.motion-ready) [data-reviews-section][data-in-view] .reviews__controls {
+    opacity: 1;
+    transform: none;
+  }
+  :global(.motion-ready) [data-reviews-section] .reviews__stage {
+    opacity: 0;
+    transform: translate3d(0, var(--distance-sm), 0);
+    transition: opacity var(--duration-reveal) var(--ease-out-soft), transform var(--duration-reveal) var(--ease-out-primary);
+  }
+  :global(.motion-ready) [data-reviews-section][data-in-view] .reviews__stage {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .review-nav-btn,
+    :global(.motion-ready) [data-reviews-section] .reviews__controls,
+    :global(.motion-ready) [data-reviews-section] .reviews__stage {
+      transition: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+    .reviews__progress {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-reviews-section]').forEach((section) => {
+    const stage = section.querySelector<HTMLElement>('[data-review-stage]');
+    const panels = [...section.querySelectorAll<HTMLElement>('[data-review-panel]')];
+    const prevBtn = section.querySelector<HTMLButtonElement>('[data-review-prev]');
+    const nextBtn = section.querySelector<HTMLButtonElement>('[data-review-next]');
+    const counter = section.querySelector<HTMLElement>('[data-review-counter]');
+    const progressBar = section.querySelector<HTMLElement>('[data-review-progress]');
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+
+    if (!panels.length) return;
+
+    const AUTO_MS = 6500;
+    let activeIndex = 0;
+    let inView = false;
+    let paused = false;
+    let progressAnim: Animation | undefined;
+    let autoTimer = 0;
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    const pad = (n: number) => String(n).padStart(2, '0');
+
+    const stopAuto = () => {
+      clearTimeout(autoTimer);
+      progressAnim?.cancel();
+      if (progressBar) progressBar.style.transform = 'scaleX(0)';
+    };
+
+    const startAuto = () => {
+      stopAuto();
+      if (panels.length < 2 || !inView || paused || document.hidden || reduced.matches) return;
+      if (progressBar) {
+        progressAnim = progressBar.animate(
+          [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }],
+          { duration: AUTO_MS, easing: 'linear', fill: 'forwards' },
+        );
+      }
+      autoTimer = window.setTimeout(() => {
+        showReview((activeIndex + 1) % panels.length, 1);
+      }, AUTO_MS);
+    };
+
+    const showReview = (nextIndex: number, direction = 1) => {
+      const target = ((nextIndex % panels.length) + panels.length) % panels.length;
+      if (target === activeIndex) return;
+
+      const prevPanel = panels[activeIndex];
+      const nextPanel = panels[target];
+      activeIndex = target;
+
+      if (counter) counter.textContent = `${pad(activeIndex + 1)} / ${pad(panels.length)}`;
+
+      if (prevPanel) {
+        prevPanel.dataset.active = 'false';
+        prevPanel.setAttribute('aria-hidden', 'true');
+      }
+      if (nextPanel) {
+        nextPanel.dataset.active = 'true';
+        nextPanel.setAttribute('aria-hidden', 'false');
+        if (!reduced.matches) {
+          const quoteEl = nextPanel.querySelector<HTMLElement>('.review-panel__quote');
+          if (quoteEl) {
+            const offset = direction >= 0 ? '14px' : '-14px';
+            quoteEl.animate(
+              [
+                { opacity: 0, transform: `translate3d(${offset}, 0, 0)` },
+                { opacity: 1, transform: 'translate3d(0, 0, 0)' },
+              ],
+              { duration: 420, easing: 'cubic-bezier(.22, 1, .36, 1)' },
+            );
+          }
+        }
+      }
+
+      startAuto();
+    };
+
+    prevBtn?.addEventListener('click', () => {
+      showReview(activeIndex - 1, -1);
+    });
+
+    nextBtn?.addEventListener('click', () => {
+      showReview(activeIndex + 1, 1);
+    });
+
+    stage?.addEventListener('keydown', (event) => {
+      if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+      event.preventDefault();
+      const step = event.key === 'ArrowRight' ? 1 : -1;
+      showReview(activeIndex + step, step);
+    });
+
+    stage?.addEventListener('pointerdown', (event) => {
+      if (event.pointerType !== 'touch') return;
+      touchStartX = event.clientX;
+      touchStartY = event.clientY;
+    }, { passive: true });
+
+    stage?.addEventListener('pointerup', (event) => {
+      if (event.pointerType !== 'touch') return;
+      const dx = event.clientX - touchStartX;
+      const dy = event.clientY - touchStartY;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+        showReview(dx < 0 ? activeIndex + 1 : activeIndex - 1, dx < 0 ? 1 : -1);
+      }
+    }, { passive: true });
+
+    section.addEventListener('pointerenter', (event) => {
+      if (event.pointerType === 'mouse') {
+        paused = true;
+        stopAuto();
+      }
+    });
+    section.addEventListener('pointerleave', (event) => {
+      if (event.pointerType === 'mouse') {
+        paused = false;
+        startAuto();
+      }
+    });
+    section.addEventListener('focusin', () => {
+      paused = true;
+      stopAuto();
+    });
+    section.addEventListener('focusout', () => {
+      if (!section.matches(':focus-within')) {
+        paused = false;
+        startAuto();
+      }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stopAuto();
+      else startAuto();
+    });
+    reduced.addEventListener('change', () => {
+      if (reduced.matches) stopAuto();
+      else startAuto();
+    });
+
+    if (typeof IntersectionObserver !== 'undefined') {
+      new IntersectionObserver(([entry]) => {
+        inView = entry.isIntersecting;
+        if (inView) startAuto();
+        else stopAuto();
+      }, { threshold: 0.2 }).observe(section);
+    } else {
+      inView = true;
+      startAuto();
+    }
+  });
+</script>

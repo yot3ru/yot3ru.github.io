@@ -1,28 +1,30 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
 import LivingMaterial from '../components/LivingMaterial.astro';
 import LabGallery from '../components/LabGallery.astro';
 import VideoShowcase from '../components/VideoShowcase.astro';
+import ReviewsSection from '../components/ReviewsSection.astro';
 import { photographyRows } from '../data/photographyWork';
 
 const capabilities = [
-  { key: 'identity', name: 'Graphic design', detail: 'Identities, campaigns and visual systems built to be recognized, then used.', proof: 'Type, image and hierarchy in one visual language.', image: '/img/lufi-lab-type.webp', small: '/img/lufi-lab-type-640.webp', width: 896, height: 1120, alt: 'LUFI typographic study made with layered paper, black print and Cinnabar registration marks.' },
-  { key: 'film', name: 'Film & motion', detail: 'Edit, titles and moving images with a reason for every frame.', proof: 'Pace, cut and feeling working together.', image: '/img/lufi-material-hero.webp', small: '/img/lufi-material-hero-640.webp', width: 896, height: 1120, alt: 'LUFI material study of folded paper, black metal and red fabric.' },
-  { key: 'image', name: 'Photography', detail: 'Images with clear framing, light and intent—from product to people and place.', proof: 'Art direction before the shutter.', image: '/img/lufi-lab-material.webp', small: '/img/lufi-lab-material-640.webp', width: 1024, height: 688, alt: 'LUFI close-up material study of paper, ink and reflective black surface.' },
-  { key: 'production', name: 'Video production', detail: 'A visual idea carried from shoot planning through the final cut.', proof: 'A point of view that survives production.', image: '/img/studio-launch-film.webp', small: '/img/studio-launch-film-640.webp', width: 1122, height: 1402, alt: 'Self-initiated LUFI film image study.' },
-  { key: 'digital', name: 'Digital experiences', detail: 'Websites and interfaces that are clear to use and distinctive to see.', proof: 'Structure and interaction that earn their place.', image: '/img/lufi-lab-digital.webp', small: '/img/lufi-lab-digital-640.webp', width: 1344, height: 752, alt: 'LUFI digital interface study in translucent layers and a Cinnabar control.' },
+  { key: 'identity', name: 'Graphic design', detail: 'Identities, campaigns and visual systems built to be recognized, then used.', proof: 'Type, image and hierarchy in one visual language.', image: '/img/cap-identity.webp', small: '/img/cap-identity-640.webp', width: 900, height: 1200, alt: 'Tarot card I: Light Academia engraving of a drafting compass, fountain pen, stacked books, olive branches and a Cinnabar sun.' },
+  { key: 'film', name: 'Film & motion', detail: 'Edit, titles and moving images with a reason for every frame.', proof: 'Pace, cut and feeling working together.', image: '/img/cap-film.webp', small: '/img/cap-film-640.webp', width: 900, height: 1200, alt: 'Tarot card II: Light Academia engraving of a celestial film reel, winged hourglasses, crescent moons and Cinnabar rays.' },
+  { key: 'image', name: 'Photography', detail: 'Images with clear framing, light and intent—from product to people and place.', proof: 'Art direction before the shutter.', image: '/img/cap-photography.webp', small: '/img/cap-photography-640.webp', width: 900, height: 1200, alt: 'Tarot card III: Light Academia engraving of a vintage camera obscura lens eye framed by prisms, laurel wreaths and a Cinnabar eclipse.' },
+  { key: 'production', name: 'Video production', detail: 'A visual idea carried from shoot planning through the final cut.', proof: 'A point of view that survives production.', image: '/img/cap-production.webp', small: '/img/cap-production-640.webp', width: 900, height: 1200, alt: 'Tarot card IV: Light Academia engraving of a classical theatre arch with a cinema projector casting a Cinnabar light beam.' },
+  { key: 'digital', name: 'Digital experiences', detail: 'Websites and interfaces that are clear to use and distinctive to see.', proof: 'Structure and interaction that earn their place.', image: '/img/cap-digital.webp', small: '/img/cap-digital-640.webp', width: 900, height: 1200, alt: 'Tarot card V: Light Academia engraving of an antique astrolabe, geometric portal, Cinnabar constellations and a sculpted hand.' },
 ];
 ---
 
 <BaseLayout title="LUFI — Independent creative studio" description="LUFI is an independent creative studio in Colombo. We make identities, images, film and digital experiences with a clear point of view.">
-  <section class="hero" id="start" aria-labelledby="hero-title" data-cursor-theme="dark">
+  <section class="hero" id="start" aria-labelledby="hero-title" data-surface="dark">
     <div class="hero__field"><LivingMaterial priority /></div>
     <div class="hero__content">
       <h1 id="hero-title" class="hero__statement" aria-label="Make something worth noticing."><span class="motion-line"><span>Make something</span></span><span class="motion-line"><em class="hero__phrase" aria-hidden="true" data-hero-phrase>worth noticing.</em></span></h1>
     </div>
   </section>
 
-  <section class="intro section-pad" id="point-of-view" aria-labelledby="intro-title" data-motion-section data-cursor-theme="light">
+  <section class="intro section-pad" id="point-of-view" aria-labelledby="intro-title" data-motion-section data-surface="light">
     <div class="intro__grid">
       <h2 id="intro-title" class="motion-heading"><span class="motion-line"><span>Good design</span></span><span class="motion-line"><span>has a <em>point.</em></span></span></h2>
       <div class="intro__copy">
@@ -32,7 +34,7 @@ const capabilities = [
     </div>
   </section>
 
-  <section class="capabilities section-pad" id="capabilities" aria-labelledby="capabilities-title" data-capability data-active="identity" data-motion-section data-cursor-theme="dark">
+  <section class="capabilities section-pad" id="capabilities" aria-labelledby="capabilities-title" data-capability data-active="identity" data-motion-section data-surface="dark">
     <div class="section-heading capabilities__header">
       <h2 id="capabilities-title" class="motion-heading">
         <span class="motion-line capabilities__title-main"><span>The work<br />takes</span></span>
@@ -41,20 +43,52 @@ const capabilities = [
     </div>
     <div class="capabilities__layout">
       <div class="capabilities__tabs" role="tablist" aria-label="LUFI capabilities" aria-orientation="vertical">
-        {capabilities.map((item, index) => <button class="capability-tab" type="button" role="tab" id={`tab-${item.key}`} aria-controls={`panel-${item.key}`} aria-selected={index === 0 ? 'true' : 'false'} tabindex={index === 0 ? 0 : -1} data-key={item.key}><span class="capability-tab__index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><span class="capability-tab__name">{item.name}</span><span class="capability-tab__arrow" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 17 17 7" /><path d="M9 7h8v8" /></svg></span></button>)}
+        {capabilities.map((item, index) => (
+          <div class="capability-item" data-selected={index === 0 ? 'true' : 'false'}>
+            <button
+              class="capability-tab"
+              type="button"
+              role="tab"
+              id={`tab-${item.key}`}
+              aria-controls={`panel-${item.key}`}
+              aria-selected={index === 0 ? 'true' : 'false'}
+              tabindex={index === 0 ? 0 : -1}
+              data-key={item.key}
+            >
+              <span class="capability-tab__index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+              <span class="capability-tab__name">{item.name}</span>
+              <span class="capability-tab__arrow" aria-hidden="true"><Icon name="arrow-up-right" /></span>
+            </button>
+            <div class="capability-panel" role="tabpanel" id={`panel-${item.key}`} aria-labelledby={`tab-${item.key}`} hidden={index !== 0}>
+              <p class="capability-panel__detail">{item.detail}</p>
+            </div>
+          </div>
+        ))}
       </div>
       <div class="capabilities__panels">
-        {capabilities.map((item, index) => <div class="capability-panel" role="tabpanel" id={`panel-${item.key}`} aria-labelledby={`tab-${item.key}`} hidden={index !== 0}>
-          <figure data-cursor="media"><img src={item.image} srcset={`${item.small} 640w, ${item.image} ${item.width}w`} sizes="(min-width: 700px) 45vw, calc(100vw - 2.5rem)" alt={item.alt} width={item.width} height={item.height} loading="lazy" decoding="async" /></figure>
-          <div class="capability-panel__copy"><p class="capability-panel__detail">{item.detail}</p><p class="capability-panel__proof">{item.proof}</p></div>
-        </div>)}
+        <div class="capabilities__deck" data-capability-deck aria-hidden="true">
+          {capabilities.map((item, index) => (
+            <figure class="tarot-card" data-card-index={index} data-offset={index}>
+              <img
+                src={item.image}
+                srcset={`${item.small} 480w, ${item.image} ${item.width}w`}
+                sizes="(min-width: 760px) 22rem, 78vw"
+                alt={item.alt}
+                width={item.width}
+                height={item.height}
+                loading={index === 0 ? 'eager' : 'lazy'}
+                decoding="async"
+              />
+            </figure>
+          ))}
+        </div>
       </div>
     </div>
   </section>
 
   <LabGallery />
 
-  <section class="thinking section-pad" id="thinking" aria-labelledby="thinking-title" data-motion-section data-cursor-theme="dark">
+  <section class="thinking section-pad" id="thinking" aria-labelledby="thinking-title" data-motion-section data-surface="dark">
     <div class="thinking__grid">
       <div class="thinking__statement">
         <h2 id="thinking-title" class="motion-heading"><span class="motion-line"><span>We don't start</span></span><span class="motion-line"><span>with the <em>surface.</em></span></span></h2>
@@ -68,34 +102,13 @@ const capabilities = [
 
   <LabGallery rows={photographyRows} id="photography" title="Photography." imageRoot="/img/photography" />
 
-  <section class="studio section-pad" id="studio" aria-labelledby="studio-title" data-motion-section data-cursor-theme="dark">
-    <div class="studio__layout"><div class="studio__mark" aria-hidden="true" data-cursor="media" data-cursor-theme="dark"><LivingMaterial /><img src="/img/lufi-mark.svg" width="879" height="1654" alt="" /></div><div class="studio__copy"><h2 id="studio-title" class="motion-heading"><span class="motion-line"><span>Small enough</span></span><span class="motion-line"><span>to <em>care.</em></span></span></h2><p>LUFI is an independent creative studio in Colombo, Sri Lanka. We work across graphic design, photography, video and digital experiences.</p><p>We care about the thought behind the work, and the details that make it hold together.</p></div></div>
+  <section class="studio section-pad" id="studio" aria-labelledby="studio-title" data-motion-section data-surface="dark">
+    <div class="studio__layout"><div class="studio__mark" aria-hidden="true"><LivingMaterial /><img src="/img/lufi-mark.svg" width="879" height="1654" alt="" /></div><div class="studio__copy"><h2 id="studio-title" class="motion-heading"><span class="motion-line"><span>Small enough</span></span><span class="motion-line"><span>to <em>care.</em></span></span></h2><p>LUFI is an independent creative studio in Colombo, Sri Lanka. We work across graphic design, photography, video and digital experiences.</p><p>We care about the thought behind the work, and the details that make it hold together.</p></div></div>
   </section>
 
   <VideoShowcase />
 
-  <section class="contact section-pad" id="contact" aria-labelledby="contact-title" data-motion-section data-cursor-theme="accent">
-    <div class="contact__body">
-      <div class="contact__statement">
-        <p>Start a project</p>
-        <h2 id="contact-title" class="motion-heading">
-          <span class="motion-line"><span>Have an idea?</span></span>
-          <span class="motion-line"><span><em>Let's talk.</em></span></span>
-        </h2>
-      </div>
-      <div class="contact__conversation">
-        <p class="contact__detail">Tell us what you're making. We'll reply with a clear next step.</p>
-        <div class="contact__actions" aria-label="Contact options">
-          <a class="contact__link" href="mailto:contact@lufi.lk">
-            <span>Email</span><strong>contact@lufi.lk</strong><svg class="contact__arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7" /><path d="M9 7h8v8" /></svg>
-          </a>
-          <a class="contact__link" href="https://wa.me/94781993860" target="_blank" rel="noreferrer">
-            <span>WhatsApp</span><strong>+94 78 199 3860</strong><svg class="contact__arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7" /><path d="M9 7h8v8" /></svg>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
+  <ReviewsSection />
 </BaseLayout>
 
 <script>

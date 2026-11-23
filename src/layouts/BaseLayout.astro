@@ -1,5 +1,6 @@
 ---
 import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
 import EntryLoader from '../components/EntryLoader.astro';
 import '../styles/global.css';
 
@@ -108,9 +109,7 @@ const socialImage = new URL(image, Astro.site);
     <a class="skip-link" href="#main">Skip to content</a>
     <SiteHeader />
     <main id="main"><slot /></main>
-    <div class="custom-cursor" data-cursor-overlay aria-hidden="true">
-      <span class="custom-cursor__dot"></span>
-    </div>
+    <SiteFooter />
 
     <script>
       const reduce = matchMedia('(prefers-reduced-motion: reduce)');
@@ -122,7 +121,8 @@ const socialImage = new URL(image, Astro.site);
         base: motionTime('--duration-base', 450),
         reveal: motionTime('--duration-reveal', 650),
         ease: motionStyles.getPropertyValue('--ease-out-primary').trim() || 'cubic-bezier(.22,1,.36,1)',
-        soft: motionStyles.getPropertyValue('--ease-out-soft').trim() || 'cubic-bezier(.16,1,.3,1)',
+        soft: motionStyles.getPropertyValue('--ease-out-soft').trim() || 'cubic-bezier(.05,.7,.1,1)',
+        inExit: motionStyles.getPropertyValue('--ease-in-exit').trim() || 'cubic-bezier(.3,0,.8,.15)',
       };
       const menu = document.querySelector('[data-menu]');
       const openMenu = document.querySelector('[data-menu-open]');
@@ -131,8 +131,6 @@ const socialImage = new URL(image, Astro.site);
         let closing = false;
         const openDialog = () => {
           if (menu.open) return;
-          const cursorLayer = document.querySelector<HTMLElement>('[data-cursor-overlay]');
-          if (cursorLayer) menu.append(cursorLayer);
           menu.showModal();
           if (reduce.matches) return;
           menu.animate(
@@ -152,19 +150,15 @@ const socialImage = new URL(image, Astro.site);
           if (!menu.open || closing) return;
           if (reduce.matches) {
             menu.close();
-            const cursorLayer = menu.querySelector<HTMLElement>('[data-cursor-overlay]');
-            if (cursorLayer) document.body.append(cursorLayer);
             return;
           }
           closing = true;
           const animation = menu.animate(
             [{ opacity: 1 }, { opacity: 0 }],
-            { duration: motion.fast, easing: 'cubic-bezier(.4,0,1,1)' },
+            { duration: motion.fast, easing: motion.inExit },
           );
           try { await animation.finished; } catch {}
           menu.close();
-          const cursorLayer = menu.querySelector<HTMLElement>('[data-cursor-overlay]');
-          if (cursorLayer) document.body.append(cursorLayer);
           closing = false;
         };
         openMenu.addEventListener('click', openDialog);
@@ -178,13 +172,46 @@ const socialImage = new URL(image, Astro.site);
       if (capability instanceof HTMLElement) {
         const buttons = [...capability.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
         const panels = [...capability.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
+        const deck = capability.querySelector<HTMLElement>('[data-capability-deck]');
+        const cards = [...capability.querySelectorAll<HTMLElement>('[data-card-index]')];
         const panelTimers = new WeakMap<HTMLElement, number>();
+        let activeIndex = 0;
+        let dealTimer = 0;
+
+        const updateDeck = (nextIndex: number) => {
+          if (!cards.length) return;
+          const prevCard = cards[activeIndex];
+          const total = cards.length;
+
+          if (prevCard && nextIndex !== activeIndex && !reduce.matches) {
+            clearTimeout(dealTimer);
+            cards.forEach((card) => delete card.dataset.leaving);
+            prevCard.dataset.leaving = 'true';
+            dealTimer = window.setTimeout(() => {
+              delete prevCard.dataset.leaving;
+              cards.forEach((card, idx) => {
+                card.dataset.offset = String((idx - nextIndex + total) % total);
+              });
+            }, 170);
+          } else {
+            cards.forEach((card, idx) => {
+              delete card.dataset.leaving;
+              card.dataset.offset = String((idx - nextIndex + total) % total);
+            });
+          }
+        };
+
         const activate = (button: HTMLButtonElement) => {
           if (button.getAttribute('aria-selected') === 'true') return;
+          const nextIndex = buttons.indexOf(button);
+          updateDeck(nextIndex);
+          activeIndex = nextIndex;
           buttons.forEach((item) => {
             const selected = item === button;
             item.setAttribute('aria-selected', String(selected));
             item.setAttribute('tabindex', selected ? '0' : '-1');
+            const wrapper = item.closest<HTMLElement>('.capability-item');
+            if (wrapper) wrapper.dataset.selected = String(selected);
           });
           panels.forEach((panel) => {
             const selected = panel.id === button.getAttribute('aria-controls');
@@ -215,141 +242,22 @@ const socialImage = new URL(image, Astro.site);
             next.focus();
           });
         });
-      }
-
-      const cursor = document.querySelector<HTMLElement>('[data-cursor-overlay]');
-      const fine = matchMedia('(any-hover: hover) and (any-pointer: fine)');
-      if (cursor) {
-        const spring = { damping: 45, stiffness: 400, mass: 1 };
-        const scaleSpring = { damping: 35, stiffness: 500, mass: 1 };
-        let enabled = false;
-        let visible = false;
-        let targetX = 0;
-        let targetY = 0;
-        let x = 0;
-        let y = 0;
-        let velocityX = 0;
-        let velocityY = 0;
-        let restScale = 1;
-        let targetScale = 1;
-        let scale = 1;
-        let scaleVelocity = 0;
-        let previousX = 0;
-        let previousY = 0;
-        let previousPointerTime = performance.now();
-        let frameId = 0;
-        let lastFrame = performance.now();
-        let settleTimer = 0;
-
-        const eligible = () => fine.matches && !reduce.matches;
-        const stepSpring = (value: number, speed: number, target: number, config: typeof spring, delta: number) => {
-          const acceleration = ((target - value) * config.stiffness - speed * config.damping) / config.mass;
-          const nextSpeed = speed + acceleration * delta;
-          return [value + nextSpeed * delta, nextSpeed] as const;
-        };
-        const disableCursor = () => {
-          enabled = false;
-          visible = false;
-          cursor.removeAttribute('data-visible');
-          delete document.documentElement.dataset.cursorReady;
-          cancelAnimationFrame(frameId);
-          clearTimeout(settleTimer);
-          frameId = 0;
-        };
-        const render = (now: number) => {
-          frameId = 0;
-          if (!enabled || !visible || document.hidden) return;
-          const delta = Math.min((now - lastFrame) / 1000, 1 / 30);
-          lastFrame = now;
-          [x, velocityX] = stepSpring(x, velocityX, targetX, spring, delta);
-          [y, velocityY] = stepSpring(y, velocityY, targetY, spring, delta);
-          [scale, scaleVelocity] = stepSpring(scale, scaleVelocity, targetScale, scaleSpring, delta);
-          cursor.style.transform = `translate3d(${x}px,${y}px,0) translate(-50%,-50%) scale(${scale})`;
-          const moving = Math.abs(targetX - x) > .01 || Math.abs(targetY - y) > .01
-            || Math.abs(targetScale - scale) > .001
-            || Math.abs(velocityX) > .01 || Math.abs(velocityY) > .01
-            || Math.abs(scaleVelocity) > .001;
-          if (moving) frameId = requestAnimationFrame(render);
-        };
-        const startLoop = () => {
-          if (frameId || !enabled || !visible || document.hidden) return;
-          lastFrame = performance.now();
-          frameId = requestAnimationFrame(render);
-        };
-
-        const hideCursor = () => {
-          visible = false;
-          cursor.removeAttribute('data-visible');
-          cancelAnimationFrame(frameId);
-          frameId = 0;
-        };
-
-        addEventListener('pointermove', (event) => {
-          if (event.pointerType === 'touch' || !eligible()) return;
-          if (event.target instanceof Element && event.target.closest('iframe, video')) {
-            hideCursor();
-            return;
-          }
-          if (!enabled) {
-            enabled = true;
-            document.documentElement.dataset.cursorReady = 'true';
-          }
-          const now = performance.now();
-          const deltaTime = Math.max(now - previousPointerTime, 1);
-          const dx = event.clientX - previousX;
-          const dy = event.clientY - previousY;
-          const speed = Math.hypot(dx / deltaTime, dy / deltaTime);
-          const theme = event.target instanceof Element
-            ? event.target.closest<HTMLElement>('[data-cursor-theme]')?.dataset.cursorTheme
-            : undefined;
-          const interactive = event.target instanceof Element
-            ? event.target.closest('a,button,[role="button"],[role="tab"]')
-            : null;
-          cursor.dataset.theme = theme || 'dark';
-          restScale = interactive ? 1.75 : 1;
-          targetX = event.clientX;
-          targetY = event.clientY;
-          if (!visible) {
-            visible = true;
-            x = targetX;
-            y = targetY;
-            cursor.dataset.visible = 'true';
-          }
-          if (speed > .1) {
-            targetScale = restScale * .72;
-            clearTimeout(settleTimer);
-            settleTimer = window.setTimeout(() => {
-              targetScale = restScale;
-              startLoop();
-            }, 150);
-          } else {
-            targetScale = restScale;
-          }
-          previousX = event.clientX;
-          previousY = event.clientY;
-          previousPointerTime = now;
-          startLoop();
-        }, { passive: true });
-        addEventListener('pointerdown', (event) => {
-          if (!enabled || event.pointerType !== 'mouse') return;
-          targetScale = restScale * .58;
-          startLoop();
-        }, { passive: true });
-        addEventListener('pointerup', (event) => {
-          if (!enabled || event.pointerType !== 'mouse') return;
-          targetScale = restScale;
-          startLoop();
-        }, { passive: true });
-        document.documentElement.addEventListener('pointerleave', hideCursor);
-        addEventListener('blur', hideCursor);
-        document.addEventListener('visibilitychange', () => {
-          if (document.hidden) {
-            cancelAnimationFrame(frameId);
-            frameId = 0;
-          } else startLoop();
+        deck?.addEventListener('click', () => {
+          const next = buttons[(activeIndex + 1) % buttons.length];
+          if (next) activate(next);
         });
-        fine.addEventListener('change', () => { if (!eligible()) disableCursor(); });
-        reduce.addEventListener('change', () => { if (!eligible()) disableCursor(); });
+        deck?.addEventListener('pointermove', (event) => {
+          if (event.pointerType !== 'mouse' || reduce.matches) return;
+          const rect = deck.getBoundingClientRect();
+          const nx = (event.clientX - rect.left) / rect.width - 0.5;
+          const ny = (event.clientY - rect.top) / rect.height - 0.5;
+          deck.style.setProperty('--deck-rx', `${(-ny * 7).toFixed(2)}deg`);
+          deck.style.setProperty('--deck-ry', `${(nx * 9).toFixed(2)}deg`);
+        }, { passive: true });
+        deck?.addEventListener('pointerleave', () => {
+          deck.style.removeProperty('--deck-rx');
+          deck.style.removeProperty('--deck-ry');
+        });
       }
 
       const motionSections = [...document.querySelectorAll<HTMLElement>('[data-motion-section]')];

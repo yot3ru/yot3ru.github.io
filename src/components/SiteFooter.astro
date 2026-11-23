@@ -1,6 +1,319 @@
-<footer class="site-footer" data-cursor-theme="dark">
-  <img src="/img/lufi-mark.svg" width="879" height="1654" alt="" />
-  <p>LUFI · Colombo</p>
-  <p>Independent creative studio</p>
-  <a href="#main">Top</a>
+---
+import Icon from './Icon.astro';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer" id="contact" data-surface="dark" data-motion-section>
+  <div class="site-footer__inner">
+    <div class="site-footer__grid">
+      <div class="site-footer__thesis">
+        <p class="site-footer__headline">
+          Made to be noticed,<br />
+          built to <em>endure.</em>
+        </p>
+        <div class="site-footer__actions">
+          <a class="site-footer__cta" href="mailto:contact@lufi.lk">
+            <span>contact@lufi.lk</span>
+            <Icon name="arrow-up-right" class="site-footer__arrow" />
+          </a>
+          <a class="site-footer__cta" href="https://wa.me/94781993860" target="_blank" rel="noreferrer">
+            <span>WhatsApp</span>
+            <Icon name="external" class="site-footer__arrow" />
+          </a>
+        </div>
+      </div>
+
+      <div class="site-footer__artwork" aria-hidden="true">
+        <img
+          src="/img/lufi-footer-logo.png"
+          width="968"
+          height="458"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    </div>
+
+    <div class="site-footer__colophon">
+      <p>© {year} LUFI Creatives</p>
+      <p class="site-footer__disciplines">Identities · Photography · Film · Digital</p>
+      <a class="site-footer__top" href="#main">
+        <span>Top</span>
+        <Icon name="arrow-up" class="site-footer__top-icon" />
+      </a>
+    </div>
+  </div>
 </footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    z-index: 2;
+    min-height: 76svh;
+    display: flex;
+    flex-direction: column;
+    background: var(--ink);
+    color: var(--bone);
+    padding: clamp(3.5rem, 6vw, 5rem) var(--p) clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .site-footer__inner {
+    flex: 1;
+    width: 100%;
+    max-width: var(--content);
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: clamp(3rem, 6vw, 5rem);
+  }
+
+  .site-footer__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(2.5rem, 6vw, 4.5rem);
+    align-items: stretch;
+  }
+
+  .site-footer__thesis {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .site-footer__headline {
+    margin: 0;
+    font-family: Funnel, sans-serif;
+    font-size: clamp(2.15rem, 4.4vw, 3.75rem);
+    font-weight: 600;
+    line-height: 1.02;
+    letter-spacing: -0.04em;
+    color: var(--bone);
+  }
+
+  .site-footer__headline em {
+    font-family: Zodiak, Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--red);
+  }
+
+  .site-footer__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .site-footer__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-height: 44px;
+    padding: 0 1.25rem;
+    border-radius: var(--radius-control);
+    border: 1px solid rgba(235, 231, 224, 0.22);
+    background: rgba(235, 231, 224, 0.04);
+    font-family: DM, sans-serif;
+    font-size: var(--type-body);
+    color: var(--bone);
+    text-decoration: none;
+    transition:
+      background-color var(--duration-fast) var(--ease-out-soft),
+      border-color var(--duration-fast) var(--ease-out-soft),
+      color var(--duration-fast) var(--ease-out-soft),
+      transform var(--duration-fast) var(--ease-spring);
+  }
+
+  .site-footer__cta:hover,
+  .site-footer__cta:focus-visible {
+    background: var(--bone);
+    border-color: var(--bone);
+    color: var(--ink);
+  }
+
+  .site-footer__cta:active {
+    transform: scale(0.97);
+  }
+
+  .site-footer__arrow,
+  .site-footer__top-icon {
+    width: 15px;
+    height: 15px;
+    flex: none;
+    color: var(--red);
+    transition: transform var(--duration-fast) var(--ease-spring);
+  }
+
+  .site-footer__cta:hover .site-footer__arrow,
+  .site-footer__cta:focus-visible .site-footer__arrow {
+    transform: translate3d(2px, -2px, 0);
+  }
+
+  .site-footer__artwork {
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .site-footer__artwork img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .site-footer__colophon {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding-top: var(--space-3);
+    border-top: 1px solid rgba(235, 231, 224, 0.14);
+    font-size: var(--type-label);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(235, 231, 224, 0.56);
+  }
+
+  .site-footer__colophon p {
+    margin: 0;
+  }
+
+  .site-footer__disciplines {
+    display: none;
+  }
+
+  .site-footer__top {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 44px;
+    padding-inline: 0.25rem;
+    color: var(--bone);
+    text-decoration: none;
+    transition:
+      color var(--duration-fast) var(--ease-out-soft),
+      transform var(--duration-fast) var(--ease-spring);
+  }
+
+  .site-footer__top:hover,
+  .site-footer__top:focus-visible {
+    color: var(--red);
+    transform: translate3d(0, -2px, 0);
+  }
+
+  .site-footer a:focus-visible {
+    outline: 2px solid var(--red);
+    outline-offset: 3px;
+  }
+
+  @media (min-width: 760px) {
+    .site-footer__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+      gap: clamp(3rem, 6vw, 6rem);
+    }
+
+    .site-footer__colophon {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+    }
+
+    .site-footer__disciplines {
+      display: block;
+      text-align: center;
+    }
+
+    .site-footer__top {
+      justify-self: end;
+    }
+  }
+
+  @supports (corner-shape: squircle) {
+    .site-footer__cta {
+      corner-shape: squircle;
+    }
+  }
+
+  /* Cohesive entrance reveal */
+  :global(.motion-ready) .site-footer .site-footer__thesis,
+  :global(.motion-ready) .site-footer .site-footer__artwork {
+    opacity: 0;
+    transform: translate3d(0, var(--distance-sm), 0);
+    transition:
+      opacity var(--duration-reveal) var(--ease-out-soft),
+      transform var(--duration-reveal) var(--ease-out-primary);
+  }
+
+  :global(.motion-ready) .site-footer .site-footer__artwork {
+    transition-delay: 80ms;
+  }
+
+  :global(.motion-ready) .site-footer[data-in-view] .site-footer__thesis,
+  :global(.motion-ready) .site-footer[data-in-view] .site-footer__artwork {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-footer__cta,
+    .site-footer__arrow,
+    .site-footer__top,
+    :global(.motion-ready) .site-footer .site-footer__thesis,
+    :global(.motion-ready) .site-footer .site-footer__artwork {
+      transition: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+</style>
+
+<script>
+  const footer = document.querySelector<HTMLElement>('.site-footer');
+  const footerInner = footer?.querySelector<HTMLElement>('.site-footer__inner');
+  const reviews = document.querySelector<HTMLElement>('#reviews');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (footer && footerInner && reviews) {
+    let frame = 0;
+
+    const updateFooterFocus = () => {
+      frame = 0;
+      if (reduced.matches) {
+        reviews.style.opacity = '';
+        reviews.style.transform = '';
+        footerInner.style.transform = '';
+        return;
+      }
+
+      const rect = footer.getBoundingClientRect();
+      const vh = window.innerHeight || 1;
+      // 0 when footer top hits viewport bottom, 1 when footer fills its presentation range
+      const raw = (vh - rect.top) / Math.min(rect.height, vh * 0.76);
+      const progress = Math.max(0, Math.min(1, raw));
+
+      // As footer rises toward mid-screen, #reviews lifts up and disappears behind it
+      const recede = Math.max(0, Math.min(1, (progress - 0.25) / 0.55));
+      const eased = 1 - Math.pow(1 - recede, 3);
+
+      reviews.style.opacity = String(1 - eased);
+      reviews.style.transform = eased > 0.001 ? `translate3d(0, ${(-36 * eased).toFixed(2)}px, 0)` : '';
+      reviews.style.pointerEvents = eased > 0.7 ? 'none' : '';
+
+      const lift = (1 - progress) * 20;
+      footerInner.style.transform = lift > 0.1 ? `translate3d(0, ${lift.toFixed(2)}px, 0)` : '';
+    };
+
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(updateFooterFocus);
+    };
+
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener('resize', onScroll, { passive: true });
+    reduced.addEventListener('change', updateFooterFocus);
+    updateFooterFocus();
+  }
+</script>

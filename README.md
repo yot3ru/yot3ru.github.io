@@ -1,38 +1,38 @@
-# LUFI
+# LUFI Creatives
 
-LUFI is an independent creative studio in Colombo, Sri Lanka. The studio works across graphic design, photography, film and digital experiences. This website is an expression of LUFI's thinking and craft: its typography, visual language, motion and responsive behavior serve as the demonstration.
+**Independent creative studio — Colombo, Sri Lanka**  
+[lufi.lk](https://lufi.lk)
 
-The site does not present concept art as commissioned client work. LUFI Lab shows 19 real graphic artwork images supplied by the owner, without invented project claims. Generated images elsewhere are labeled LUFI studies or studio experiments. There are no fictional case studies, client names, results or testimonials.
+LUFI Creatives makes identities, images, film, and digital experiences for people with something to say. We look for the idea first—then give it form, a voice, and a life beyond the presentation.
 
-## Run locally
+Small enough to care about the thought behind the work, and the details that make it hold together.
 
-```bash
-npm ci
-npm run dev
-```
+---
 
-`npm run build` checks Astro and TypeScript, writes the static site to `dist`, then verifies required Pages files and local asset references. `npm run preview` serves that build locally.
+## What We Do
 
-The entry mark is a real asset-loading indicator. It waits for page images, brand fonts, the logo and the hero material before revealing the site. Slow or failed requests can lengthen the first visit; a one-minute emergency release prevents an indefinite blocking screen.
+- **Graphic design** — Identities, campaigns, and visual systems built to be recognized, then used.
+- **Film & motion** — Edit, titles, and moving images with a reason for every frame.
+- **Photography** — Images with clear framing, light, and intent—from product to people and place.
+- **Video production** — A visual idea carried from shoot planning through the final cut.
+- **Digital experiences** — Websites and interfaces that are clear to use and distinctive to see.
 
-## Deployment
+---
 
-The GitHub Actions workflow in `.github/workflows/deploy.yml` checks the project, builds `dist`, packages the Pages artifact and deploys it whenever `main` is pushed. In the repository, set **Settings → Pages → Source** to **GitHub Actions**. Set the custom domain there to `lufi.lk`; `public/CNAME` and `astro.config.mjs` preserve the same canonical origin in the generated site.
+## How We Think
 
-The repository root is source code; Pages must publish the `dist` artifact, not the root directory. The workflow is the only deployment workflow this project needs. Remove any older “Static HTML” workflow from `.github/workflows/` before pushing if one exists in the repository.
+A visual can get attention. An idea gives it somewhere to go.
 
-## Site structure
+1. **Find what matters.** Understand the thing before making it look like anything.
+2. **Give it a shape.** Build a visual language people can recognize and use.
+3. **Keep the necessary.** Remove what distracts from the point.
+4. **Make it move with purpose.** Let every frame and interaction carry the idea.
 
-- `src/pages/index.astro` — single-page narrative and content
-- `src/components/` — navigation, footer, hero material and LUFI Lab gallery
-- `src/data/labWork.ts` — Lab artwork order, dimensions and descriptions
-- `src/styles/global.css` — layout, type, color and responsive behavior
-- `public/img/` — logos, optimized LUFI studies and owner-supplied Lab artwork
-- `DESIGN.md` — art direction and interaction rules
-- `PRODUCT.md` — product goals and truth boundaries
+---
 
-## Before launch
+## Start a Conversation
 
-Replace the contact placeholder in `src/pages/index.astro` with LUFI's **verified** WhatsApp number and email. Do not invent them. Run `npm run build` after any content or asset change.
-
-The private `brand/` directory is ignored and must stay out of the published repository. No open-source license has been assigned to the site or brand assets.
+- **Website:** [lufi.lk](https://lufi.lk)
+- **Email:** [contact@lufi.lk](mailto:contact@lufi.lk)
+- **WhatsApp:** [+94 78 199 3860](https://wa.me/94781993860)
+- **Location:** Colombo, Sri Lanka
