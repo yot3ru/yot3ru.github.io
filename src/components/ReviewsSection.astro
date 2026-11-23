@@ -201,9 +201,15 @@ const initialsOf = (name: string) =>
   }
 
   .reviews__arrows {
-    display: flex;
+    display: none;
     align-items: center;
     gap: var(--space-1);
+  }
+
+  @media (min-width: 760px) {
+    .reviews__arrows {
+      display: flex;
+    }
   }
 
   .review-nav-btn {
