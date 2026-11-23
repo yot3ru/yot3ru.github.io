@@ -56,14 +56,12 @@ const year = new Date().getFullYear();
     background: var(--ink);
     color: var(--bone);
     padding: clamp(2.5rem, 6vw, 3.5rem) var(--p) clamp(1.5rem, 4vw, 2rem);
-    border-top: 1px solid rgba(235, 231, 224, 0.12);
   }
 
   @media (min-width: 760px) {
     .site-footer {
       min-height: 76svh;
       padding: clamp(3.5rem, 6vw, 5rem) var(--p) clamp(1.5rem, 3vw, 2.25rem);
-      border-top: 0;
     }
   }
 
@@ -302,19 +300,17 @@ const year = new Date().getFullYear();
       const vh = window.innerHeight || 1;
       const isMobile = window.innerWidth < 760;
       // 0 when footer top hits viewport bottom, 1 when footer fills its presentation range
-      const denom = isMobile ? Math.max(rect.height * 0.85, vh * 0.55) : Math.min(rect.height, vh * 0.76);
+      const denom = isMobile ? Math.max(rect.height * 0.72, 1) : Math.min(rect.height, vh * 0.76);
       const raw = (vh - rect.top) / Math.max(denom, 1);
       const progress = Math.max(0, Math.min(1, raw));
 
-      // Smoothstep easing for a seamless end-of-page transition
-      const t = Math.max(0, Math.min(1, (progress - (isMobile ? 0.3 : 0.25)) / 0.6));
+      // Smoothstep easing all the way to 0 opacity at the end of the page
+      const t = Math.max(0, Math.min(1, (progress - (isMobile ? 0.25 : 0.25)) / 0.55));
       const eased = t * t * (3 - 2 * t);
-      const maxFade = isMobile ? 0.85 : 1;
-      const fade = eased * maxFade;
 
-      reviews.style.opacity = String(1 - fade);
+      reviews.style.opacity = String(1 - eased);
       reviews.style.transform = eased > 0.001 ? `translate3d(0, ${((isMobile ? -20 : -36) * eased).toFixed(2)}px, 0)` : '';
-      reviews.style.pointerEvents = fade > 0.75 ? 'none' : '';
+      reviews.style.pointerEvents = eased > 0.75 ? 'none' : '';
 
       const lift = (1 - progress) * (isMobile ? 12 : 20);
       footerInner.style.transform = lift > 0.1 ? `translate3d(0, ${lift.toFixed(2)}px, 0)` : '';
