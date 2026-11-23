@@ -138,6 +138,12 @@ const initialsOf = (name: string) =>
     overflow: visible;
   }
 
+  @media (max-width: 759px) {
+    .reviews {
+      padding-bottom: clamp(2rem, 6vw, 3rem);
+    }
+  }
+
   .reviews__inner {
     width: 100%;
     max-width: var(--content);

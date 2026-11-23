@@ -430,9 +430,14 @@ h1,h2,h3,p,figure{margin:0}h1,h2,h3{font-family:Funnel,Arial,sans-serif;font-wei
   .capability-panel__copy { grid-template-columns: 1fr; gap: var(--space-1); }
 }
 @media (max-width: 759px) {
-  .capabilities__layout { gap: var(--space-4); }
+  .capabilities__layout { gap: var(--space-3); }
   .capabilities__tabs { border-top: 1px solid rgba(235, 231, 224, 0.16); }
-  .capability-tab { min-height: 54px; }
+  .capability-tab { height: 54px; min-height: 54px; }
+  .capability-panel:not([hidden]) {
+    height: 5.5rem;
+    min-height: 5.5rem;
+    padding: 0.1rem 0.5rem 0.85rem 2.25rem;
+  }
 }
 
 /* Split capability title, following the supplied composition. */
